@@ -183,8 +183,8 @@ namespace Spring.Collections.Generic
         {
             NonGenericTestFixture fixture = SetupNonGeneric();
 
-            Expect.Call(fixture.OmniUnsync.IsSynchronized).Return(false);
-            Expect.Call(fixture.OmniSync.IsSynchronized).Return(true);
+            Expect.Call(((IList)fixture.OmniUnsync).IsSynchronized).Return(false);
+            Expect.Call(((IList)fixture.OmniSync).IsSynchronized).Return(true);
             _mocks.ReplayAll();
 
             Assert.IsFalse((fixture.FromGeneric).IsSynchronized);
@@ -200,8 +200,8 @@ namespace Spring.Collections.Generic
             NonGenericTestFixture fixture = SetupNonGeneric();
             object syncRoot = new object();
 
-            Expect.Call(fixture.OmniUnsync.SyncRoot).Return(null);
-            Expect.Call(fixture.OmniSync.SyncRoot).Return(syncRoot);
+            Expect.Call(((IList)fixture.OmniUnsync).SyncRoot).Return(null);
+            Expect.Call(((IList)fixture.OmniSync).SyncRoot).Return(syncRoot);
             _mocks.ReplayAll();
 
             Assert.IsNull((fixture.FromGeneric).SyncRoot);
@@ -224,8 +224,8 @@ namespace Spring.Collections.Generic
         struct NonGenericTestFixture
         {
             public IList<int> Generic;
-            public IOmniList<int> OmniSync;
-            public IOmniList<int> OmniUnsync;
+            public IList<int> OmniSync;
+            public IList<int> OmniUnsync;
 
             public IList FromGeneric;
 
@@ -238,8 +238,8 @@ namespace Spring.Collections.Generic
         {
             NonGenericTestFixture fixture = new NonGenericTestFixture();
             fixture.Generic = _mocks.CreateMock<IList<int>>();
-            fixture.OmniSync = _mocks.CreateMock<IOmniList<int>>();
-            fixture.OmniUnsync = _mocks.CreateMock<IOmniList<int>>();
+            fixture.OmniSync = _mocks.CreateMultiMock<IList<int>>(typeof(IList));
+            fixture.OmniUnsync = _mocks.CreateMultiMock<IList<int>>(typeof(IList));
 
             fixture.FromGeneric = new TransformingList<int, string>(fixture.Generic, _intToString);
 

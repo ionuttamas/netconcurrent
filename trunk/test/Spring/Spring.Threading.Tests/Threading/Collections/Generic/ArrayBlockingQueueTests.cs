@@ -93,75 +93,75 @@ namespace Spring.Threading.Collections.Generic
                 throw new Exception("The method or operation is not implemented.");
             }
 
-//            public IFuture<T> Submit<T>(IRunnable task, T result)
-//            {
-//                throw new Exception("The method or operation is not implemented.");
-//            }
-//
-//            public IFuture<T> Submit<T>(Task task, T result)
-//            {
-//                throw new Exception("The method or operation is not implemented.");
-//            }
-//
-//            public IFuture<T> Submit<T>(ICallable<T> callable)
-//            {
-//                throw new Exception("The method or operation is not implemented.");
-//            }
-//
-//            public IFuture<T> Submit<T>(Call<T> call)
-//            {
-//                throw new Exception("The method or operation is not implemented.");
-//            }
+            public IFuture<T> Submit<T>(IRunnable task, T result)
+            {
+                throw new Exception("The method or operation is not implemented.");
+            }
+
+            public IFuture<T> Submit<T>(Task task, T result)
+            {
+                throw new Exception("The method or operation is not implemented.");
+            }
+
+            public IFuture<T> Submit<T>(ICallable<T> callable)
+            {
+                throw new Exception("The method or operation is not implemented.");
+            }
+
+            public IFuture<T> Submit<T>(Call<T> call)
+            {
+                throw new Exception("The method or operation is not implemented.");
+            }
 
             public System.Collections.Generic.IList<IFuture> InvokeAll(System.Collections.Generic.ICollection<ICallable> tasks)
             {
                 throw new Exception("The method or operation is not implemented.");
             }
 
-//            public System.Collections.Generic.IList<IFuture<T>> InvokeAll<T>(System.Collections.Generic.ICollection<ICallable<T>> tasks)
-//            {
-//                throw new Exception("The method or operation is not implemented.");
-//            }
-//
-//            public System.Collections.Generic.IList<IFuture<T>> InvokeAll<T>(System.Collections.Generic.ICollection<Call<T>> tasks)
-//            {
-//                throw new Exception("The method or operation is not implemented.");
-//            }
-//
-//            public System.Collections.Generic.IList<IFuture<T>> InvokeAll<T>(System.Collections.Generic.IEnumerable<ICallable<T>> tasks)
-//            {
-//                throw new Exception("The method or operation is not implemented.");
-//            }
-//
-//            public System.Collections.Generic.IList<IFuture<T>> InvokeAll<T>(System.Collections.Generic.IEnumerable<Call<T>> tasks)
-//            {
-//                throw new Exception("The method or operation is not implemented.");
-//            }
+            public System.Collections.Generic.IList<IFuture<T>> InvokeAll<T>(System.Collections.Generic.ICollection<ICallable<T>> tasks)
+            {
+                throw new Exception("The method or operation is not implemented.");
+            }
+
+            public System.Collections.Generic.IList<IFuture<T>> InvokeAll<T>(System.Collections.Generic.ICollection<Call<T>> tasks)
+            {
+                throw new Exception("The method or operation is not implemented.");
+            }
+
+            public System.Collections.Generic.IList<IFuture<T>> InvokeAll<T>(System.Collections.Generic.IEnumerable<ICallable<T>> tasks)
+            {
+                throw new Exception("The method or operation is not implemented.");
+            }
+
+            public System.Collections.Generic.IList<IFuture<T>> InvokeAll<T>(System.Collections.Generic.IEnumerable<Call<T>> tasks)
+            {
+                throw new Exception("The method or operation is not implemented.");
+            }
 
             public System.Collections.Generic.IList<IFuture> InvokeAll(System.Collections.Generic.ICollection<ICallable> tasks, TimeSpan durationToWait)
             {
                 throw new Exception("The method or operation is not implemented.");
             }
 
-//            public System.Collections.Generic.IList<IFuture<T>> InvokeAll<T>(System.Collections.Generic.ICollection<ICallable<T>> tasks, TimeSpan durationToWait)
-//            {
-//                throw new Exception("The method or operation is not implemented.");
-//            }
-//
-//            public System.Collections.Generic.IList<IFuture<T>> InvokeAll<T>(System.Collections.Generic.ICollection<Call<T>> tasks, TimeSpan durationToWait)
-//            {
-//                throw new Exception("The method or operation is not implemented.");
-//            }
-//
-//            public System.Collections.Generic.IList<IFuture<T>> InvokeAll<T>(System.Collections.Generic.IEnumerable<ICallable<T>> tasks, TimeSpan durationToWait)
-//            {
-//                throw new Exception("The method or operation is not implemented.");
-//            }
-//
-//            public System.Collections.Generic.IList<IFuture<T>> InvokeAll<T>(System.Collections.Generic.IEnumerable<Call<T>> tasks, TimeSpan durationToWait)
-//            {
-//                throw new Exception("The method or operation is not implemented.");
-//            }
+            public System.Collections.Generic.IList<IFuture<T>> InvokeAll<T>(System.Collections.Generic.ICollection<ICallable<T>> tasks, TimeSpan durationToWait)
+            {
+                throw new Exception("The method or operation is not implemented.");
+            }
+
+            public System.Collections.Generic.IList<IFuture<T>> InvokeAll<T>(System.Collections.Generic.ICollection<Call<T>> tasks, TimeSpan durationToWait)
+            {
+                throw new Exception("The method or operation is not implemented.");
+            }
+
+            public System.Collections.Generic.IList<IFuture<T>> InvokeAll<T>(System.Collections.Generic.IEnumerable<ICallable<T>> tasks, TimeSpan durationToWait)
+            {
+                throw new Exception("The method or operation is not implemented.");
+            }
+
+            public System.Collections.Generic.IList<IFuture<T>> InvokeAll<T>(System.Collections.Generic.IEnumerable<Call<T>> tasks, TimeSpan durationToWait)
+            {
+                throw new Exception("The method or operation is not implemented.");
+            }
 
             public object InvokeAny(System.Collections.Generic.ICollection<ICallable> tasks)
             {
@@ -457,7 +457,8 @@ namespace Spring.Threading.Collections.Generic
 				try
 				{
 				    object obj;
-					Assert.IsNull(q.Poll(SHORT_DELAY_MS, out obj));
+					Assert.IsFalse(q.Poll(SHORT_DELAY_MS, out obj));
+					Assert.IsNull(obj);
 					q.Poll(LONG_DELAY_MS, out obj);
 					q.Poll(LONG_DELAY_MS, out obj);
 					Assert.Fail("should throw an exception");
@@ -708,8 +709,11 @@ namespace Spring.Threading.Collections.Generic
 		}
 
 
-		[Test]
-		[ExpectedException(typeof (ArgumentNullException))]
+        // In Java, null is used to indicate empty queue for the Poll related methods.
+        // In .NET, out parameter is used in the Poll method and a bool return value
+        // is used to indicate a empty queue. So null can well be a valid element in the
+        // queue.
+        [Test]
 		public void OfferNull()
 		{
 			ArrayBlockingQueue<object> q = new ArrayBlockingQueue<object>(1);
@@ -717,8 +721,11 @@ namespace Spring.Threading.Collections.Generic
 		}
 
 
-		[Test]
-		[ExpectedException(typeof (ArgumentNullException))]
+        // In Java, null is used to indicate empty queue for the Poll related methods.
+        // In .NET, out parameter is used in the Poll method and a bool return value
+        // is used to indicate a empty queue. So null can well be a valid element in the
+        // queue.
+        [Test]
 		public void AddNull()
 		{
 			ArrayBlockingQueue<object> q = new ArrayBlockingQueue<object>(1);
@@ -766,9 +773,11 @@ namespace Spring.Threading.Collections.Generic
 			q.AddAll(q);
 		}
 
-
+        // In Java, null is used to indicate empty queue for the Poll related methods.
+        // In .NET, out parameter is used in the Poll method and a bool return value
+        // is used to indicate a empty queue. So null can well be a valid element in the
+        // queue.
 		[Test]
-		[ExpectedException(typeof (ArgumentNullException))]
 		public void AddCollectionOfNullElements()
 		{
 			ArrayBlockingQueue<object> q = new ArrayBlockingQueue<object>(DEFAULT_COLLECTION_SIZE);
@@ -778,8 +787,11 @@ namespace Spring.Threading.Collections.Generic
 		}
 
 
-		[Test]
-		[ExpectedException(typeof (ArgumentNullException))]
+        // In Java, null is used to indicate empty queue for the Poll related methods.
+        // In .NET, out parameter is used in the Poll method and a bool return value
+        // is used to indicate a empty queue. So null can well be a valid element in the
+        // queue.
+        [Test]
 		public void AddCollectionOfSomeNullElements()
 		{
 			ArrayBlockingQueue<object> q = new ArrayBlockingQueue<object>(DEFAULT_COLLECTION_SIZE);
@@ -791,7 +803,7 @@ namespace Spring.Threading.Collections.Generic
 		}
 
 		[Test]
-		[ExpectedException(typeof (ArgumentException))]
+		[ExpectedException(typeof (InvalidOperationException))]
 		public void AddAll4()
 		{
 			ArrayBlockingQueue<int> q = new ArrayBlockingQueue<int>(1);
@@ -825,8 +837,11 @@ namespace Spring.Threading.Collections.Generic
 		}
 
 
-		[Test]
-		[ExpectedException(typeof (ArgumentNullException))]
+        // In Java, null is used to indicate empty queue for the Poll related methods.
+        // In .NET, out parameter is used in the Poll method and a bool return value
+        // is used to indicate a empty queue. So null can well be a valid element in the
+        // queue.
+        [Test]
 		public void PutNull()
 		{
 			ArrayBlockingQueue<object> q = new ArrayBlockingQueue<object>(DEFAULT_COLLECTION_SIZE);
@@ -980,11 +995,10 @@ namespace Spring.Threading.Collections.Generic
 
 
 		[Test]
-        [Ignore("Some serialization error")]
 		public void TimedPollWithOffer()
 		{
 			ArrayBlockingQueue<object> q = new ArrayBlockingQueue<object>(2);
-			Thread t = new Thread(new ThreadStart(new AnonymousClassRunnable6(q).Run));
+			Thread t = new Thread(new AnonymousClassRunnable6(q).Run);
 			t.Start();
 
 			Thread.Sleep(SMALL_DELAY_MS);
@@ -1134,67 +1148,21 @@ namespace Spring.Threading.Collections.Generic
 			 Assert.AreEqual(three, targetArray[3]);
 		 }
 		[Test]
-        [Ignore("Implement generic CollectionUtils")]
 		public void RemoveAll()
 		{
 			for (int i = 1; i < DEFAULT_COLLECTION_SIZE; ++i)
 			{
 				ArrayBlockingQueue<int> q = populatedQueue(DEFAULT_COLLECTION_SIZE);
 				ArrayBlockingQueue<int> p = populatedQueue(i);
-				CollectionUtils.RemoveAll(q, p);
+				Util.Generic.CollectionUtils.RemoveAll(q, p);
 				Assert.AreEqual(DEFAULT_COLLECTION_SIZE - i, q.Count);
 				for (int j = 0; j < i; ++j)
 				{
-					Int32 I = (Int32) (p.Remove());
+					Int32 I = p.Remove();
 					Assert.IsFalse(q.Contains(I));
 				}
 			}
 		}
-
-
-		[Test]
-        [Ignore("Figure out ToArray impl for new ArrayBlockingQueue")]
-		public void ToArray()
-		{
-//			ArrayBlockingQueue<int> q = populatedQueue(DEFAULT_COLLECTION_SIZE);
-//			Object[] o = q.ToArray();
-//			for (int i = 0; i < o.Length; i++)
-//				Assert.AreEqual(o[i], q.Take());
-		}
-
-
-		[Test]
-        [Ignore("Figure out ToArray impl for new ArrayBlockingQueue")]
-		public void ToArray2()
-		{
-//			ArrayBlockingQueue q = populatedQueue(DEFAULT_COLLECTION_SIZE);
-//			object[] ints = new object[DEFAULT_COLLECTION_SIZE];
-
-//			ints = q.ToArray(ints);
-//			for (int i = 0; i < ints.Length; i++)
-//				Assert.AreEqual(ints[i], q.Take());
-		}
-
-
-		[Test]
-		[ExpectedException(typeof (ArgumentNullException))]
-        [Ignore("Figure out ToArray impl for new ArrayBlockingQueue")]
-		public void ToArray_BadArg()
-		{
-//			ArrayBlockingQueue<int> q = populatedQueue(DEFAULT_COLLECTION_SIZE);
-//			q.ToArray(null);
-		}
-
-
-		[Test]
-		[ExpectedException(typeof (ArrayTypeMismatchException))]
-        [Ignore("Figure out ToArray impl for new ArrayBlockingQueue")]
-		public void ToArray1_BadArg()
-		{
-//			ArrayBlockingQueue<int> q = populatedQueue(DEFAULT_COLLECTION_SIZE);
-//			q.ToArray(new String[10]);
-		}
-
 
 		[Test]
 		public void Iterator()
@@ -1267,7 +1235,7 @@ namespace Spring.Threading.Collections.Generic
 
 
 		[Test]
-		[ExpectedException(typeof (InvalidOperationException))]
+		[ExpectedException(typeof (ArgumentException))]
 		public void DrainToSelf()
 		{
 			ArrayBlockingQueue<int> q = populatedQueue(DEFAULT_COLLECTION_SIZE);
@@ -1325,7 +1293,7 @@ namespace Spring.Threading.Collections.Generic
 
 
 		[Test]
-		[ExpectedException(typeof (InvalidOperationException))]
+		[ExpectedException(typeof (ArgumentException))]
 		public void DrainToSelfN()
 		{
 			ArrayBlockingQueue<int> q = populatedQueue(DEFAULT_COLLECTION_SIZE);

@@ -18,14 +18,10 @@
 
 #endregion
 
-#if NET_2_0
-
 #region Imports
 using System;
 using System.Collections.Generic;
-using System.Threading;
 using Spring.Collections.Generic;
-using Spring.Threading.Locks;
 
 #endregion
 
@@ -121,9 +117,6 @@ namespace Spring.Threading.Collections.Generic
 		}
 
 		#endregion
-
         
 	}
 }
-
-#endif

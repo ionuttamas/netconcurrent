@@ -283,7 +283,6 @@ namespace Spring.Threading.AtomicTypes {
         /// <returns> 
         /// The String representation of the current values of array.
         /// </returns>
-        // TODO: Should be updated to use Spring.Core.StringUtils class.
         public override String ToString() {
             if(_longArray.Length == 0)
                 return "[]";

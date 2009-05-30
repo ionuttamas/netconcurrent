@@ -20,7 +20,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
-using Spring.Threading;
 using Spring.Threading.AtomicTypes;
 using Spring.Threading.Collections;
 using Spring.Threading.Future;
@@ -114,7 +113,7 @@ namespace Spring.Threading.Execution
 		/// <returns> the newly created single-threaded <see cref="Spring.Threading.IExecutor"/> </returns>
 		public static IExecutorService NewSingleThreadExecutor()
 		{
-			return new DelegatedExecutorService(new ThreadPoolExecutor(1, 1, new TimeSpan(0), new LinkedBlockingQueue<IRunnable>()));
+			return new FinalizableDelegatedExecutorService(new ThreadPoolExecutor(1, 1, new TimeSpan(0), new LinkedBlockingQueue<IRunnable>()));
 		}
 
 		/// <summary> 
@@ -131,7 +130,7 @@ namespace Spring.Threading.Execution
 		/// <returns> the newly created single-threaded <see cref="Spring.Threading.IExecutor"/></returns>
 		public static IExecutorService NewSingleThreadExecutor(IThreadFactory threadFactory)
 		{
-			return new DelegatedExecutorService(new ThreadPoolExecutor(1, 1, new TimeSpan(0), new LinkedBlockingQueue<IRunnable>(), threadFactory));
+			return new FinalizableDelegatedExecutorService(new ThreadPoolExecutor(1, 1, new TimeSpan(0), new LinkedBlockingQueue<IRunnable>(), threadFactory));
 		}
 
 		/// <summary> 
@@ -358,7 +357,6 @@ namespace Spring.Threading.Execution
             return CreateCallable(task, null);
         }
 
-#if NET_2_0
         /// <summary> 
         /// Returns a <see cref="ICallable{T}"/>  object that, when called, 
         /// runs the given <paramref name="task"/> and returns the given 
@@ -512,7 +510,6 @@ namespace Spring.Threading.Execution
             if (callable == null) throw new ArgumentNullException("callable");
             return callable.Call;
         }
-#endif
 
         /// <summary>
         /// Converts a <see cref="Task"/> delegate to an
@@ -574,7 +571,6 @@ namespace Spring.Threading.Execution
             #endregion
         }
 
-#if NET_2_0
         internal sealed class CallableAdapter<T> : ICallable<T>
         {
             internal Call<T> call;
@@ -604,7 +600,6 @@ namespace Spring.Threading.Execution
                 return Call();
             }
         }
-#endif
 
         internal class DefaultThreadFactory : IThreadFactory
 		{
@@ -619,7 +614,7 @@ namespace Spring.Threading.Execution
 
 			public virtual Thread NewThread(IRunnable r)
 			{
-				Thread t = new Thread(new ThreadStart(r.Run));
+				Thread t = new Thread(r.Run);
                 t.Name = namePrefix + threadNumber.IncrementValueAndReturn();
 				if (t.IsBackground)
 					t.IsBackground = false;
@@ -633,7 +628,7 @@ namespace Spring.Threading.Execution
 
 		internal class DelegatedExecutorService : AbstractExecutorService
 		{
-			private IExecutorService _executorService;
+			private readonly IExecutorService _executorService;
 
 			public override bool IsShutdown
 			{
@@ -687,33 +682,47 @@ namespace Spring.Threading.Execution
 				return _executorService.Submit(task, result);
 			}
 
-			public override IList InvokeAll(ICollection tasks)
+			public override IList<IFuture> InvokeAll(ICollection<ICallable> tasks)
 			{
 				return _executorService.InvokeAll(tasks);
 			}
 
-			public override IList InvokeAll(ICollection tasks, TimeSpan duration)
+			public override IList<IFuture> InvokeAll(ICollection<ICallable> tasks, TimeSpan duration)
 			{
 				return _executorService.InvokeAll(tasks, duration);
 			}
 
-			public override Object InvokeAny(ICollection tasks)
+			public override Object InvokeAny(ICollection<ICallable> tasks)
 			{
 				return _executorService.InvokeAny(tasks);
 			}
 
-			public override Object InvokeAny(ICollection tasks, TimeSpan duration)
+			public override Object InvokeAny(ICollection<ICallable> tasks, TimeSpan duration)
 			{
 				return _executorService.InvokeAny(tasks, duration);
 			}
 		}
 
-		/// <summary> A wrapper class that exposes only the <see cref="Spring.Threading.Execution.IExecutorService"/> and
+
+        internal class FinalizableDelegatedExecutorService : DelegatedExecutorService
+        {
+            internal FinalizableDelegatedExecutorService(IExecutorService executor)
+                : base(executor)
+            {
+            }
+
+            ~FinalizableDelegatedExecutorService()
+            {
+                base.Shutdown();
+            }
+        }
+
+       /// <summary> A wrapper class that exposes only the <see cref="Spring.Threading.Execution.IExecutorService"/> and
 		/// <see cref="Spring.Threading.Execution.IScheduledExecutorService"/> methods of a <see cref="Spring.Threading.Execution.IScheduledExecutorService"/> implementation.
 		/// </summary>
 		internal class DelegatedScheduledExecutorService : DelegatedExecutorService, IScheduledExecutorService
 		{
-			private IScheduledExecutorService e;
+			private readonly IScheduledExecutorService e;
 
 			internal DelegatedScheduledExecutorService(IScheduledExecutorService executor) : base(executor)
 			{

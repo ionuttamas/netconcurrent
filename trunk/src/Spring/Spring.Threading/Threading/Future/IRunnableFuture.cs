@@ -34,24 +34,22 @@ namespace Spring.Threading.Future
 	public interface IRunnableFuture : IRunnable, IFuture
 	{
 	}
-//
-//#if NET_2_0
-//    /// <summary> 
-//    /// A <see cref="IFuture{T}"/> that is a <see cref="IRunnable"/>. Successful execution of
-//    /// the <see cref="IRunnable.Run()"/> method causes completion of the 
-//    /// <see cref="IFuture{T}"/> and allows access to its results.
-//    /// </summary>
-//    /// <remarks>
-//    /// Sets this <see cref="IFuture{T}"/> to the result of its computation
-//    /// unless it has been cancelled.
-//    /// </remarks>
-//    /// <seealso cref="FutureTask{T}"/>
-//    /// <seealso cref="IExecutor"/>
-//    /// <author>Doug Lea</author>
-//    /// <author>Griffin Caprio (.NET)</author>
-//    /// <author>Kenneth Xu</author>
-//    public interface IRunnableFuture<T> : IRunnableFuture, IFuture
-//    {
-//    }
-//#endif
+
+    /// <summary> 
+    /// A <see cref="IFuture{T}"/> that is a <see cref="IRunnable"/>. Successful execution of
+    /// the <see cref="IRunnable.Run()"/> method causes completion of the 
+    /// <see cref="IFuture{T}"/> and allows access to its results.
+    /// </summary>
+    /// <remarks>
+    /// Sets this <see cref="IFuture{T}"/> to the result of its computation
+    /// unless it has been cancelled.
+    /// </remarks>
+    /// <seealso cref="FutureTask{T}"/>
+    /// <seealso cref="IExecutor"/>
+    /// <author>Doug Lea</author>
+    /// <author>Griffin Caprio (.NET)</author>
+    /// <author>Kenneth Xu</author>
+    public interface IRunnableFuture<T> : IRunnableFuture, IFuture<T>
+    {
+    }
 }

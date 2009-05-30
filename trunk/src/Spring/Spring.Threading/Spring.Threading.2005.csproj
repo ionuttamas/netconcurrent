@@ -39,8 +39,7 @@
     <DebugSymbols>true</DebugSymbols>
     <FileAlignment>4096</FileAlignment>
     <NoStdLib>false</NoStdLib>
-    <NoWarn>
-    </NoWarn>
+    <NoWarn>1591</NoWarn>
     <Optimize>false</Optimize>
     <RegisterForComInterop>false</RegisterForComInterop>
     <RemoveIntegerChecks>false</RemoveIntegerChecks>
@@ -67,7 +66,7 @@
     <Optimize>true</Optimize>
     <RegisterForComInterop>false</RegisterForComInterop>
     <RemoveIntegerChecks>false</RemoveIntegerChecks>
-    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <WarningLevel>4</WarningLevel>
     <DebugType>none</DebugType>
     <ErrorReport>prompt</ErrorReport>
@@ -80,23 +79,29 @@
     <Reference Include="System">
       <Name>System</Name>
     </Reference>
+    <Reference Include="System.XML" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Collections\INavigableDictionary.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Collections\INavigableSet.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Collections\ISortedDictionary.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Collections\ISortedSet.cs">
-      <SubType>Code</SubType>
-    </Compile>
+    <Compile Include="Collections\Generic\AbstractCollection.cs" />
+    <Compile Include="Collections\Generic\AbstractEnumerator.cs" />
+    <Compile Include="Collections\Generic\AbstractList.cs" />
+    <Compile Include="Collections\Generic\AbstractTransformingList.cs" />
+    <Compile Include="Collections\Generic\DictionarySet.cs" />
+    <Compile Include="Collections\Generic\HashedSet.cs" />
+    <Compile Include="Collections\Generic\INavigableDictionary.cs" />
+    <Compile Include="Collections\Generic\INavigableSet.cs" />
+    <Compile Include="Collections\Generic\ISet.cs" />
+    <Compile Include="Collections\Generic\ISortedDictionary.cs" />
+    <Compile Include="Collections\Generic\ISortedSet.cs" />
+    <Compile Include="Collections\Generic\PriorityQueue.cs" />
+    <Compile Include="Collections\Generic\Set.cs" />
+    <Compile Include="Collections\Generic\SortedSet.cs" />
+    <Compile Include="Collections\Generic\TransformingEnumerator.cs" />
+    <Compile Include="Collections\Generic\DownCastList.cs" />
+    <Compile Include="Collections\Generic\TransformingList.cs" />
     <Compile Include="CommonAssemblyInfo.cs" />
     <Compile Include="Threading\AtomicTypes\AtomicBoolean.cs">
       <SubType>Code</SubType>
@@ -137,30 +142,25 @@
     <Compile Include="Threading\BrokenBarrierException.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Threading\Call.cs" />
     <Compile Include="Threading\ClockDaemon.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Threading\Collections\ArrayBlockingQueue.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Threading\Collections\CopyOnWriteArrayList.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Threading\Collections\DelayQueue.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Threading\Collections\IBlockingQueue.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Threading\Collections\IConcurrentDictionary.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Threading\Collections\IConcurrentNavigableDictionary.cs">
-      <SubType>Code</SubType>
-    </Compile>
+    <Compile Include="Collections\Generic\AbstractQueue.cs" />
+    <Compile Include="Threading\Collections\Generic\AbstractBlockingQueue.cs" />
+    <Compile Include="Threading\Collections\Generic\ArrayBlockingQueue.cs" />
+    <Compile Include="Threading\Collections\Generic\BlockingQueueWrapper.cs" />
+    <Compile Include="Collections\Generic\ArrayQueue.cs" />
+    <Compile Include="Threading\Collections\Generic\CopyOnWriteArrayList.cs" />
+    <Compile Include="Threading\Collections\Generic\DelayQueue.cs" />
+    <Compile Include="Threading\Collections\Generic\IBlockingQueue.cs" />
+    <Compile Include="Collections\Generic\IQueue.cs" />
+    <Compile Include="Threading\Collections\Generic\IConcurrentDictionary.cs" />
+    <Compile Include="Threading\Collections\Generic\IConcurrentNavigableDictionary.cs" />
     <Compile Include="Threading\Collections\LinkedBlockingQueue.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Threading\Collections\PriorityBlockingQueue.cs" />
     <Compile Include="Threading\Collections\SynchronousQueue.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -188,13 +188,11 @@
     <Compile Include="Threading\Execution\ExecutionPolicy\AbortPolicy.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Threading\Execution\ExecutionPolicy\CallerRunsPolicy.cs" />
     <Compile Include="Threading\Execution\ExecutionPolicy\DiscardOldestPolicy.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Threading\Execution\ExecutionPolicy\DiscardPolicy.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Threading\Execution\ExecutionPolicy\RunPriorToExecutorShutdown.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Threading\Execution\ExecutorCompletionService.cs">
@@ -395,6 +393,7 @@
     <Compile Include="Threading\SynchronousChannel.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Threading\Task.cs" />
     <Compile Include="Threading\ThreadedExecutor.cs">
       <SubType>Code</SubType>
     </Compile>

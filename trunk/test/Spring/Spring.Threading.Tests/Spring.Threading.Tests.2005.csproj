@@ -82,6 +82,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\lib\Net\2.0\nunit.framework.dll</HintPath>
     </Reference>
+    <Reference Include="Rhino.Mocks, Version=3.5.0.1337, Culture=neutral, PublicKeyToken=0b3305902db7183f, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\lib\net\2.0\Rhino.Mocks.dll</HintPath>
+    </Reference>
     <Reference Include="Spring.Core, Version=1.1.2.20125, Culture=neutral, PublicKeyToken=65e474d141e25e07, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\lib\net\2.0\Spring.Core.dll</HintPath>
@@ -91,6 +95,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BaseMockTestCase.cs" />
     <Compile Include="BaseThreadingTestCase.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -130,15 +135,13 @@
     <Compile Include="Threading\AtomicTypes\AtomicStampedReferenceTests.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Threading\Collections\ArrayBlockingQueueTests.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Threading\Collections\CopyOnWriteArrayListTests.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Threading\Collections\DelayQueueTests.cs">
-      <SubType>Code</SubType>
-    </Compile>
+    <Compile Include="Threading\Collections\Generic\ArrayBlockingQueueTests.cs" />
+    <Compile Include="Threading\Collections\Generic\CopyOnWriteArrayListTests.cs" />
+    <Compile Include="Threading\Collections\Generic\DelayQueueTests.cs" />
+    <Compile Include="Threading\Collections\LinkedBlockingQueueTest.cs" />
+    <Compile Include="Threading\Collections\PriorityBlockingQueueTest.cs" />
+    <Compile Include="Threading\Collections\SynchronousQueueTest.cs" />
+    <Compile Include="Threading\CyclicBarrierTests.cs" />
     <Compile Include="Threading\Execution\AbstractExecutorServiceTests.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -148,12 +151,11 @@
     <Compile Include="Threading\Execution\ExecutionPolicy\AbortPolicyTests.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Threading\Execution\ExecutionPolicy\RunPriorToExecutorShutdownTests.cs">
-      <SubType>Code</SubType>
-    </Compile>
+    <Compile Include="Threading\Execution\ExecutionPolicy\CallerRunsPolicyTests.cs" />
     <Compile Include="Threading\Execution\RejectedExecutionExceptionTests.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Threading\Execution\ThreadPoolExecutorTests.cs" />
     <Compile Include="Threading\ForkJoin\FJTaskRunnerTest.cs">
       <SubType>Code</SubType>
     </Compile>

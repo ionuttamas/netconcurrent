@@ -27,7 +27,13 @@ namespace Spring.Threading.Locks
 		{
 			get { return ReentrantReadWriteLock.WriterLockedByCurrentThread; }
 		}
-		#endregion
+
+	    public int HoldCount
+	    {
+            get { return ReentrantReadWriteLock.WriteHoldCount; }
+	    }
+
+	    #endregion
 
 		#region Abstract Implementation Methods
 		/// <summary> 
@@ -124,12 +130,21 @@ namespace Spring.Threading.Locks
 		/// <exception cref="System.Threading.SynchronizationLockException">if the current thread is not the holder of this lock.</exception>
 		public override void Unlock()
 		{
-			if (! HeldByCurrentThread)
-			{
-				throw new SynchronizationLockException("Current thread does not hold this lock.");
-			}
-			ISignaller s = ReentrantReadWriteLock.EndWrite();
-			s.SignalWaiters();
+		    if (! HeldByCurrentThread)
+		    {
+		        throw new SynchronizationLockException("Current thread does not hold this lock.");
+		    }
+		    switch (ReentrantReadWriteLock.EndWrite())
+		    {
+		        case ReentrantReadWriteLock.Signaller.READER:
+		            ReentrantReadWriteLock.SignallerReaderLock.SignalWaiters();
+		            break;
+		        case ReentrantReadWriteLock.Signaller.WRITER:
+		            ReentrantReadWriteLock.SignallerWriterLock.SignalWaiters();
+		            break;
+		        default:
+		            break;
+		    }
 		}
 
 		/// <summary> 
