@@ -422,7 +422,12 @@
     <Compile Include="Collections\Generic\SortedSet.cs" />
     <Compile Include="Threading\Collections\Generic\AbstractBlockingQueue.cs" />
     <Compile Include="Threading\Collections\PriorityBlockingQueue.cs" />
+    <Compile Include="Threading\ContextCarrier.cs" />
+    <Compile Include="Threading\ContextCopyingRunable.cs" />
+    <Compile Include="Threading\Execution\ContextCopyingThreadPoolExecutor.cs" />
     <Compile Include="Threading\Execution\ExecutionPolicy\CallerRunsPolicy.cs" />
+    <Compile Include="Threading\Future\ContextCopyingFutureTask.cs" />
+    <Compile Include="Threading\IContextCopier.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

@@ -33,24 +33,6 @@ namespace Spring.Threading.AtomicTypes {
 	[TestFixture]
 	public class AtomicBooleanTest : BaseThreadingTestCase
 	{
-		private class AnonymousClassRunnable
-		{
-			private readonly AtomicBoolean _atomicBoolean;
-
-			public AnonymousClassRunnable( AtomicBoolean ai )
-			{
-				_atomicBoolean = ai;
-			}
-
-			public void Run()
-			{
-				while ( !_atomicBoolean.CompareAndSet( false, true ) )
-				{
-					Thread.Sleep( SHORT_DELAY_MS );
-				}
-			}
-		}
-
 		[Test]
 		public void Constructor()
 		{
@@ -106,7 +88,12 @@ namespace Spring.Threading.AtomicTypes {
 		public void CompareExpectedValueAndSetNewValueInMultipleThreads()
 		{
 			AtomicBoolean ai = new AtomicBoolean( true );
-            Thread t = new Thread(new AnonymousClassRunnable(ai).Run);
+            Thread t = new Thread(new ThreadStart(delegate 
+                    {
+                        while (!ai.CompareAndSet(false, true))
+                            Thread.Sleep(SHORT_DELAY_MS);
+                    }
+                ));
 
 			t.Start();
 			Assert.IsTrue( ai.CompareAndSet( true, false ), "Value" );

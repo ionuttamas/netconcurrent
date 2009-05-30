@@ -95,10 +95,22 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BaseAbstractCollectionTest.cs" />
     <Compile Include="BaseMockTestCase.cs" />
     <Compile Include="BaseThreadingTestCase.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Collections\Generic\AbstractCollectionTest.cs" />
+    <Compile Include="Collections\Generic\AbstractEnumeratorTest.cs" />
+    <Compile Include="Collections\Generic\AbstractListTest.cs" />
+    <Compile Include="Collections\Generic\CollectionTestUtils.cs" />
+    <Compile Include="Collections\Generic\EnumeratorFunctionTestBase.cs" />
+    <Compile Include="Collections\Generic\IOmniCollection.cs" />
+    <Compile Include="Collections\Generic\IOmniList.cs" />
+    <Compile Include="Collections\Generic\PriorityQueueTests.cs" />
+    <Compile Include="Collections\Generic\TestEnumerator.cs" />
+    <Compile Include="Collections\Generic\TransformingEnumeratorTest.cs" />
+    <Compile Include="Collections\Generic\TransformingListTest.cs" />
     <Compile Include="CoreExceptionTests.cs">
       <SubType>Code</SubType>
     </Compile>
