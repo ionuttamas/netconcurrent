@@ -18,7 +18,6 @@
 
 #endregion
 
-#if NET_2_0
 #region Imports
 using System;
 using System.Collections.Generic;
@@ -161,9 +160,7 @@ namespace Spring.Collections.Generic
             get
             {
                 int count = 0;
-#pragma warning disable 168
                 foreach (T item in this) count++;
-#pragma warning restore 168
                 return count;
             }
         }
@@ -405,4 +402,3 @@ namespace Spring.Collections.Generic
 
     }
 }
-#endif

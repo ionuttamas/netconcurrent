@@ -27,6 +27,8 @@ namespace Spring.Threading.Future
 	/// </summary>
 	public enum TaskState
 	{
+		/// <summary>State value representing that task is ready to run </summary>
+        READY = 0,
 		/// <summary>State value representing that task is running </summary>
 		RUNNING = 1,
 		/// <summary>State value representing that task ran </summary>
@@ -252,11 +254,11 @@ namespace Spring.Threading.Future
 		/// <summary>
 		/// The entry point
 		/// </summary>
-		public void Run()
+		public virtual void Run()
 		{
 			lock (this)
 			{
-				if (_taskState != 0)
+				if (_taskState != TaskState.READY)
 					return;
 				_taskState = TaskState.RUNNING;
 				_runningThread = Thread.CurrentThread;
@@ -436,7 +438,7 @@ namespace Spring.Threading.Future
 		{
 			lock (this)
 			{
-				if (_taskState != 0)
+				if (_taskState != TaskState.READY)
 					return false;
 				_taskState = TaskState.RUNNING;
 				_runningThread = Thread.CurrentThread;
@@ -449,7 +451,7 @@ namespace Spring.Threading.Future
 					_runningThread = null;
 					if (_taskState == TaskState.RUNNING)
 					{
-						_taskState = 0;
+						_taskState = TaskState.READY;
 						return true;
 					}
 					else
@@ -471,188 +473,186 @@ namespace Spring.Threading.Future
 		}
 		#endregion
 	}
-//
-//#if NET_2_0
-//	/// <summary> 
-//	/// A cancellable asynchronous computation.  
-//	/// </summary>	
-//	/// <remarks> 
-//	/// <para>
-//	/// This class provides a base implementation of 
-//	/// <see cref="IFuture{T}"/> , with methods to start and cancel
-//	/// a computation, query to see if the computation is complete, and
-//	/// retrieve the result of the computation.  The result can only be
-//	/// retrieved when the computation has completed; the <see cref="GetResult()"/>
-//	/// method will block if the computation has not yet completed.  Once
-//	/// the computation has completed, the computation cannot be restarted
-//	/// or cancelled.
-//	/// </para>
-//	/// <para>
-//	/// A <see cref="FutureTask{T}"/> can be used to wrap a <see cref="Task"/>
-//	/// delegate, <see cref="Call{T}"/> delegate, <see cref="IRunnable"/> object 
-//	/// or <see cref="ICallable{T}"/> object.  Because <see cref="FutureTask{T}"/>
-//	/// implements <see cref="IRunnable"/>, a <see cref="FutureTask{T}"/> can be
-//	/// submitted to an <see cref="IExecutor"/> for execution.
-//	/// </para>
-//	/// <para>
-//	/// In addition to serving as a standalone class, this class provides
-//	/// protected functionality that may be useful when creating
-//	/// customized task classes.
-//	/// </para>
-//	/// </remarks>
-//    /// <typeparam name="T">The of the result to return upon completion.</typeparam>
-//    /// <author>Doug Lea</author>
-//    /// <author>Griffin Caprio (.NET)</author>
-//    /// <author>Kenneth Xu</author>
-//    // TODO: 
-//    // this is a lazy implementation that is not great for performance.
-//    // I did try to implemnet something support both 1.x and 2.0 to have good
-//    // performance without duplicating the code, but the readability was a mess!
-//    // This implementation is cleanest until we can get rid of 1.x support.
-//    // BTW, who is still using 1.x today?
-//    public class FutureTask<T> : FutureTask, IRunnableFuture<T>
-//    {
-//        /// <summary> 
-//        /// Creates a <see cref="FutureTask{T}"/> that will, upon running, execute the
-//        /// given <see cref="ICallable{T}"/>.
-//        /// </summary>
-//        /// <param name="callable">The callable task.</param>
-//        /// <exception cref="System.ArgumentNullException">
-//        /// If the <paramref name="callable"/> is <c>null</c>.
-//        /// </exception>
-//        public FutureTask(ICallable<T> callable)
-//            : base(callable)
-//        {
-//        }
-//
-//        /// <summary> 
-//        /// Creates a <see cref="FutureTask{T}"/> that will, upon running, execute the
-//        /// given <see cref="Call{T}"/> delegate.
-//        /// </summary>
-//        /// <param name="call">The <see cref="Call{T}"/> delegate.</param>
-//        /// <exception cref="System.ArgumentNullException">
-//        /// If the <paramref name="call"/> is <c>null</c>.
-//        /// </exception>
-//        public FutureTask(Call<T> call)
-//            : this(Executors.CreateCallable(call))
-//        {
-//        }
-//
-//        /// <summary> 
-//        /// Creates a <see cref="FutureTask{T}"/> that will, upon running, execute the
-//        /// given <see cref="IRunnable"/>, and arrange that <see cref="GetResult()"/> 
-//        /// will return the given <paramref name="result"/> upon successful completion.
-//        /// </summary>
-//        /// <param name="task">The runnable task.</param>
-//        /// <param name="result">
-//        /// The result to return on successful completion. If
-//        /// you don't need a particular result, consider using
-//        /// constructions of the form:
-//        /// <code language="c#">
-//        ///		Future f = new FutureTask(runnable, default(T))
-//        ///	</code>	
-//        /// </param>
-//        /// <exception cref="System.ArgumentNullException">
-//        /// If the <paramref name="task"/> is <c>null</c>.
-//        /// </exception>
-//        public FutureTask(IRunnable task, T result)
-//            : this(Executors.CreateCallable(task, result))
-//        {
-//        }
-//
-//        /// <summary> 
-//        /// Creates a <see cref="FutureTask{T}"/> that will, upon running, execute the
-//        /// given <see cref="Task"/>, and arrange that <see cref="GetResult()"/> 
-//        /// will return the given <paramref name="result"/> upon successful completion.
-//        /// </summary>
-//        /// <param name="task">The <see cref="Task"/> delegate.</param>
-//        /// <param name="result">
-//        /// The result to return on successful completion. If
-//        /// you don't need a particular result, consider using
-//        /// constructions of the form:
-//        /// <code language="c#">
-//        ///		Future f = new FutureTask(task, default(T))
-//        ///	</code>	
-//        /// </param>
-//        /// <exception cref="System.ArgumentNullException">
-//        /// If the <paramref name="task"/> is <c>null</c>.
-//        /// </exception>
-//        public FutureTask(Task task, T result)
-//            : this(Executors.CreateCallable(task, result))
-//        {
-//        }
-//
-//        #region IFuture<T> Members
-//
-//	    /// <summary>
-//	    /// Waits for computation to complete, then returns its result. 
-//	    /// </summary>
-//	    /// <remarks> 
-//	    /// Waits if necessary for the computation to complete, and then
-//	    /// retrieves its result.
-//	    /// </remarks>
-//	    /// <returns>The computed result</returns>
-//	    /// <exception cref="Spring.Threading.Execution.CancellationException">if the computation was cancelled.</exception>
-//	    /// <exception cref="Spring.Threading.Execution.ExecutionException">if the computation threw an exception.</exception>
-//	    /// <exception cref="System.Threading.ThreadInterruptedException">if the current thread was interrupted while waiting.</exception>
-//	    public new virtual T GetResult()
-//        {
-//            return (T) base.GetResult();
-//        }
-//
-//	    /// <summary>
-//	    /// Waits for the given time span, then returns its result.
-//	    /// </summary>
-//	    /// <remarks> 
-//	    /// Waits, if necessary, for at most the <paramref name="durationToWait"/> for the computation
-//	    /// to complete, and then retrieves its result, if available.
-//	    /// </remarks>
-//	    /// <param name="durationToWait">the <see cref="System.TimeSpan"/> to wait.</param>
-//	    /// <returns>the computed result</returns>
-//	    /// <exception cref="Spring.Threading.Execution.CancellationException">if the computation was cancelled.</exception>
-//	    /// <exception cref="Spring.Threading.Execution.ExecutionException">if the computation threw an exception.</exception>
-//	    /// <exception cref="System.Threading.ThreadInterruptedException">if the current thread was interrupted while waiting.</exception>
-//	    /// <exception cref="Spring.Threading.TimeoutException">if the computation threw an exception.</exception>
-//	    public virtual new T GetResult(TimeSpan durationToWait)
-//        {
-//            return (T) base.GetResult(durationToWait);
-//        }
-//
-//        #endregion
-//
-//        #region Protected Methods
-//
-//	    /// <summary> 
-//	    /// Sets the result of this <see cref="Spring.Threading.Future.IFuture"/> to the given <paramref name="result"/> value unless
-//	    /// this future has already been set or has been cancelled.
-//	    /// </summary>
-//	    /// <remarks>
-//	    /// This implementation calls <see cref="setResult(T)"/>
-//	    /// </remarks>
-//	    /// <param name="result">the value</param>
-//	    protected sealed override void setResult(object result)
-//        {
-//            setResult((T)result);
-//        }
-//
-//        /// <summary> 
-//        /// Sets the result of this <see cref="IFuture{T}"/> to the given 
-//        /// <paramref name="result"/> value unless
-//        /// this future has already been set or has been cancelled.
-//        /// </summary>
-//        /// <remarks>
-//        /// This method is invoked upon successful completion of the 
-//        /// computation.
-//        /// </remarks>
-//        /// <param name="result">
-//        /// The value to be retured by <see cref="GetResult()"/>.
-//        /// </param>
-//        protected virtual void setResult(T result)
-//		{
-//            base.setResult(result);
-//		}
-//
-//        #endregion
-//    }
-//#endif
+
+	/// <summary> 
+	/// A cancellable asynchronous computation.  
+	/// </summary>	
+	/// <remarks> 
+	/// <para>
+	/// This class provides a base implementation of 
+	/// <see cref="IFuture{T}"/> , with methods to start and cancel
+	/// a computation, query to see if the computation is complete, and
+	/// retrieve the result of the computation.  The result can only be
+	/// retrieved when the computation has completed; the <see cref="GetResult()"/>
+	/// method will block if the computation has not yet completed.  Once
+	/// the computation has completed, the computation cannot be restarted
+	/// or cancelled.
+	/// </para>
+	/// <para>
+	/// A <see cref="FutureTask{T}"/> can be used to wrap a <see cref="Task"/>
+	/// delegate, <see cref="Call{T}"/> delegate, <see cref="IRunnable"/> object 
+	/// or <see cref="ICallable{T}"/> object.  Because <see cref="FutureTask{T}"/>
+	/// implements <see cref="IRunnable"/>, a <see cref="FutureTask{T}"/> can be
+	/// submitted to an <see cref="IExecutor"/> for execution.
+	/// </para>
+	/// <para>
+	/// In addition to serving as a standalone class, this class provides
+	/// protected functionality that may be useful when creating
+	/// customized task classes.
+	/// </para>
+	/// </remarks>
+    /// <typeparam name="T">The of the result to return upon completion.</typeparam>
+    /// <author>Doug Lea</author>
+    /// <author>Griffin Caprio (.NET)</author>
+    /// <author>Kenneth Xu</author>
+    // TODO: 
+    // this is a lazy implementation that is not great for performance.
+    // I did try to implemnet something support both 1.x and 2.0 to have good
+    // performance without duplicating the code, but the readability was a mess!
+    // This implementation is cleanest until we can get rid of 1.x support.
+    // BTW, who is still using 1.x today?
+    public class FutureTask<T> : FutureTask, IRunnableFuture<T>
+    {
+        /// <summary> 
+        /// Creates a <see cref="FutureTask{T}"/> that will, upon running, execute the
+        /// given <see cref="ICallable{T}"/>.
+        /// </summary>
+        /// <param name="callable">The callable task.</param>
+        /// <exception cref="System.ArgumentNullException">
+        /// If the <paramref name="callable"/> is <c>null</c>.
+        /// </exception>
+        public FutureTask(ICallable<T> callable)
+            : base(callable)
+        {
+        }
+
+        /// <summary> 
+        /// Creates a <see cref="FutureTask{T}"/> that will, upon running, execute the
+        /// given <see cref="Call{T}"/> delegate.
+        /// </summary>
+        /// <param name="call">The <see cref="Call{T}"/> delegate.</param>
+        /// <exception cref="System.ArgumentNullException">
+        /// If the <paramref name="call"/> is <c>null</c>.
+        /// </exception>
+        public FutureTask(Call<T> call)
+            : this(Executors.CreateCallable(call))
+        {
+        }
+
+        /// <summary> 
+        /// Creates a <see cref="FutureTask{T}"/> that will, upon running, execute the
+        /// given <see cref="IRunnable"/>, and arrange that <see cref="GetResult()"/> 
+        /// will return the given <paramref name="result"/> upon successful completion.
+        /// </summary>
+        /// <param name="task">The runnable task.</param>
+        /// <param name="result">
+        /// The result to return on successful completion. If
+        /// you don't need a particular result, consider using
+        /// constructions of the form:
+        /// <code language="c#">
+        ///		Future f = new FutureTask(runnable, default(T))
+        ///	</code>	
+        /// </param>
+        /// <exception cref="System.ArgumentNullException">
+        /// If the <paramref name="task"/> is <c>null</c>.
+        /// </exception>
+        public FutureTask(IRunnable task, T result)
+            : this(Executors.CreateCallable(task, result))
+        {
+        }
+
+        /// <summary> 
+        /// Creates a <see cref="FutureTask{T}"/> that will, upon running, execute the
+        /// given <see cref="Task"/>, and arrange that <see cref="GetResult()"/> 
+        /// will return the given <paramref name="result"/> upon successful completion.
+        /// </summary>
+        /// <param name="task">The <see cref="Task"/> delegate.</param>
+        /// <param name="result">
+        /// The result to return on successful completion. If
+        /// you don't need a particular result, consider using
+        /// constructions of the form:
+        /// <code language="c#">
+        ///		Future f = new FutureTask(task, default(T))
+        ///	</code>	
+        /// </param>
+        /// <exception cref="System.ArgumentNullException">
+        /// If the <paramref name="task"/> is <c>null</c>.
+        /// </exception>
+        public FutureTask(Task task, T result)
+            : this(Executors.CreateCallable(task, result))
+        {
+        }
+
+        #region IFuture<T> Members
+
+	    /// <summary>
+	    /// Waits for computation to complete, then returns its result. 
+	    /// </summary>
+	    /// <remarks> 
+	    /// Waits if necessary for the computation to complete, and then
+	    /// retrieves its result.
+	    /// </remarks>
+	    /// <returns>The computed result</returns>
+	    /// <exception cref="Spring.Threading.Execution.CancellationException">if the computation was cancelled.</exception>
+	    /// <exception cref="Spring.Threading.Execution.ExecutionException">if the computation threw an exception.</exception>
+	    /// <exception cref="System.Threading.ThreadInterruptedException">if the current thread was interrupted while waiting.</exception>
+	    public new virtual T GetResult()
+        {
+            return (T) base.GetResult();
+        }
+
+	    /// <summary>
+	    /// Waits for the given time span, then returns its result.
+	    /// </summary>
+	    /// <remarks> 
+	    /// Waits, if necessary, for at most the <paramref name="durationToWait"/> for the computation
+	    /// to complete, and then retrieves its result, if available.
+	    /// </remarks>
+	    /// <param name="durationToWait">the <see cref="System.TimeSpan"/> to wait.</param>
+	    /// <returns>the computed result</returns>
+	    /// <exception cref="Spring.Threading.Execution.CancellationException">if the computation was cancelled.</exception>
+	    /// <exception cref="Spring.Threading.Execution.ExecutionException">if the computation threw an exception.</exception>
+	    /// <exception cref="System.Threading.ThreadInterruptedException">if the current thread was interrupted while waiting.</exception>
+	    /// <exception cref="Spring.Threading.TimeoutException">if the computation threw an exception.</exception>
+	    public virtual new T GetResult(TimeSpan durationToWait)
+        {
+            return (T) base.GetResult(durationToWait);
+        }
+
+        #endregion
+
+        #region Protected Methods
+
+	    /// <summary> 
+	    /// Sets the result of this <see cref="Spring.Threading.Future.IFuture"/> to the given <paramref name="result"/> value unless
+	    /// this future has already been set or has been cancelled.
+	    /// </summary>
+	    /// <remarks>
+	    /// This implementation calls <see cref="setResult(T)"/>
+	    /// </remarks>
+	    /// <param name="result">the value</param>
+	    protected sealed override void setResult(object result)
+        {
+            setResult((T)result);
+        }
+
+        /// <summary> 
+        /// Sets the result of this <see cref="IFuture{T}"/> to the given 
+        /// <paramref name="result"/> value unless
+        /// this future has already been set or has been cancelled.
+        /// </summary>
+        /// <remarks>
+        /// This method is invoked upon successful completion of the 
+        /// computation.
+        /// </remarks>
+        /// <param name="result">
+        /// The value to be retured by <see cref="GetResult()"/>.
+        /// </param>
+        protected virtual void setResult(T result)
+		{
+            base.setResult(result);
+		}
+
+        #endregion
+    }
 }

@@ -18,8 +18,6 @@
 
 #endregion
 
-#if NET_2_0
-
 #region Imports
 
 using System;
@@ -73,32 +71,36 @@ namespace Spring.Collections.Generic
         /// <exception cref="System.ArgumentNullException">
         /// If the supplied <paramref name="collection"/> is <see langword="null"/>.
         /// </exception>
-        /// <exception cref="System.ArgumentException">
-        /// If the collection is the current queue or the collection size is 
-        /// greater than the queue capacity.
-        /// </exception>
-        public virtual void AddAll(ICollection<T> collection)
+        ///// <exception cref="System.ArgumentException">
+        ///// If the collection is the current queue or the collection size is 
+        ///// greater than the queue capacity.
+        ///// </exception>
+        public virtual bool AddAll(ICollection<T> collection)
         {
-            if(collection == null)
+            if (collection == null)
             {
                 throw new ArgumentNullException("collection");
             }
-            if(collection == this)
+            if (collection == this)
             {
                 throw new ArgumentException("Cannot add to itself.");
             }
-            if(collection.Count > RemainingCapacity)
-            {
-                throw new ArgumentException("Collcation size greater than queue capacity.");
-            }
-            foreach(T element in collection)
+            // TODO: check with Griffin current backport does not contain this constraint
+            //if (collection.Count > RemainingCapacity)
+            //{
+            //    throw new ArgumentException("Collcation size greater than queue capacity.");
+            //}
+            bool modified = false;
+            foreach (T element in collection)
             {
                 Add(element);
+                modified = true;
             }
+            return modified;
         }
 
 
-        /// <summary>
+	    /// <summary>
         /// Returns the remaining capacity of this queue.
         /// </summary>
         public abstract int RemainingCapacity { get; }
@@ -300,4 +302,3 @@ namespace Spring.Collections.Generic
         }
     }
 }
-#endif

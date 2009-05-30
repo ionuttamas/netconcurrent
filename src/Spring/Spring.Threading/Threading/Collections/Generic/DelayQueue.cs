@@ -4,11 +4,9 @@ using System.Diagnostics;
 using System.Threading;
 using Spring.Collections;
 using Spring.Collections.Generic;
-using Spring.Threading.Collections.Generic;
 using Spring.Threading.Future;
-using CollectionUtils=Spring.Util.Generic.CollectionUtils;
 
-namespace Spring.Threading.Collections
+namespace Spring.Threading.Collections.Generic
 {
 	/// <summary>
 	/// An unbounded <see cref="IBlockingQueue{T}"/> of
@@ -17,7 +15,7 @@ namespace Spring.Threading.Collections
 	/// </summary>
 	/// <author>Doug Lea</author>
 	/// <author>Griffin Caprio (.NET)</author>
-    public class DelayQueue<T> : AbstractQueue<T>, IBlockingQueue<T> //where T : IDelayed
+    public class DelayQueue<T> : AbstractBlockingQueue<T> //TODO should we include this? where T : IDelayed
     {
         [NonSerialized]
         private object lockObject = new object();
@@ -67,7 +65,7 @@ namespace Spring.Threading.Collections
         /// </summary>
         /// <param name="element">element to add</param>
         /// <exception cref="NullReferenceException">if the element is <see lang="null"/></exception>
-        public void Put(T element)
+        public override void Put(T element)
         {
             Offer(element);
         }
@@ -106,7 +104,7 @@ namespace Spring.Threading.Collections
         /// If some property of the supplied <paramref name="objectToAdd"/> prevents
         /// it from being added to this queue.
         /// </exception>
-        public bool Offer(T objectToAdd, TimeSpan duration)
+        public override bool Offer(T objectToAdd, TimeSpan duration)
         {
             return Offer(objectToAdd);
         }
@@ -116,7 +114,7 @@ namespace Spring.Threading.Collections
         /// until an element becomes available and/or expired.
         /// </summary>
         /// <returns> the head of this queue</returns>
-        public T Take()
+        public override T Take()
         {
             lock (lockObject)
             {
@@ -137,7 +135,8 @@ namespace Spring.Threading.Collections
                         else
                         {
                             T x;
-                            Debug.Assert(_queue.Poll(out x));
+                            bool hasOne = _queue.Poll(out x);
+                            Debug.Assert(hasOne);
                             if (_queue.Count != 0)
                             {
                                 Monitor.PulseAll(lockObject);
@@ -169,7 +168,8 @@ namespace Spring.Threading.Collections
                 else
                 {
                     T x;
-                    Debug.Assert(_queue.Poll(out x));
+                    bool hasOne = _queue.Poll(out x);
+                    Debug.Assert(hasOne);
                     if (_queue.Count != 0)
                     {
                         Monitor.PulseAll(lockObject);
@@ -197,7 +197,8 @@ namespace Spring.Threading.Collections
                 else
                 {
                     T x;
-                    Debug.Assert(_queue.Peek(out x));
+                    bool hasOne = _queue.Peek(out x);
+                    Debug.Assert(hasOne);
                     if (_queue.Count != 0)
                     {
                         Monitor.PulseAll(lockObject);
@@ -218,7 +219,7 @@ namespace Spring.Threading.Collections
         /// the head of this queue, or <see lang="null"/> if the
         /// specified waiting time elapses before an element is available
         /// </returns>
-        public bool Poll(TimeSpan duration, out T element)
+        public override bool Poll(TimeSpan duration, out T element)
         {
             lock (lockObject)
             {
@@ -254,7 +255,8 @@ namespace Spring.Threading.Collections
                         else
                         {
                             T x;
-                            Debug.Assert(_queue.Poll(out x));
+                            bool hasOne = _queue.Poll(out x);
+                            Debug.Assert(hasOne);
                             if (_queue.Count != 0)
                             {
                                 Monitor.PulseAll(lockObject);
@@ -286,112 +288,15 @@ namespace Spring.Threading.Collections
         }
 
         /// <summary> 
-        /// Removes all available elements from this queue and adds them
-        /// to the given collection.  
+        /// Does the real work for all <c>Drain</c> methods. Caller must
+        /// guarantee the <paramref name="action"/> is not <c>null</c> and
+        /// <paramref name="maxElements"/> is greater then zero (0).
         /// </summary>
-        /// <remarks>
-        /// This operation may be more
-        /// efficient than repeatedly polling this queue.  A failure
-        /// encountered while attempting to add elements to
-        /// collection <paramref name="collection"/> may result in elements being in neither,
-        /// either or both collections when the associated exception is
-        /// thrown.  Attempts to drain a queue to itself result in
-        /// <see cref="System.ArgumentException"/>. Further, the behavior of
-        /// this operation is undefined if the specified collection is
-        /// modified while the operation is in progress.
-        /// </remarks>
-        /// <param name="collection">the collection to transfer elements into</param>
-        /// <returns> the number of elements transferred</returns>
-        /// <exception cref="System.InvalidOperationException">
-        /// If the queue cannot be drained at this time.
-        /// </exception>
-        /// <exception cref="System.InvalidCastException">
-        /// If the class of the supplied <paramref name="collection"/> prevents it
-        /// from being used for the elemetns from the queue.
-        /// </exception>
-        /// <exception cref="System.ArgumentNullException">
-        /// If the specified collection is <see lang="null"/>.
-        /// </exception>
-        /// <exception cref="System.ArgumentException">
-        /// If <paramref name="collection"/> represents the queue itself.
-        /// </exception>
-        public int DrainTo(System.Collections.Generic.ICollection<T> collection)
+        /// <seealso cref="IBlockingQueue{T}.DrainTo(ICollection{T})"/>
+        /// <seealso cref="IBlockingQueue{T}.Drain(System.Action{T})"/>
+        /// <seealso cref="IBlockingQueue{T}.DrainTo(ICollection{T},int)"/>
+        protected override int DoDrainTo(Action<T> action, int maxElements)
         {
-            if (null == collection)
-            {
-                throw new ArgumentNullException("collection", "Collection cannot be null.");
-            }
-            if (this == collection)
-            {
-                throw new ArgumentException("Cannot drain queue to itself.");
-            }
-            lock (lockObject)
-            {
-                int n = 0;
-                for (; ; )
-                {
-                    T first;
-                    if (!_queue.Peek(out first) || ((IDelayed)first).GetRemainingDelay().Ticks > 0)
-                    {
-                        break;
-                    }
-                    T head;
-                    _queue.Poll(out head);
-                    CollectionUtils.Add(collection, head);
-                    ++n;
-                }
-                if (n > 0)
-                {
-                    Monitor.PulseAll(lockObject);
-                }
-                return n;
-            }
-        }
-
-        /// <summary> Removes at most the given number of available elements from
-        /// this queue and adds them to the given collection.  
-        /// </summary>
-        /// <remarks> 
-        /// This operation may be more
-        /// efficient than repeatedly polling this queue.  A failure
-        /// encountered while attempting to add elements to
-        /// collection <paramref name="collection"/> may result in elements being in neither,
-        /// either or both collections when the associated exception is
-        /// thrown.  Attempts to drain a queue to itself result in
-        /// <see cref="System.ArgumentException"/>. Further, the behavior of
-        /// this operation is undefined if the specified collection is
-        /// modified while the operation is in progress.
-        /// </remarks>
-        /// <param name="collection">the collection to transfer elements into</param>
-        /// <param name="maxElements">the maximum number of elements to transfer</param>
-        /// <returns> the number of elements transferred</returns>
-        /// <exception cref="System.InvalidOperationException">
-        /// If the queue cannot be drained at this time.
-        /// </exception>
-        /// <exception cref="System.InvalidCastException">
-        /// If the class of the supplied <paramref name="collection"/> prevents it
-        /// from being used for the elemetns from the queue.
-        /// </exception>
-        /// <exception cref="System.ArgumentNullException">
-        /// If the specified collection is <see lang="null"/>.
-        /// </exception>
-        /// <exception cref="System.ArgumentException">
-        /// If <paramref name="collection"/> represents the queue itself.
-        /// </exception>
-        public int DrainTo(System.Collections.Generic.ICollection<T> collection, int maxElements)
-        {
-            if (null == collection)
-            {
-                throw new ArgumentNullException("collection", "Collection cannot be null.");
-            }
-            if (this == collection)
-            {
-                throw new ArgumentException("Cannot drain queue to itself.");
-            }
-            if (maxElements <= 0)
-            {
-                return 0;
-            }
             lock (lockObject)
             {
                 int n = 0;
@@ -404,7 +309,7 @@ namespace Spring.Threading.Collections
                     }
                     T head;
                     _queue.Poll(out head);
-                    CollectionUtils.Add(collection, head);
+                    action(head);
                     ++n;
                 }
                 if (n > 0)
@@ -419,22 +324,6 @@ namespace Spring.Threading.Collections
 
         #region ICollection Members
 
-        /// <summary>
-        ///When implemented by a class, gets an object that can be used to synchronize access to the ICollection.  For this implementation,
-        ///always return null, indicating the array is already synchronized.
-        /// </summary>
-        protected override object SyncRoot
-        {
-            get { return null; }
-        }
-
-        /// <summary>
-        /// When implemented by a class, gets a value indicating whether access to the ICollection is synchronized (thread-safe).
-        /// </summary>
-        protected override Boolean IsSynchronized
-        {
-            get { return true; }
-        }
 
         /// <summary>
         /// Returns the current number of elements in this queue.
@@ -508,6 +397,19 @@ namespace Spring.Threading.Collections
             lock (lockObject)
             {
                 _queue.Clear();
+            }
+        }
+
+        /// <summary>
+        /// Removes a single instance of the specified element from this
+        /// queue, if it is present, whether or not it has expired.
+        /// </summary>
+        /// <param name="element">element to remove</param>
+        /// <returns><see lang="true"/> if element was remove, <see lang="false"/> if not.</returns>
+        public override bool Remove(T element) {
+            lock (lockObject)
+            {
+                return _queue.Remove(element);
             }
         }
     }

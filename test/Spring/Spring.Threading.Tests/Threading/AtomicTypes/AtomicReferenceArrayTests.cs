@@ -62,7 +62,7 @@ namespace Spring.Threading.AtomicTypes
 			}
 		}
 
-		[ExpectedException(typeof (NullReferenceException))]
+		[ExpectedException(typeof (ArgumentNullException))]
 		[Test]
 		public void NullReferenceExceptionForConstructor()
 		{

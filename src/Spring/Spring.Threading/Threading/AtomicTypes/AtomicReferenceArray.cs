@@ -56,7 +56,7 @@ namespace Spring.Threading.AtomicTypes {
         /// </param>
         /// <throws><see cref="ArgumentNullException"/>if array is null</throws>
         public AtomicReferenceArray(T[] array)
-            : this(array.Length) {
+            : this(array!= null?array.Length:0) {
             if(array == null)
                 throw new ArgumentNullException();
             Array.Copy(array, 0, _referenceArray, 0, array.Length);
@@ -119,9 +119,9 @@ namespace Spring.Threading.AtomicTypes {
         /// <param name="newValue">
         /// The new value
         /// </param>
-        public object SetNewAtomicValue(int index, T newValue) {
+        public T SetNewAtomicValue(int index, T newValue) {
             lock(this) {
-                object old = _referenceArray[index];
+                T old = _referenceArray[index];
                 _referenceArray[index] = newValue;
                 return old;
             }
@@ -185,7 +185,6 @@ namespace Spring.Threading.AtomicTypes {
         /// Returns the String representation of the current values of array.</summary>
         /// <returns> the String representation of the current values of array.
         /// </returns>
-        // TODO: Should be updated to use Spring.Core.StringUtils class.
         public override string ToString() {
             if(_referenceArray.Length == 0)
                 return "[]";
