@@ -55,11 +55,13 @@ namespace Spring.Threading.AtomicTypes {
 
         /// <summary> 
         /// Gets / Sets the current value.
-        /// <p/>
-        /// <b>Note:</b> The setting of this value occurs within a <see lang="lock"/>.
         /// </summary>
         public T Reference {
-            get { return _reference; }
+            get {
+                lock(this) {
+                    return _reference;
+                }
+            }
             set {
                 lock(this) {
                     _reference = value;
@@ -94,7 +96,19 @@ namespace Spring.Threading.AtomicTypes {
         /// </returns>
         public bool CompareAndSet(T expectedValue, T newValue) {
             lock(this) {
-                // TODO: This is crap.  Need to figure out why =='s doesn't work here.  It should.
+                // it is not possible to call _reference == expected value for a generic. So we have to handle
+                // null if T is not a value type because we can not call _reference.Equals() if _reference is null
+                if (!typeof(T).IsValueType) {
+                    // if T is not a value type handle null 
+                    if (_reference == null) {
+                        if (expectedValue == null) {
+                            _reference = newValue;
+                            return true;
+                        }
+                        return false;
+                    }
+                }
+
                 if(_reference.Equals(expectedValue)) {
                     _reference = newValue;
                     return true;
