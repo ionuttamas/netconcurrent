@@ -74,13 +74,15 @@
     <ErrorReport>prompt</ErrorReport>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Spring.Core, Version=1.1.2.20125, Culture=neutral, PublicKeyToken=65e474d141e25e07, processorArchitecture=MSIL">
+    <Reference Include="Spring.Core, Version=1.2.0.20313, Culture=neutral, PublicKeyToken=65e474d141e25e07, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\lib\net\2.0\Spring.Core.dll</HintPath>
     </Reference>
     <Reference Include="System">
       <Name>System</Name>
     </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyInfo.cs">
@@ -93,23 +95,18 @@
     <Compile Include="Collections\Generic\AbstractTransformingList.cs" />
     <Compile Include="Collections\Generic\ArrayQueue.cs" />
     <Compile Include="Collections\Generic\DownCastList.cs" />
+    <Compile Include="Collections\Generic\INavigableDictionary.cs" />
+    <Compile Include="Collections\Generic\INavigableSet.cs" />
+    <Compile Include="Collections\Generic\ISet.cs" />
+    <Compile Include="Collections\Generic\ISortedDictionary.cs" />
+    <Compile Include="Collections\Generic\ISortedSet.cs" />
+    <Compile Include="Collections\Generic\PriorityQueue.cs" />
+    <Compile Include="Threading\Collections\Generic\IConcurrentDictionary.cs" />
     <Compile Include="Collections\Generic\IQueue.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Collections\Generic\TransformingEnumerator.cs" />
     <Compile Include="Collections\Generic\TransformingList.cs" />
-    <Compile Include="Collections\INavigableDictionary.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Collections\INavigableSet.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Collections\ISortedDictionary.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Collections\ISortedSet.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="CommonAssemblyInfo.cs" />
     <Compile Include="Threading\AtomicTypes\AtomicBoolean.cs">
       <SubType>Code</SubType>
@@ -140,7 +137,6 @@
     <Compile Include="Threading\AtomicTypes\AtomicStampedReference.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Threading\AtomicTypes\AbstractAtomic.cs" />
     <Compile Include="Threading\BoundedBuffer.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -157,27 +153,17 @@
     <Compile Include="Threading\ClockDaemon.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Threading\Collections\CopyOnWriteArrayList.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Threading\Collections\DelayQueue.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="Threading\Collections\Generic\ArrayBlockingQueue.cs" />
     <Compile Include="Threading\Collections\Generic\BlockingQueueWrapper.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Threading\Collections\Generic\CopyOnWriteArrayList.cs" />
+    <Compile Include="Threading\Collections\Generic\DelayQueue.cs" />
     <Compile Include="Threading\Collections\Generic\IBlockingQueue.cs" />
-    <Compile Include="Threading\Collections\IConcurrentDictionary.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Threading\Collections\IConcurrentNavigableDictionary.cs">
-      <SubType>Code</SubType>
-    </Compile>
+    <Compile Include="Threading\Collections\Generic\IConcurrentNavigableDictionary.cs" />
     <Compile Include="Threading\Collections\LinkedBlockingQueue.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Threading\Collections\PriorityQueue.cs" />
     <Compile Include="Threading\Collections\SynchronousQueue.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -209,9 +195,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Threading\Execution\ExecutionPolicy\DiscardPolicy.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Threading\Execution\ExecutionPolicy\RunPriorToExecutorShutdown.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Threading\Execution\ExecutorCompletionService.cs">
@@ -434,6 +417,14 @@
     <Compile Include="Utility\SerializationUtilities.cs">
       <SubType>Code</SubType>
     </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Collections\Generic\DictionarySet.cs" />
+    <Compile Include="Collections\Generic\HashedSet.cs" />
+    <Compile Include="Collections\Generic\Set.cs" />
+    <Compile Include="Collections\Generic\SortedSet.cs" />
+    <Compile Include="Threading\Collections\PriorityBlockingQueue.cs" />
+    <Compile Include="Threading\Execution\ExecutionPolicy\CallerRunsPolicy.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
