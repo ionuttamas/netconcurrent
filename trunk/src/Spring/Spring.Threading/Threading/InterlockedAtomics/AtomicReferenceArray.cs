@@ -20,8 +20,10 @@
 
 using System;
 using System.Text;
+using System.Threading;
 
-namespace Spring.Threading.AtomicTypes {
+namespace Spring.Threading.InterlockedAtomics
+{
     /// <summary> 
     /// An array of object references in which elements may be updated
     /// atomically. 
@@ -31,8 +33,10 @@ namespace Spring.Threading.AtomicTypes {
     /// <author>Doug Lea</author>
     /// <author>Griffin Caprio (.NET)</author>
     /// <author>Andreas Doehring (.NET)</author>
+    /// <author>Kenneth Xu (Interlocked)</author>
     [Serializable]
-    public class AtomicReferenceArray<T> {
+    public class AtomicReferenceArray<T> where T : class
+    {
         /// <summary>
         /// Holds the object array reference
         /// </summary>
@@ -55,11 +59,17 @@ namespace Spring.Threading.AtomicTypes {
         /// The array to copy elements from
         /// </param>
         /// <throws><see cref="ArgumentNullException"/>if array is null</throws>
-        public AtomicReferenceArray(T[] array)
-            : this(array!= null?array.Length:0) {
-            if(array == null)
-                throw new ArgumentNullException();
-            Array.Copy(array, 0, _referenceArray, 0, array.Length);
+        public AtomicReferenceArray(T[] array) {
+            if(array == null) throw new ArgumentNullException("array");
+            int length = array.Length;
+            _referenceArray = new T[length];
+            if (length > 0)
+            {
+                int last = length - 1;
+                for (int i = 0; i < last; ++i) _referenceArray[i] = array[i];
+                // Do the last write as volatile
+                Thread.VolatileWrite(ref ((object[])_referenceArray)[last], array[last]);
+            }
         }
 
         /// <summary> 
@@ -80,16 +90,8 @@ namespace Spring.Threading.AtomicTypes {
         /// The index to use.
         /// </param>
         public T this[int index] {
-            get {
-                lock(this) {
-                    return _referenceArray[index];
-                }
-            }
-            set {
-                lock(this) {
-                    _referenceArray[index] = value;
-                }
-            }
+            get { return (T)Thread.VolatileRead(ref ((object[])_referenceArray)[index]); }
+            set { Thread.VolatileWrite(ref ((object[])_referenceArray)[index], value); }
         }
 
         /// <summary> 
@@ -101,11 +103,8 @@ namespace Spring.Threading.AtomicTypes {
         /// <param name="index">
         /// the index to set
         /// </param>
-        /// TODO: This method doesn't differ from the set() method, which was converted to a property.  For now
-        /// the property will be called for this method.
-        [Obsolete("This method will be removed.  Please use indexer instead.")]
         public virtual void LazySet(int index, T newValue) {
-            this[index] = newValue;
+            Thread.VolatileWrite(ref ((object[])_referenceArray)[index], newValue); 
         }
 
 
@@ -119,12 +118,8 @@ namespace Spring.Threading.AtomicTypes {
         /// <param name="newValue">
         /// The new value
         /// </param>
-        public T SetNewAtomicValue(int index, T newValue) {
-            lock(this) {
-                T old = _referenceArray[index];
-                _referenceArray[index] = newValue;
-                return old;
-            }
+        public T Exchange(int index, T newValue) {
+            return Interlocked.Exchange(ref _referenceArray[index], newValue);
         }
 
         /// <summary> 
@@ -145,13 +140,8 @@ namespace Spring.Threading.AtomicTypes {
         /// the actual value was not equal to the expected value.
         /// </returns>
         public bool CompareAndSet(int index, T expectedValue, T newValue) {
-            lock(this) {
-                if(_referenceArray[index].Equals(expectedValue)) {
-                    _referenceArray[index] = newValue;
-                    return true;
-                }
-                return false;
-            }
+            return ReferenceEquals(expectedValue,
+                Interlocked.CompareExchange(ref _referenceArray[index], newValue, expectedValue));
         }
 
         /// <summary> 
@@ -172,13 +162,8 @@ namespace Spring.Threading.AtomicTypes {
         /// True if successful, false otherwise.
         /// </returns>
         public bool WeakCompareAndSet(int index, T expectedValue, T newValue) {
-            lock(this) {
-                if(_referenceArray[index].Equals(expectedValue)) {
-                    _referenceArray[index] = newValue;
-                    return true;
-                }
-                return false;
-            }
+            return ReferenceEquals(expectedValue,
+                Interlocked.CompareExchange(ref _referenceArray[index], newValue, expectedValue));
         }
 
         /// <summary> 
@@ -188,6 +173,8 @@ namespace Spring.Threading.AtomicTypes {
         public override string ToString() {
             if(_referenceArray.Length == 0)
                 return "[]";
+            // force volatile read
+            T dummy = this[0];
 
             StringBuilder buf = new StringBuilder();
 
@@ -197,7 +184,7 @@ namespace Spring.Threading.AtomicTypes {
                 else
                     buf.Append(", ");
 
-                buf.Append(Convert.ToString(_referenceArray[i]));
+                buf.Append(_referenceArray[i].ToString());
             }
 
             buf.Append("]");

@@ -135,21 +135,21 @@ namespace Spring.Threading.AtomicTypes {
 		[Test] public void GetReturnValueAndDecrement()
 		{
 			AtomicLong ai = new AtomicLong(1);
-			Assert.AreEqual(1, ai.ReturnValueAndDecrement);
-			Assert.AreEqual(0, ai.ReturnValueAndDecrement);
-			Assert.AreEqual(- 1, ai.ReturnValueAndDecrement);
+			Assert.AreEqual(1, ai.ReturnValueAndDecrement());
+			Assert.AreEqual(0, ai.ReturnValueAndDecrement());
+			Assert.AreEqual(- 1, ai.ReturnValueAndDecrement());
 		}
 
 
 		[Test] public void GetReturnValueAndIncrement()
 		{
 			AtomicLong ai = new AtomicLong(1);
-			Assert.AreEqual(1, ai.ReturnValueAndIncrement);
+			Assert.AreEqual(1, ai.ReturnValueAndIncrement());
 			Assert.AreEqual(2, ai.LongValue);
 			ai.LongValue = - 2;
-			Assert.AreEqual(- 2, ai.ReturnValueAndIncrement);
-			Assert.AreEqual(- 1, ai.ReturnValueAndIncrement);
-			Assert.AreEqual(0, ai.ReturnValueAndIncrement);
+			Assert.AreEqual(- 2, ai.ReturnValueAndIncrement());
+			Assert.AreEqual(- 1, ai.ReturnValueAndIncrement());
+			Assert.AreEqual(0, ai.ReturnValueAndIncrement());
 			Assert.AreEqual(1, ai.LongValue);
 		}
 

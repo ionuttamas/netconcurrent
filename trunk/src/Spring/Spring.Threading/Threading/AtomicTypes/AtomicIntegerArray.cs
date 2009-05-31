@@ -29,6 +29,7 @@ namespace Spring.Threading.AtomicTypes {
     /// <author>Doug Lea</author>
     /// <author>Griffin Caprio (.NET)</author>
     /// <author>Andreas Doehring(.NET)</author>
+    /// <author>Kenneth Xu (.NET)</author>
     [Serializable]
     public class AtomicIntegerArray {
         private readonly int[] _intArray;
@@ -84,7 +85,7 @@ namespace Spring.Threading.AtomicTypes {
                     return _intArray[index];
                 }
             }
-            set { _intArray[index] = value; }
+            set { lock(this) _intArray[index] = value; }
         }
 
         /// <summary> 
@@ -96,9 +97,12 @@ namespace Spring.Threading.AtomicTypes {
         /// <param name="newValue">
         /// The new value
         /// </param>
-        [Obsolete("This method will be removed.  Please use AtomicintArray indexer instead.")]
+        //Why obsolete? If I understood correctly, programmer should use this for the low priority 
+        //thread access. This can be better implemented to yield access to other thread in some 
+        //other platform that support this.
+        //[Obsolete("This method will be removed.  Please use AtomicintArray indexer instead.")]
         public void LazySet(int index, int newValue) {
-            this[index] = newValue;
+            lock (this) this[index] = newValue;
         }
 
         /// <summary> 
@@ -114,6 +118,7 @@ namespace Spring.Threading.AtomicTypes {
         /// <returns> 
         /// The previous value
         /// </returns>
+        //TODO: recommend to change to Exchange to confirm with .Net's convention.
         public int SetNewAtomicValue(int index, int newValue) {
             lock(this) {
                 int old = _intArray[index];

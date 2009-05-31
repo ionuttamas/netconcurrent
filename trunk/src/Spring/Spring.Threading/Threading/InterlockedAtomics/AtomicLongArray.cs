@@ -20,8 +20,10 @@
 
 using System;
 using System.Text;
+using System.Threading;
 
-namespace Spring.Threading.AtomicTypes {
+namespace Spring.Threading.InterlockedAtomics
+{
     /// <summary> 
     /// A long array in which elements may be updated atomically.
     /// <p/>
@@ -53,11 +55,16 @@ namespace Spring.Threading.AtomicTypes {
         /// </param>
         /// <exception cref="ArgumentNullException"> if the array is null</exception>
         public AtomicLongArray(long[] array) {
-            if(array == null)
-                throw new ArgumentNullException();
+            if(array == null) throw new ArgumentNullException("array");
             int length = array.Length;
             _longArray = new long[length];
-            Array.Copy(array, 0, _longArray, 0, array.Length);
+            if (length > 0)
+            {
+                int last = length - 1;
+                for (int i = 0; i < last; ++i) _longArray[i] = array[i];
+                // Do the last write as volatile
+                Thread.VolatileWrite(ref _longArray[last], array[last]);
+            }
         }
 
         /// <summary> 
@@ -80,12 +87,8 @@ namespace Spring.Threading.AtomicTypes {
         /// The current value
         /// </returns>
         public long this[int index] {
-            get {
-                lock(this) {
-                    return _longArray[index];
-                }
-            }
-            set { _longArray[index] = value; }
+            get { return Interlocked.Read(ref _longArray[index]); }
+            set { Interlocked.Exchange(ref _longArray[index], value); }
         }
 
         /// <summary> 
@@ -97,9 +100,8 @@ namespace Spring.Threading.AtomicTypes {
         /// <param name="newValue">
         /// The new value
         /// </param>
-        [Obsolete("This method will be removed.  Please use AtomicLongArray indexer instead.")]
         public void LazySet(int index, long newValue) {
-            this[index] = newValue;
+            Interlocked.Exchange(ref _longArray[index], newValue);
         }
 
         /// <summary> 
@@ -115,12 +117,8 @@ namespace Spring.Threading.AtomicTypes {
         /// <returns> 
         /// The previous value
         /// </returns>
-        public long SetNewAtomicValue(int index, long newValue) {
-            lock(this) {
-                long old = _longArray[index];
-                _longArray[index] = newValue;
-                return old;
-            }
+        public long Exchange(int index, long newValue) {
+            return Interlocked.Exchange(ref _longArray[index], newValue);
         }
 
         /// <summary>
@@ -140,15 +138,8 @@ namespace Spring.Threading.AtomicTypes {
         /// the actual value was not equal to the expected value.
         /// </returns>
         public bool CompareAndSet(int index, long expectedValue, long newValue) {
-            lock(this) {
-                if(_longArray[index] == expectedValue) {
-                    _longArray[index] = newValue;
-                    return true;
-                }
-                else {
-                    return false;
-                }
-            }
+            return expectedValue == Interlocked.CompareExchange(
+                ref _longArray[index], newValue, expectedValue);
         }
 
         /// <summary> 
@@ -168,15 +159,8 @@ namespace Spring.Threading.AtomicTypes {
         /// True if successful.
         /// </returns>
         public virtual bool WeakCompareAndSet(int index, long expectedValue, long newValue) {
-            lock(this) {
-                if(_longArray[index] == expectedValue) {
-                    _longArray[index] = newValue;
-                    return true;
-                }
-                else {
-                    return false;
-                }
-            }
+            return expectedValue == Interlocked.CompareExchange(
+                ref _longArray[index], newValue, expectedValue);
         }
 
         /// <summary> 
@@ -189,9 +173,7 @@ namespace Spring.Threading.AtomicTypes {
         /// The previous value
         /// </returns>
         public long ReturnValueAndIncrement(int index) {
-            lock(this) {
-                return _longArray[index]++;
-            }
+            return Interlocked.Increment(ref _longArray[index]) - 1;
         }
 
         /// <summary> 
@@ -204,9 +186,7 @@ namespace Spring.Threading.AtomicTypes {
         /// The previous value
         /// </returns>
         public long ReturnValueAndDecrement(int index) {
-            lock(this) {
-                return _longArray[index]--;
-            }
+            return Interlocked.Decrement(ref _longArray[index]) + 1;
         }
 
         /// <summary> 
@@ -222,11 +202,7 @@ namespace Spring.Threading.AtomicTypes {
         /// The previous value
         /// </returns>
         public long AddDeltaAndReturnPreviousValue(int index, long deltaValue) {
-            lock(this) {
-                long oldValue = _longArray[index];
-                _longArray[index] += deltaValue;
-                return oldValue;
-            }
+            return Interlocked.Add(ref _longArray[index], deltaValue) - deltaValue;
         }
 
         /// <summary> 
@@ -239,9 +215,7 @@ namespace Spring.Threading.AtomicTypes {
         /// The updated value
         /// </returns>
         public long IncrementValueAndReturn(int index) {
-            lock(this) {
-                return ++_longArray[index];
-            }
+            return Interlocked.Increment(ref _longArray[index]);
         }
 
         /// <summary> 
@@ -254,9 +228,7 @@ namespace Spring.Threading.AtomicTypes {
         /// The updated value
         /// </returns>
         public long DecrementValueAndReturn(int index) {
-            lock(this) {
-                return --_longArray[index];
-            }
+            return Interlocked.Decrement(ref _longArray[index]);
         }
 
         /// <summary> 
@@ -272,9 +244,7 @@ namespace Spring.Threading.AtomicTypes {
         /// The updated value
         /// </returns>
         public long AddDeltaAndReturnNewValue(int index, long deltaValue) {
-            lock(this) {
-                return _longArray[index] += deltaValue;
-            }
+            return Interlocked.Add(ref _longArray[index], deltaValue);
         }
 
         /// <summary> 
@@ -286,6 +256,8 @@ namespace Spring.Threading.AtomicTypes {
         public override String ToString() {
             if(_longArray.Length == 0)
                 return "[]";
+            // force volatile read
+            Thread.VolatileRead(ref _longArray[0]);
 
             StringBuilder buf = new StringBuilder();
             buf.Append('[');
