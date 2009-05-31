@@ -431,8 +431,10 @@
     <Compile Include="Threading\InterlockedAtomics\AtomicIntegerArray.cs" />
     <Compile Include="Threading\InterlockedAtomics\AtomicLong.cs" />
     <Compile Include="Threading\InterlockedAtomics\AtomicLongArray.cs" />
+    <Compile Include="Threading\InterlockedAtomics\AtomicMarkableReference.cs" />
     <Compile Include="Threading\InterlockedAtomics\AtomicReference.cs" />
     <Compile Include="Threading\InterlockedAtomics\AtomicReferenceArray.cs" />
+    <Compile Include="Threading\InterlockedAtomics\AtomicStampedReference.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

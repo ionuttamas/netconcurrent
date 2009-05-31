@@ -18,7 +18,7 @@
     <DefaultTargetSchema>IE50</DefaultTargetSchema>
     <DelaySign>false</DelaySign>
     <OutputType>Library</OutputType>
-    <RootNamespace>Spring.Threading.Tests</RootNamespace>
+    <RootNamespace>Spring</RootNamespace>
     <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
     <StartupObject>
     </StartupObject>
@@ -220,6 +220,15 @@
   <ItemGroup>
     <Compile Include="Threading\Collections\PriorityBlockingQueueTest.cs" />
     <Compile Include="Threading\Collections\SynchronousQueueTest.cs" />
+    <Compile Include="Threading\InterlockedAtomics\AtomicBooleanTests.cs" />
+    <Compile Include="Threading\InterlockedAtomics\AtomicIntegerArrayTests.cs" />
+    <Compile Include="Threading\InterlockedAtomics\AtomicIntegerTests.cs" />
+    <Compile Include="Threading\InterlockedAtomics\AtomicLongArrayTests.cs" />
+    <Compile Include="Threading\InterlockedAtomics\AtomicLongTests.cs" />
+    <Compile Include="Threading\InterlockedAtomics\AtomicMarkableReferenceTests.cs" />
+    <Compile Include="Threading\InterlockedAtomics\AtomicReferenceArrayTests.cs" />
+    <Compile Include="Threading\InterlockedAtomics\AtomicReferenceTests.cs" />
+    <Compile Include="Threading\InterlockedAtomics\AtomicStampedReferenceTests.cs" />
     <Compile Include="Threading\Execution\ExecutionPolicy\CallerRunsPolicyTests.cs" />
     <Compile Include="Threading\Execution\ThreadPoolExecutorTests.cs" />
   </ItemGroup>
