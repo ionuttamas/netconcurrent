@@ -35,6 +35,7 @@ namespace Spring.Threading.AtomicTypes
 	/// <author>Doug Lea</author>
 	/// <author>Griffin Caprio (.NET)</author>
     /// <author>Andreas Doehring (.NET)</author>
+    /// <author>Kenneth Xu (.NET)</author>
 	[Serializable]
 	public class AtomicLong
 	{
@@ -58,51 +59,44 @@ namespace Spring.Threading.AtomicTypes
 		{
 		}
 
-		/// <summary> 
-		/// Atomically increments by one the current value.
-		/// </summary>
-		/// <returns> the previous value
-		/// </returns>
-		public long ReturnValueAndIncrement
-		{
-			get
-			{
-				lock (this)
-				{
-					return _longValue++;
-				}
-			}
+	    /// <summary> 
+	    /// Atomically increments by one the current value.
+	    /// </summary>
+	    /// <returns> the previous value
+	    /// </returns>
+	    public long ReturnValueAndIncrement()
+	    {
+	        lock (this)
+	        {
+	            return _longValue++;
+	        }
+	    }
 
-		}
+	    /// <summary> 
+	    /// Atomically decrements by one the current value.
+	    /// </summary>
+	    /// <returns> 
+	    /// The previous value
+	    /// </returns>
+	    public long ReturnValueAndDecrement()
+	    {
+	        lock (this)
+	        {
+	            return _longValue--;
+	        }
+	    }
 
-		/// <summary> 
-		/// Atomically decrements by one the current value.
-		/// </summary>
-		/// <returns> 
-		/// The previous value
-		/// </returns>
-		public long ReturnValueAndDecrement
-		{
-			get
-			{
-				lock (this)
-				{
-					return _longValue--;
-				}
-			}
-		}
-
-		/// <summary> 
+	    /// <summary> 
 		/// Gets / Sets the current value.
 		/// <p/>
-		/// <b>Note:</b> the set of this property occurs within a lock.
+		/// <b>Note:</b> the get and set of this property occurs within a lock.
 		/// </summary>
 		/// <returns> 
 		/// The current value
 		/// </returns>
 		public long LongValue
 		{
-			get { return _longValue; }
+			get { lock(this) return _longValue; }
 			set
 			{
 				lock (this)

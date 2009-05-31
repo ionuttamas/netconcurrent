@@ -119,9 +119,10 @@ namespace Spring.Threading.AtomicTypes {
         /// <param name="newValue">
         /// the new value
         /// </param>
-        /// TODO: This method doesn't differ from the set() method, which was converted to a property.  For now
-        /// the property will be called for this method.
-        [Obsolete("This method will be removed.  Please use AtomicBoolean.Value property instead.")]
+        //Why obsolete? If I understood correctly, programmer should use this for the low priority 
+        //thread access. This can be better implemented to yield access to other thread in some 
+        //other platform that support this.
+        //[Obsolete("This method will be removed.  Please use AtomicBoolean.Value property instead.")]
         public void LazySet(bool newValue) {
             Value = newValue;
         }

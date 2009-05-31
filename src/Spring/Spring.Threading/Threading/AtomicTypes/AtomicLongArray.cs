@@ -30,6 +30,7 @@ namespace Spring.Threading.AtomicTypes {
     /// <author>Doug Lea</author>
     /// <author>Griffin Caprio (.NET)</author>
     /// <author>Andreas Doehring (.NET)</author>
+    /// <author>Kenneth Xu (.NET)</author>
     [Serializable]
     public class AtomicLongArray {
         private long[] _longArray;
@@ -85,7 +86,7 @@ namespace Spring.Threading.AtomicTypes {
                     return _longArray[index];
                 }
             }
-            set { _longArray[index] = value; }
+            set { lock(this) _longArray[index] = value; }
         }
 
         /// <summary> 
@@ -97,7 +98,10 @@ namespace Spring.Threading.AtomicTypes {
         /// <param name="newValue">
         /// The new value
         /// </param>
-        [Obsolete("This method will be removed.  Please use AtomicLongArray indexer instead.")]
+        //Why obsolete? If I understood correctly, programmer should use this for the low priority 
+        //thread access. This can be better implemented to yield access to other thread in some 
+        //other platform that support this.
+        //[Obsolete("This method will be removed.  Please use AtomicLongArray indexer instead.")]
         public void LazySet(int index, long newValue) {
             this[index] = newValue;
         }

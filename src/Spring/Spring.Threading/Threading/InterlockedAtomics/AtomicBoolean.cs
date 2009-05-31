@@ -20,7 +20,8 @@ using System;
 using System.Threading;
 
 #pragma warning disable 420
-namespace Spring.Threading.AtomicTypes
+
+namespace Spring.Threading.InterlockedAtomics
 {
     /// <summary>
     /// A <see lang="bool"/> value that may be updated atomically. An <see cref="Spring.Threading.AtomicTypes.AtomicBoolean"/> 
@@ -31,7 +32,7 @@ namespace Spring.Threading.AtomicTypes
     /// <author>Doug Lea</author>
     /// <author>Griffin Caprio (.NET)</author>
     /// <author>Andreas Doehring (.NET)</author>
-    /// <author>Kenneth Xu</author>
+    /// <author>Kenneth Xu (Interlocked)</author>
     [Serializable]
     public class AtomicBoolean {
         /// <summary>
@@ -54,12 +55,10 @@ namespace Spring.Threading.AtomicTypes
         /// </summary>
         public AtomicBoolean()
             : this(false) {
-        }
+            }
 
         /// <summary> 
         /// Gets / Sets the current value.
-        /// <p/>
-        /// <b>Note:</b> The setting of this value occurs within a <see lang="lock"/>.
         /// </summary>
         public bool Value {
             get { return _booleanValue != 0; }
@@ -109,11 +108,8 @@ namespace Spring.Threading.AtomicTypes
         /// <param name="newValue">
         /// the new value
         /// </param>
-        /// TODO: This method doesn't differ from the set() method, which was converted to a property.  For now
-        /// the property will be called for this method.
-        [Obsolete("This method will be removed.  Please use AtomicBoolean.Value property instead.")]
         public void LazySet(bool newValue) {
-            Value = newValue;
+            _booleanValue = newValue ? 1 : 0;
         }
 
         /// <summary> 
@@ -141,4 +137,5 @@ namespace Spring.Threading.AtomicTypes
         }
     }
 }
+
 #pragma warning restore 420

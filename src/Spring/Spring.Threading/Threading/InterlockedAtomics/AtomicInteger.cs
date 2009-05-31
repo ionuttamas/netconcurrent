@@ -22,7 +22,7 @@ using System;
 using System.Threading;
 
 #pragma warning disable 420
-namespace Spring.Threading.AtomicTypes
+namespace Spring.Threading.InterlockedAtomics
 {
 	/// <summary> 
 	/// An <see lang="int"/> value that may be updated atomically.
@@ -35,6 +35,7 @@ namespace Spring.Threading.AtomicTypes
 	/// <author>Doug Lea</author>
 	/// <author>Griffin Caprio (.NET)</author>
     /// <author>Andreas Doehring (.NET)</author>
+    /// <author>Kenneth Xu (Interlocked)</author>
 	[Serializable]
 	public class AtomicInteger
 	{
@@ -58,16 +59,6 @@ namespace Spring.Threading.AtomicTypes
 		{
 		}
 
-        public byte ByteValue
-        {
-            get { return (byte) _integerValue; }
-        }
-
-	    public short ShortValue
-	    {
-            get { return (short) _integerValue; }
-	    }
-
 		/// <summary> 
 		/// Gets and sets the current value.
 		/// </summary>
@@ -77,26 +68,8 @@ namespace Spring.Threading.AtomicTypes
 		public int IntegerValue
 		{
 			get { return _integerValue; }
-			set
-			{
-                Interlocked.Exchange(ref _integerValue, value);
-			}
+			set { _integerValue = value; }
 		}
-
-	    public long LongValue
-	    {
-            get { return _integerValue; }
-	    }
-
-	    public float FloatValue
-	    {
-            get { return _integerValue; }
-	    }
-
-	    public double DoubleValue
-	    {
-            get { return _integerValue; }
-	    }
 
 		/// <summary> 
 		/// Atomically increments by one the current value.
@@ -128,7 +101,7 @@ namespace Spring.Threading.AtomicTypes
 		/// </param>
 		public void LazySet(int newValue)
 		{
-            Interlocked.Exchange(ref _integerValue, newValue);
+            _integerValue = newValue;
 		}
 
 		/// <summary> 
@@ -140,7 +113,7 @@ namespace Spring.Threading.AtomicTypes
 		/// <returns> 
 		/// The previous value
 		/// </returns>
-		public int SetNewAtomicValue(int newValue)
+		public int Exchange(int newValue)
 		{
 		    return Interlocked.Exchange(ref _integerValue, newValue);
 		}
@@ -241,7 +214,7 @@ namespace Spring.Threading.AtomicTypes
 		/// </returns>
 		public override String ToString()
 		{
-			return IntegerValue.ToString();
+			return _integerValue.ToString();
 		}
 	}
 }
