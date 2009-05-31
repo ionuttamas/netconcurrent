@@ -26,17 +26,17 @@ namespace Spring.Threading.Execution
             {
             }
 
-            protected override void beforeExecute(Thread t, IRunnable r)
+            protected internal override void beforeExecute(Thread t, IRunnable r)
             {
                 beforeCalled = true;
             }
 
-            protected override void afterExecute(IRunnable r, Exception e)
+            protected internal override void afterExecute(IRunnable r, Exception e)
             {
                 afterCalled = true;
             }
 
-            protected override void terminated()
+            protected internal override void terminated()
             {
                 terminatedCalled = true;
             }
