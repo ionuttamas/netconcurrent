@@ -26,7 +26,7 @@ namespace Spring.Threading.InterlockedAtomics
 {
 	/// <summary> 
 	/// An <see lang="int"/> value that may be updated atomically.
-	/// An <see cref="Spring.Threading.AtomicTypes.AtomicInteger"/> is used in applications such as atomically
+	/// An <see cref="AtomicInteger"/> is used in applications such as atomically
 	/// incremented counters, and cannot be used as a replacement for an
 	/// <see cref="int"/>. 
 	/// <p/>
@@ -37,12 +37,12 @@ namespace Spring.Threading.InterlockedAtomics
     /// <author>Andreas Doehring (.NET)</author>
     /// <author>Kenneth Xu (Interlocked)</author>
 	[Serializable]
-	public class AtomicInteger
+	public class AtomicInteger : IAtomic<int>
 	{
 		private volatile int _integerValue;
 
 		/// <summary> 
-		/// Creates a new <see cref="Spring.Threading.AtomicTypes.AtomicInteger"/> with a value of <paramref name="initialValue"/>.
+		/// Creates a new <see cref="AtomicInteger"/> with a value of <paramref name="initialValue"/>.
 		/// </summary>
 		/// <param name="initialValue">
 		/// The initial value
@@ -53,7 +53,7 @@ namespace Spring.Threading.InterlockedAtomics
 		}
 
 		/// <summary> 
-		/// Creates a new <see cref="Spring.Threading.AtomicTypes.AtomicInteger"/> with initial value 0.
+		/// Creates a new <see cref="AtomicInteger"/> with initial value 0.
 		/// </summary>
 		public AtomicInteger() : this(0)
 		{
@@ -65,7 +65,7 @@ namespace Spring.Threading.InterlockedAtomics
 		/// <returns>
 		/// The current value
 		/// </returns>
-		public int IntegerValue
+		public int Value
 		{
 			get { return _integerValue; }
 			set { _integerValue = value; }
@@ -216,6 +216,21 @@ namespace Spring.Threading.InterlockedAtomics
 		{
 			return _integerValue.ToString();
 		}
+
+        /// <summary>
+        /// Implicit converts <see cref="AtomicInteger"/> to int.
+        /// </summary>
+        /// <param name="atomicInteger">
+        /// Instance of <see cref="AtomicInteger"/>.
+        /// </param>
+        /// <returns>
+        /// The converted int value of <paramref name="atomicInteger"/>.
+        /// </returns>
+        public static implicit operator int(AtomicInteger atomicInteger)
+        {
+            return atomicInteger.Value;
+        }
+
 	}
 }
 #pragma warning restore 420

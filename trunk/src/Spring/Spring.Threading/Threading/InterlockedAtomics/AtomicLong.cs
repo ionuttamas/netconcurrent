@@ -24,7 +24,7 @@ using System.Threading;
 namespace Spring.Threading.InterlockedAtomics
 {
 	/// <summary> A <see lang="long"/> value that may be updated atomically.  See the
-	/// An <see cref="Spring.Threading.AtomicTypes.AtomicLong"/> is used in applications such as atomically
+	/// An <see cref="AtomicLong"/> is used in applications such as atomically
 	/// incremented sequence numbers, and cannot be used as a replacement
 	/// for a <see cref="long"/>. 
 	/// <p/>
@@ -34,12 +34,12 @@ namespace Spring.Threading.InterlockedAtomics
 	/// <author>Griffin Caprio (.NET)</author>
     /// <author>Andreas Doehring (.NET)</author>
 	[Serializable]
-	public class AtomicLong
+	public class AtomicLong : IAtomic<long>
 	{
 		private long _longValue;
 
 		/// <summary> 
-		/// Creates a new <see cref="Spring.Threading.AtomicTypes.AtomicLong"/> with the given initial value.
+		/// Creates a new <see cref="AtomicLong"/> with the given initial value.
 		/// </summary>
 		/// <param name="initialValue">
 		/// The initial value
@@ -50,7 +50,7 @@ namespace Spring.Threading.InterlockedAtomics
 		}
 
 		/// <summary> 
-		/// Creates a new <see cref="Spring.Threading.AtomicTypes.AtomicLong"/> with initial value 0.
+		/// Creates a new <see cref="AtomicLong"/> with initial value 0.
 		/// </summary>
 		public AtomicLong() : this(0)
 		{
@@ -83,7 +83,7 @@ namespace Spring.Threading.InterlockedAtomics
 		/// <returns> 
 		/// The current value
 		/// </returns>
-		public long LongValue
+		public long Value
 		{
             get { return Interlocked.Read(ref _longValue); }
 			set { Interlocked.Exchange(ref _longValue, value); }
@@ -205,7 +205,22 @@ namespace Spring.Threading.InterlockedAtomics
 		/// </returns>
         public override string ToString() 
         {
-			return LongValue.ToString();
+			return Value.ToString();
 		}
+
+        /// <summary>
+        /// Implicit converts <see cref="AtomicInteger"/> to int.
+        /// </summary>
+        /// <param name="atomicLong">
+        /// Instance of <see cref="AtomicInteger"/>.
+        /// </param>
+        /// <returns>
+        /// The converted int value of <paramref name="atomicLong"/>.
+        /// </returns>
+        public static implicit operator long(AtomicLong atomicLong)
+        {
+            return atomicLong.Value;
+        }
+
 	}
 }

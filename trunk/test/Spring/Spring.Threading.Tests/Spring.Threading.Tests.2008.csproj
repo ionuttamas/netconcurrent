@@ -226,11 +226,14 @@
     <Compile Include="Threading\InterlockedAtomics\AtomicLongArrayTests.cs" />
     <Compile Include="Threading\InterlockedAtomics\AtomicLongTests.cs" />
     <Compile Include="Threading\InterlockedAtomics\AtomicMarkableReferenceTests.cs" />
+    <Compile Include="Threading\InterlockedAtomics\AtomicMarkableTests.cs" />
     <Compile Include="Threading\InterlockedAtomics\AtomicReferenceArrayTests.cs" />
     <Compile Include="Threading\InterlockedAtomics\AtomicReferenceTests.cs" />
     <Compile Include="Threading\InterlockedAtomics\AtomicStampedReferenceTests.cs" />
     <Compile Include="Threading\Execution\ExecutionPolicy\CallerRunsPolicyTests.cs" />
     <Compile Include="Threading\Execution\ThreadPoolExecutorTests.cs" />
+    <Compile Include="Threading\InterlockedAtomics\AtomicStampedTests.cs" />
+    <Compile Include="Threading\InterlockedAtomics\AtomicTests.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

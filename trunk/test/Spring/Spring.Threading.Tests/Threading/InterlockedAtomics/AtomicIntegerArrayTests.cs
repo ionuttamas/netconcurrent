@@ -70,7 +70,7 @@ namespace Spring.Threading.InterlockedAtomics
             public void Run() {
                 for(; ; ) {
                     bool done = true;
-                    for(int i = 0; i < ai.Length; ++i) {
+                    for(int i = 0; i < ai.Count; ++i) {
                         int v = ai[i];
                         Assert.IsTrue(v >= 0);
                         if(v != 0) {
@@ -104,7 +104,7 @@ namespace Spring.Threading.InterlockedAtomics
         public void Constructor2() {
             int[] a = new int[] { 17, 3, -42, 99, -7 };
             AtomicIntegerArray ai = new AtomicIntegerArray(a);
-            Assert.AreEqual(a.Length, ai.Length);
+            Assert.AreEqual(a.Length, ai.Count);
             for(int i = 0; i < a.Length; ++i)
                 Assert.AreEqual(a[i], ai[i]);
         }
@@ -215,9 +215,9 @@ namespace Spring.Threading.InterlockedAtomics
             AtomicIntegerArray ai = new AtomicIntegerArray(DEFAULT_COLLECTION_SIZE);
             for(int i = 0; i < DEFAULT_COLLECTION_SIZE; ++i) {
                 ai[i] = 1;
-                Assert.AreEqual(1, ai.SetNewAtomicValue(i, 0));
-                Assert.AreEqual(0, ai.SetNewAtomicValue(i, -10));
-                Assert.AreEqual(-10, ai.SetNewAtomicValue(i, 1));
+                Assert.AreEqual(1, ai.Exchange(i, 0));
+                Assert.AreEqual(0, ai.Exchange(i, -10));
+                Assert.AreEqual(-10, ai.Exchange(i, 1));
             }
         }
 

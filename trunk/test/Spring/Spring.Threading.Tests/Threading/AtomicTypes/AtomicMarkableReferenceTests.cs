@@ -31,9 +31,9 @@ namespace Spring.Threading.AtomicTypes
 	{
 		private class AnonymousClassRunnable
 		{
-            private AtomicMarkableReference<int> ai;
+            private AtomicMarkableReference<Integer> ai;
 
-            public AnonymousClassRunnable(AtomicMarkableReference<int> ai)
+            public AnonymousClassRunnable(AtomicMarkableReference<Integer> ai)
 			{
 				this.ai = ai;
 			}
@@ -65,7 +65,7 @@ namespace Spring.Threading.AtomicTypes
 		public void DefaultConstructor()
 		{
             AtomicMarkableReference<int> ai = new AtomicMarkableReference<int>(one, false);
-			Assert.AreEqual(one, ai.Reference);
+			Assert.AreEqual(one.Value, ai.Reference);
 			Assert.IsFalse(ai.IsReferenceMarked);
             AtomicMarkableReference<object> a2 = new AtomicMarkableReference<object>(null, true);
 			Assert.IsNull(a2.Reference);
@@ -77,25 +77,25 @@ namespace Spring.Threading.AtomicTypes
 		{
 			bool[] mark = new bool[1];
             AtomicMarkableReference<int> ai = new AtomicMarkableReference<int>(one, false);
-			Assert.AreEqual(one, ai.Reference);
+			Assert.AreEqual(one.Value, ai.Reference);
 			Assert.IsFalse(ai.IsReferenceMarked);
-			Assert.AreEqual(one, ai.GetReference(ref mark));
+			Assert.AreEqual(one.Value, ai.GetReference(ref mark));
 			Assert.IsFalse(mark[0]);
 			ai.SetNewAtomicValue(two, false);
-			Assert.AreEqual(two, ai.Reference);
+			Assert.AreEqual(two.Value, ai.Reference);
 			Assert.IsFalse(ai.IsReferenceMarked);
-			Assert.AreEqual(two, ai.GetReference(ref mark));
+			Assert.AreEqual(two.Value, ai.GetReference(ref mark));
 			Assert.IsFalse(mark[0]);
 			ai.SetNewAtomicValue(one, true);
-			Assert.AreEqual(one, ai.Reference);
+			Assert.AreEqual(one.Value, ai.Reference);
 			Assert.IsTrue(ai.IsReferenceMarked);
-			Assert.AreEqual(one, ai.GetReference(ref mark));
+			Assert.AreEqual(one.Value, ai.GetReference(ref mark));
 			Assert.IsTrue(mark[0]);
 
 			ai.SetNewAtomicValue(one, true);
-			Assert.AreEqual(one, ai.Reference);
+			Assert.AreEqual(one.Value, ai.Reference);
 			Assert.IsTrue(ai.IsReferenceMarked);
-			Assert.AreEqual(one, ai.GetReference(ref mark));
+			Assert.AreEqual(one.Value, ai.GetReference(ref mark));
 			Assert.IsTrue(mark[0]);
 		}
 
@@ -136,7 +136,7 @@ namespace Spring.Threading.AtomicTypes
 		[Test]
 		public void CompareAndSetInMultipleThreads()
 		{
-            AtomicMarkableReference<int> ai = new AtomicMarkableReference<int>(one, false);
+            AtomicMarkableReference<Integer> ai = new AtomicMarkableReference<Integer>(one, false);
 			Thread t = new Thread(new ThreadStart(new AnonymousClassRunnable(ai).Run));
 			t.Start();
 			Assert.IsTrue(ai.CompareAndSet(one, two, false, false));
@@ -155,7 +155,7 @@ namespace Spring.Threading.AtomicTypes
 			Assert.IsTrue(ai.CompareAndSet(one, one, false, true));
 			t.Join(LONG_DELAY_MS);
 			Assert.IsFalse(t.IsAlive);
-			Assert.AreEqual(ai.Reference, one);
+			Assert.AreEqual(ai.Reference, one.Value);
 			Assert.IsFalse(ai.IsReferenceMarked);
 		}
 
@@ -163,7 +163,7 @@ namespace Spring.Threading.AtomicTypes
 		public void WeakCompareAndSet()
 		{
 			bool[] mark = new bool[1];
-            AtomicMarkableReference<int> ai = new AtomicMarkableReference<int>(one, false);
+            AtomicMarkableReference<Integer> ai = new AtomicMarkableReference<Integer>(one, false);
 			Assert.AreEqual(one, ai.GetReference(ref mark));
 			Assert.IsFalse(ai.IsReferenceMarked);
 			Assert.IsFalse(mark[0]);

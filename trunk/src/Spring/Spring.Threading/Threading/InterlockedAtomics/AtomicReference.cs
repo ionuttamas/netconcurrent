@@ -25,7 +25,8 @@ using System.Threading;
 namespace Spring.Threading.InterlockedAtomics
 {
     /// <summary>
-    /// A object reference that may be updated atomically. 
+    /// A object reference that may be updated atomically with the equality
+    /// defined as reference equals.
     /// <p/>
     /// Based on the on the back port of JCP JSR-166.
     /// </summary>
@@ -34,7 +35,7 @@ namespace Spring.Threading.InterlockedAtomics
     /// <author>Andreas Doehring (.NET)</author>
     /// <author>Kenneth Xu (Interlocked)</author>
     [Serializable]
-    public class AtomicReference<T> where T : class 
+    public class AtomicReference<T> : IAtomic<T> where T : class 
     {
         /// <summary>
         /// Holds the object reference.
@@ -42,7 +43,7 @@ namespace Spring.Threading.InterlockedAtomics
         private volatile T _reference;
 
         /// <summary> 
-        /// Creates a new <see cref="Spring.Threading.AtomicTypes.AtomicReference{T}"/> with the given initial value.
+        /// Creates a new <see cref="AtomicReference{T}"/> with the given initial value.
         /// </summary>
         /// <param name="initialValue">
         /// The initial value
@@ -52,16 +53,17 @@ namespace Spring.Threading.InterlockedAtomics
         }
 
         /// <summary> 
-        /// Creates a new <see cref="Spring.Threading.AtomicTypes.AtomicReference{T}"/> with null initial value.
+        /// Creates a new <see cref="Atomic{T}"/> with <c>default<typeparamref name="T"/></c> 
+        /// as initial value.
         /// </summary>
         public AtomicReference()
             : this(default(T)) {
         }
 
         /// <summary> 
-        /// Gets / Sets the current value.
+        /// Gets and sets the current value.
         /// </summary>
-        public T Reference {
+        public T Value {
             get { return _reference; }
             set { _reference = value; }
         }
@@ -133,6 +135,21 @@ namespace Spring.Threading.InterlockedAtomics
         /// </returns>
         public override string ToString() {
             return _reference.ToString();
+        }
+
+
+        /// <summary>
+        /// Implicit converts <see cref="AtomicReference{T}"/> to <typeparamref name="T"/>.
+        /// </summary>
+        /// <param name="atomicReference">
+        /// Instance of <see cref="AtomicReference{T}"/>.
+        /// </param>
+        /// <returns>
+        /// The converted int value of <paramref name="atomicReference"/>.
+        /// </returns>
+        public static implicit operator T(AtomicReference<T> atomicReference)
+        {
+            return atomicReference.Value;
         }
     }
 }
