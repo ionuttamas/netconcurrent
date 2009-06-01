@@ -120,6 +120,7 @@
     <Compile Include="StandardsComplianceTest.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="TestHelper.cs" />
     <Compile Include="Threading\AtomicTypes\AtomicBooleanTests.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -189,6 +190,18 @@
     <Compile Include="Threading\Helpers\WaitNodeTests.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Threading\InterlockedAtomics\AtomicBooleanTests.cs" />
+    <Compile Include="Threading\InterlockedAtomics\AtomicIntegerArrayTests.cs" />
+    <Compile Include="Threading\InterlockedAtomics\AtomicIntegerTests.cs" />
+    <Compile Include="Threading\InterlockedAtomics\AtomicLongArrayTests.cs" />
+    <Compile Include="Threading\InterlockedAtomics\AtomicLongTests.cs" />
+    <Compile Include="Threading\InterlockedAtomics\AtomicMarkableReferenceTests.cs" />
+    <Compile Include="Threading\InterlockedAtomics\AtomicMarkableTests.cs" />
+    <Compile Include="Threading\InterlockedAtomics\AtomicReferenceArrayTests.cs" />
+    <Compile Include="Threading\InterlockedAtomics\AtomicReferenceTests.cs" />
+    <Compile Include="Threading\InterlockedAtomics\AtomicStampedReferenceTests.cs" />
+    <Compile Include="Threading\InterlockedAtomics\AtomicStampedTests.cs" />
+    <Compile Include="Threading\InterlockedAtomics\AtomicTests.cs" />
     <Compile Include="Threading\LatchTest.cs">
       <SubType>Code</SubType>
     </Compile>

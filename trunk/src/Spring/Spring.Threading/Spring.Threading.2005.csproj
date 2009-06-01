@@ -305,6 +305,21 @@
     <Compile Include="Threading\IExecutor.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Threading\InterlockedAtomics\Atomic.cs" />
+    <Compile Include="Threading\InterlockedAtomics\AtomicArray.cs" />
+    <Compile Include="Threading\InterlockedAtomics\AtomicBoolean.cs" />
+    <Compile Include="Threading\InterlockedAtomics\AtomicInteger.cs" />
+    <Compile Include="Threading\InterlockedAtomics\AtomicIntegerArray.cs" />
+    <Compile Include="Threading\InterlockedAtomics\AtomicLong.cs" />
+    <Compile Include="Threading\InterlockedAtomics\AtomicLongArray.cs" />
+    <Compile Include="Threading\InterlockedAtomics\AtomicMarkable.cs" />
+    <Compile Include="Threading\InterlockedAtomics\AtomicMarkableReference.cs" />
+    <Compile Include="Threading\InterlockedAtomics\AtomicReference.cs" />
+    <Compile Include="Threading\InterlockedAtomics\AtomicReferenceArray.cs" />
+    <Compile Include="Threading\InterlockedAtomics\AtomicStamped.cs" />
+    <Compile Include="Threading\InterlockedAtomics\AtomicStampedReference.cs" />
+    <Compile Include="Threading\InterlockedAtomics\IAtomic.cs" />
+    <Compile Include="Threading\InterlockedAtomics\IAtomicArray.cs" />
     <Compile Include="Threading\IPuttable.cs">
       <SubType>Code</SubType>
     </Compile>

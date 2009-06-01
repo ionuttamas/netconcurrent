@@ -25,7 +25,7 @@ namespace Spring.Collections.Generic
 
         private PriorityQueue<int> populatedQueue(int n)
         {
-            var q = new PriorityQueue<int>(n);
+            PriorityQueue<int> q = new PriorityQueue<int>(n);
             Assert.IsTrue(q.IsEmpty);
             for (int i = n - 1; i >= 0; i -= 2)
                 Assert.IsTrue(q.Offer(i));
@@ -39,7 +39,7 @@ namespace Spring.Collections.Generic
         [Test]
         public void testAdd()
         {
-            var q = new PriorityQueue<int>(DEFAULT_COLLECTION_SIZE);
+            PriorityQueue<int> q = new PriorityQueue<int>(DEFAULT_COLLECTION_SIZE);
             for (int i = 0; i < DEFAULT_COLLECTION_SIZE; ++i)
             {
                 Assert.AreEqual(i, q.Count);
@@ -51,7 +51,7 @@ namespace Spring.Collections.Generic
         [ExpectedException(typeof (ArgumentNullException))]
         public void testAddAll1()
         {
-            var q = new PriorityQueue<int>(1);
+            PriorityQueue<int> q = new PriorityQueue<int>(1);
             q.AddAll(null);
         }
 
@@ -60,8 +60,8 @@ namespace Spring.Collections.Generic
         [ExpectedException(typeof (ArgumentNullException))]
         public void testAddAll2()
         {
-            var q = new PriorityQueue<object>(DEFAULT_COLLECTION_SIZE);
-            var ints = new object[DEFAULT_COLLECTION_SIZE];
+            PriorityQueue<object> q = new PriorityQueue<object>(DEFAULT_COLLECTION_SIZE);
+            object[] ints = new object[DEFAULT_COLLECTION_SIZE];
             q.AddAll(ints);
         }
 
@@ -69,8 +69,8 @@ namespace Spring.Collections.Generic
         [ExpectedException(typeof (ArgumentNullException))]
         public void testAddAll3()
         {
-            var q = new PriorityQueue<object>(DEFAULT_COLLECTION_SIZE);
-            var ints = new object[DEFAULT_COLLECTION_SIZE];
+            PriorityQueue<object> q = new PriorityQueue<object>(DEFAULT_COLLECTION_SIZE);
+            object[] ints = new object[DEFAULT_COLLECTION_SIZE];
             for (int i = 0; i < DEFAULT_COLLECTION_SIZE - 1; ++i)
                 ints[i] = i;
             q.AddAll(ints);
@@ -79,11 +79,11 @@ namespace Spring.Collections.Generic
         [Test]
         public void testAddAll5()
         {
-            var empty = new int[0];
-            var ints = new int[DEFAULT_COLLECTION_SIZE];
+            int[] empty = new int[0];
+            int[] ints = new int[DEFAULT_COLLECTION_SIZE];
             for (int i = 0; i < DEFAULT_COLLECTION_SIZE; ++i)
                 ints[i] = DEFAULT_COLLECTION_SIZE - 1 - i;
-            var q = new PriorityQueue<int>(DEFAULT_COLLECTION_SIZE);
+            PriorityQueue<int> q = new PriorityQueue<int>(DEFAULT_COLLECTION_SIZE);
             Assert.IsFalse(q.AddAll(empty));
             Assert.IsTrue(q.AddAll(ints));
             for (int i = 0; i < DEFAULT_COLLECTION_SIZE; ++i)
@@ -117,41 +117,41 @@ namespace Spring.Collections.Generic
         [ExpectedException(typeof (ArgumentException))]
         public void testConstructor2()
         {
-            var q = new PriorityQueue<int>(0);
+            PriorityQueue<int> q = new PriorityQueue<int>(0);
         }
 
         [Test]
         [ExpectedException(typeof (ArgumentNullException))]
         public void testConstructor3()
         {
-            var q = new PriorityQueue<int>(null);
+            PriorityQueue<int> q = new PriorityQueue<int>(null);
         }
 
         [Test]
         [ExpectedException(typeof (ArgumentNullException))]
         public void testConstructor4()
         {
-            var ints = new object[DEFAULT_COLLECTION_SIZE];
-            var q = new PriorityQueue<object>(ints);
+            object[] ints = new object[DEFAULT_COLLECTION_SIZE];
+            PriorityQueue<object> q = new PriorityQueue<object>(ints);
         }
 
         [Test]
         [ExpectedException(typeof (ArgumentNullException))]
         public void testConstructor5()
         {
-            var ints = new object[DEFAULT_COLLECTION_SIZE];
+            object[] ints = new object[DEFAULT_COLLECTION_SIZE];
             for (int i = 0; i < DEFAULT_COLLECTION_SIZE - 1; ++i)
                 ints[i] = i;
-            var q = new PriorityQueue<object>(ints);
+            PriorityQueue<object> q = new PriorityQueue<object>(ints);
         }
 
         [Test]
         public void testConstructor6()
         {
-            var ints = new int[DEFAULT_COLLECTION_SIZE];
+            int[] ints = new int[DEFAULT_COLLECTION_SIZE];
             for (int i = 0; i < DEFAULT_COLLECTION_SIZE; ++i)
                 ints[i] = i;
-            var q = new PriorityQueue<int>(ints);
+            PriorityQueue<int> q = new PriorityQueue<int>(ints);
             for (int i = 0; i < DEFAULT_COLLECTION_SIZE; ++i)
             {
                 int output;
@@ -163,10 +163,10 @@ namespace Spring.Collections.Generic
         [Test]
         public void testConstructor7()
         {
-            var cmp = new MyReverseComparator();
-            var q = new PriorityQueue<int>(DEFAULT_COLLECTION_SIZE, cmp);
+            MyReverseComparator cmp = new MyReverseComparator();
+            PriorityQueue<int> q = new PriorityQueue<int>(DEFAULT_COLLECTION_SIZE, cmp);
             Assert.AreEqual(cmp, q.Comparator());
-            var ints = new int[DEFAULT_COLLECTION_SIZE];
+            int[] ints = new int[DEFAULT_COLLECTION_SIZE];
             for (int i = 0; i < DEFAULT_COLLECTION_SIZE; ++i)
                 ints[i] = i;
             q.AddAll(ints);
@@ -241,7 +241,7 @@ namespace Spring.Collections.Generic
         [Test]
         public void testEmpty()
         {
-            var q = new PriorityQueue<int>(2);
+            PriorityQueue<int> q = new PriorityQueue<int>(2);
             Assert.IsTrue(q.IsEmpty);
             q.Add(1);
             Assert.IsFalse(q.IsEmpty);
@@ -256,7 +256,7 @@ namespace Spring.Collections.Generic
         {
             PriorityQueue<int> q = populatedQueue(DEFAULT_COLLECTION_SIZE);
             int i = 0;
-            var it = q.GetEnumerator();
+            IEnumerator<int> it = q.GetEnumerator();
             while (it.MoveNext())
             {
                 Assert.IsTrue(q.Contains(it.Current));
@@ -268,7 +268,7 @@ namespace Spring.Collections.Generic
         [Test]
         public void testOffer()
         {
-            var q = new PriorityQueue<int>(1);
+            PriorityQueue<int> q = new PriorityQueue<int>(1);
             Assert.IsTrue(q.Offer(zero));
             Assert.IsTrue(q.Offer(one));
         }
