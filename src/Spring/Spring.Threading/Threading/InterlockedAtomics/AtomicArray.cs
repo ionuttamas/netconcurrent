@@ -20,29 +20,46 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Threading;
 using Spring.Collections.Generic;
 
 namespace Spring.Threading.InterlockedAtomics
 {
     /// <summary> 
-    /// An array of object references in which elements may be updated
-    /// atomically. 
-    /// <p/>
-    /// Based on the on the back port of JCP JSR-166.
+    /// An array of instances of type <typeparamref name="T"/> in which 
+    /// elements may be updated atomically. Always consider to user other
+    /// type specific atomic arraies whenever possible.
     /// </summary>
+    /// <remarks>
+    /// Based on the on the back port of JCP JSR-166.
+    /// <p/>
+    /// <b>Note:</b>This implementation boxes the value in an private
+    /// reference type holder and uses <see cref="AtomicReferenceArray{T}"/> to
+    /// accomplish the atomic access.
+    /// </remarks>
+    /// <seealso cref="AtomicIntegerArray"/>
+    /// <seealso cref="AtomicLongArray"/>
+    /// <seealso cref="AtomicReferenceArray{T}"/>
     /// <author>Doug Lea</author>
-    /// <author>Griffin Caprio (.NET)</author>
-    /// <author>Andreas Doehring (.NET)</author>
-    /// <author>Kenneth Xu (Interlocked)</author>
+    /// <author>Kenneth Xu (.NET)</author>
     [Serializable]
-    public class AtomicReferenceArray<T> : AbstractList<T>, IAtomicArray<T> where T : class
+    public class AtomicArray<T> : AbstractList<T>, IAtomicArray<T>
     {
         /// <summary>
         /// Holds the object array reference
         /// </summary>
-        private readonly T[] _referenceArray;
+        private readonly AtomicReferenceArray<ValueHolder> _atomicReferenceArray;
+
+        [Serializable]
+        private class ValueHolder
+        {
+            internal readonly T Value;
+            internal ValueHolder(){}
+            internal ValueHolder(T value) { Value = value; }
+            public override string ToString()
+            {
+                return Value.ToString();
+            }
+        }
 
         /// <summary> 
         /// Creates a new <see cref="AtomicReferenceArray{T}"/> of <paramref name="length"/>.
@@ -50,8 +67,11 @@ namespace Spring.Threading.InterlockedAtomics
         /// <param name="length">
         /// the length of the array
         /// </param>
-        public AtomicReferenceArray(int length) {
-            _referenceArray = new T[length];
+        public AtomicArray(int length) {
+            ValueHolder holder = new ValueHolder();
+            ValueHolder[] holders = new ValueHolder[length];
+            for (int i = 0; i < length; i++) holders[i] = holder;
+            _atomicReferenceArray = new AtomicReferenceArray<ValueHolder>(holders);
         }
 
         /// <summary> 
@@ -62,17 +82,13 @@ namespace Spring.Threading.InterlockedAtomics
         /// The array to copy elements from
         /// </param>
         /// <throws><see cref="ArgumentNullException"/>if array is null</throws>
-        public AtomicReferenceArray(T[] array) {
-            if(array == null) throw new ArgumentNullException("array");
+        public AtomicArray(T[] array)
+        {
+            if (array == null) throw new ArgumentNullException("array");
             int length = array.Length;
-            _referenceArray = new T[length];
-            if (length > 0)
-            {
-                int last = length - 1;
-                for (int i = 0; i < last; ++i) _referenceArray[i] = array[i];
-                // Do the last write as volatile
-                Thread.VolatileWrite(ref ((object[])_referenceArray)[last], array[last]);
-            }
+            ValueHolder[] holders = new ValueHolder[length];
+            for (int i = 0; i < length; i++) holders[i] = new ValueHolder(array[i]);
+            _atomicReferenceArray = new AtomicReferenceArray<ValueHolder>(holders);
         }
 
         /// <summary> 
@@ -83,7 +99,7 @@ namespace Spring.Threading.InterlockedAtomics
         /// </returns>
         public override int Count
         {
-            get { return _referenceArray.Length; }
+            get { return _atomicReferenceArray.Count; }
         }
 
         /// <summary>
@@ -114,8 +130,8 @@ namespace Spring.Threading.InterlockedAtomics
         /// The index to use.
         /// </param>
         public override T this[int index] {
-            get { return (T)Thread.VolatileRead(ref ((object[])_referenceArray)[index]); }
-            set { Thread.VolatileWrite(ref ((object[])_referenceArray)[index], value); }
+            get { return _atomicReferenceArray[index].Value; }
+            set { _atomicReferenceArray[index] = new ValueHolder(value); }
         }
 
         /// <summary> 
@@ -128,7 +144,7 @@ namespace Spring.Threading.InterlockedAtomics
         /// the index to set
         /// </param>
         public virtual void LazySet(int index, T newValue) {
-            Thread.VolatileWrite(ref ((object[])_referenceArray)[index], newValue); 
+            _atomicReferenceArray[index] = new ValueHolder(newValue);
         }
 
 
@@ -143,7 +159,7 @@ namespace Spring.Threading.InterlockedAtomics
         /// The new value
         /// </param>
         public T Exchange(int index, T newValue) {
-            return Interlocked.Exchange(ref _referenceArray[index], newValue);
+            return _atomicReferenceArray.Exchange(index, new ValueHolder(newValue)).Value;
         }
 
         /// <summary> 
@@ -164,8 +180,10 @@ namespace Spring.Threading.InterlockedAtomics
         /// the actual value was not equal to the expected value.
         /// </returns>
         public bool CompareAndSet(int index, T expectedValue, T newValue) {
-            return ReferenceEquals(expectedValue,
-                Interlocked.CompareExchange(ref _referenceArray[index], newValue, expectedValue));
+            ValueHolder current = _atomicReferenceArray[index];
+
+            return Equals(expectedValue, current.Value) &&
+                (Equals(newValue, current.Value) || _atomicReferenceArray.CompareAndSet(index, current, new ValueHolder(newValue)));
         }
 
         /// <summary> 
@@ -186,8 +204,10 @@ namespace Spring.Threading.InterlockedAtomics
         /// True if successful, false otherwise.
         /// </returns>
         public bool WeakCompareAndSet(int index, T expectedValue, T newValue) {
-            return ReferenceEquals(expectedValue,
-                Interlocked.CompareExchange(ref _referenceArray[index], newValue, expectedValue));
+            ValueHolder current = _atomicReferenceArray[index];
+
+            return Equals(expectedValue, current.Value) &&
+                (Equals(newValue, current.Value) || _atomicReferenceArray.CompareAndSet(index, current, new ValueHolder(newValue)));
         }
 
         /// <summary> 
@@ -195,24 +215,7 @@ namespace Spring.Threading.InterlockedAtomics
         /// <returns> the String representation of the current values of array.
         /// </returns>
         public override string ToString() {
-            if(_referenceArray.Length == 0)
-                return "[]";
-            // force volatile read
-            T dummy = this[0];
-
-            StringBuilder buf = new StringBuilder();
-
-            for(int i = 0; i < _referenceArray.Length; i++) {
-                if(i == 0)
-                    buf.Append('[');
-                else
-                    buf.Append(", ");
-
-                buf.Append(_referenceArray[i].ToString());
-            }
-
-            buf.Append("]");
-            return buf.ToString();
+            return _atomicReferenceArray.ToString();
         }
     }
 }

@@ -19,8 +19,10 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
 using System.Text;
 using System.Threading;
+using Spring.Collections.Generic;
 
 namespace Spring.Threading.InterlockedAtomics
 {
@@ -33,11 +35,12 @@ namespace Spring.Threading.InterlockedAtomics
     /// <author>Griffin Caprio (.NET)</author>
     /// <author>Andreas Doehring (.NET)</author>
     [Serializable]
-    public class AtomicLongArray {
+    public class AtomicLongArray : AbstractList<long>, IAtomicArray<long>
+    {
         private long[] _longArray;
 
         /// <summary> 
-        /// Creates a new <see cref="Spring.Threading.AtomicTypes.AtomicLongArray"/> of given <paramref name="length"/>.
+        /// Creates a new <see cref="AtomicLongArray"/> of given <paramref name="length"/>.
         /// </summary>
         /// <param name="length">
         /// The length of the array
@@ -47,7 +50,7 @@ namespace Spring.Threading.InterlockedAtomics
         }
 
         /// <summary> 
-        /// Creates a new <see cref="Spring.Threading.AtomicTypes.AtomicLongArray"/> with the same length as, and
+        /// Creates a new <see cref="AtomicLongArray"/> with the same length as, and
         /// all elements copied from, <paramref name="array"/>.
         /// </summary>
         /// <param name="array">
@@ -73,8 +76,28 @@ namespace Spring.Threading.InterlockedAtomics
         /// <returns> 
         /// The length of the array
         /// </returns>
-        public int Length {
+        public override int Count {
             get { return _longArray.Length; }
+        }
+
+        /// <summary>
+        /// Returns an enumerator that iterates through the collection.
+        /// </summary>
+        /// <remarks>
+        /// Subclass must implement this method.
+        /// </remarks>
+        /// <returns>
+        /// A <see cref="IEnumerator{T}"/> that can be used to iterate 
+        /// through the collection.
+        /// </returns>
+        /// <filterpriority>1</filterpriority>
+        public override IEnumerator<long> GetEnumerator()
+        {
+            int length = Count;
+            for (int i = 0; i < length; i++)
+            {
+                yield return this[i];
+            }
         }
 
         /// <summary> 
@@ -86,7 +109,7 @@ namespace Spring.Threading.InterlockedAtomics
         /// <returns> 
         /// The current value
         /// </returns>
-        public long this[int index] {
+        public override long this[int index] {
             get { return Interlocked.Read(ref _longArray[index]); }
             set { Interlocked.Exchange(ref _longArray[index], value); }
         }

@@ -27,13 +27,13 @@ using NUnit.Framework;
 namespace Spring.Threading.InterlockedAtomics
 {
 	[TestFixture]
-	public class AtomicMarkableReferenceTests : BaseThreadingTestCase
+	public class AtomicMarkableTests : BaseThreadingTestCase
 	{
 		private class AnonymousClassRunnable
 		{
-            private AtomicMarkableReference<Integer> ai;
+            private AtomicMarkable<int> ai;
 
-            public AnonymousClassRunnable(AtomicMarkableReference<Integer> ai)
+            public AnonymousClassRunnable(AtomicMarkable<int> ai)
 			{
 				this.ai = ai;
 			}
@@ -47,9 +47,9 @@ namespace Spring.Threading.InterlockedAtomics
 
 		private class AnonymousClassRunnable1
 		{
-            private AtomicMarkableReference<Integer> ai;
+            private AtomicMarkable<int> ai;
 
-            public AnonymousClassRunnable1(AtomicMarkableReference<Integer> ai)
+            public AnonymousClassRunnable1(AtomicMarkable<int> ai)
 			{
 				this.ai = ai;
 			}
@@ -64,10 +64,10 @@ namespace Spring.Threading.InterlockedAtomics
 		[Test]
 		public void DefaultConstructor()
 		{
-            AtomicMarkableReference<Integer> ai = new AtomicMarkableReference<Integer>(one, false);
+            AtomicMarkable<int> ai = new AtomicMarkable<int>(one, false);
 			Assert.AreEqual(one, ai.Value);
 			Assert.IsFalse(ai.IsMarked);
-            AtomicMarkableReference<object> a2 = new AtomicMarkableReference<object>(null, true);
+            AtomicMarkable<object> a2 = new AtomicMarkable<object>(null, true);
 			Assert.IsNull(a2.Value);
 			Assert.IsTrue(a2.IsMarked);
 		}
@@ -76,7 +76,7 @@ namespace Spring.Threading.InterlockedAtomics
 		public void GetSet()
 		{
 			bool mark;
-            AtomicMarkableReference<Integer> ai = new AtomicMarkableReference<Integer>(one, false);
+            AtomicMarkable<int> ai = new AtomicMarkable<int>(one, false);
 			Assert.AreEqual(one, ai.Value);
 			Assert.IsFalse(ai.IsMarked);
 			Assert.AreEqual(one, ai.GetValue(out mark));
@@ -84,59 +84,59 @@ namespace Spring.Threading.InterlockedAtomics
 			ai.SetNewAtomicValue(two, false);
 			Assert.AreEqual(two, ai.Value);
 			Assert.IsFalse(ai.IsMarked);
-			Assert.AreEqual(two, ai.GetValue(out mark));
+            Assert.AreEqual(two, ai.GetValue(out mark));
 			Assert.IsFalse(mark);
 			ai.SetNewAtomicValue(one, true);
 			Assert.AreEqual(one, ai.Value);
 			Assert.IsTrue(ai.IsMarked);
-			Assert.AreEqual(one, ai.GetValue(out mark));
+            Assert.AreEqual(one, ai.GetValue(out mark));
 			Assert.IsTrue(mark);
 
 			ai.SetNewAtomicValue(one, true);
 			Assert.AreEqual(one, ai.Value);
 			Assert.IsTrue(ai.IsMarked);
-			Assert.AreEqual(one, ai.GetValue(out mark));
+            Assert.AreEqual(one, ai.GetValue(out mark));
 			Assert.IsTrue(mark);
 		}
 
 		[Test]
 		public void AttemptMark()
 		{
-			bool mark;
-            AtomicMarkableReference<Integer> ai = new AtomicMarkableReference<Integer>(one, false);
-			Assert.IsFalse(ai.IsMarked, "Reference is marked.");
-			Assert.IsTrue(ai.AttemptMark(one, true), "Reference was not marked");
-			Assert.IsTrue(ai.IsMarked, "Reference is not marked.");
-			Assert.AreEqual(one, ai.GetValue(out mark), "Reference does not equal.");
+		    bool mark;
+            AtomicMarkable<int> ai = new AtomicMarkable<int>(one, false);
+			Assert.IsFalse(ai.IsMarked, "Value is marked.");
+			Assert.IsTrue(ai.AttemptMark(one, true), "Value was not marked");
+			Assert.IsTrue(ai.IsMarked, "Value is not marked.");
+			Assert.AreEqual(one, ai.GetValue(out mark), "Value does not equal.");
 			Assert.IsTrue(mark, "Mark returned is false");
 		}
 
 		[Test]
 		public void CompareAndSet()
 		{
-			bool mark;
-            AtomicMarkableReference<Integer> ai = new AtomicMarkableReference<Integer>(one, false);
-			Assert.AreEqual(one, ai.GetValue(out mark));
+		    bool mark;
+            AtomicMarkable<int> ai = new AtomicMarkable<int>(one, false);
+            Assert.AreEqual(one, ai.GetValue(out mark));
 			Assert.IsFalse(ai.IsMarked);
 			Assert.IsFalse(mark);
 
 			Assert.IsTrue(ai.CompareAndSet(one, two, false, false));
-			Assert.AreEqual(two, ai.GetValue(out mark));
+            Assert.AreEqual(two, ai.GetValue(out mark));
 			Assert.IsFalse(mark);
 
 			Assert.IsTrue(ai.CompareAndSet(two, m3, false, true));
-			Assert.AreEqual(m3, ai.GetValue(out mark));
+            Assert.AreEqual(m3, ai.GetValue(out mark));
 			Assert.IsTrue(mark);
 
 			Assert.IsFalse(ai.CompareAndSet(two, m3, true, true));
-			Assert.AreEqual(m3, ai.GetValue(out mark));
+            Assert.AreEqual(m3, ai.GetValue(out mark));
 			Assert.IsTrue(mark);
 		}
 
 		[Test]
 		public void CompareAndSetInMultipleThreads()
 		{
-            AtomicMarkableReference<Integer> ai = new AtomicMarkableReference<Integer>(one, false);
+            AtomicMarkable<int> ai = new AtomicMarkable<int>(one, false);
 			Thread t = new Thread(new ThreadStart(new AnonymousClassRunnable(ai).Run));
 			t.Start();
 			Assert.IsTrue(ai.CompareAndSet(one, two, false, false));
@@ -149,7 +149,7 @@ namespace Spring.Threading.InterlockedAtomics
 		[Test]
 		public void CompareAndSetInMultipleThreadsChangedMarkBits()
 		{
-            AtomicMarkableReference<Integer> ai = new AtomicMarkableReference<Integer>(one, false);
+            AtomicMarkable<int> ai = new AtomicMarkable<int>(one, false);
 			Thread t = new Thread(new ThreadStart(new AnonymousClassRunnable1(ai).Run));
 			t.Start();
 			Assert.IsTrue(ai.CompareAndSet(one, one, false, true));
@@ -163,35 +163,35 @@ namespace Spring.Threading.InterlockedAtomics
 		public void WeakCompareAndSet()
 		{
 			bool mark;
-            AtomicMarkableReference<Integer> ai = new AtomicMarkableReference<Integer>(one, false);
+            AtomicMarkable<int> ai = new AtomicMarkable<int>(one, false);
 			Assert.AreEqual(one, ai.GetValue(out mark));
 			Assert.IsFalse(ai.IsMarked);
 			Assert.IsFalse(mark);
 
 			while (!ai.WeakCompareAndSet(one, two, false, false))
 				;
-			Assert.AreEqual(two, ai.GetValue(out mark));
+            Assert.AreEqual(two, ai.GetValue(out mark));
 			Assert.IsFalse(mark);
 
 			while (!ai.WeakCompareAndSet(two, m3, false, true))
 				;
-			Assert.AreEqual(m3, ai.GetValue(out mark));
+            Assert.AreEqual(m3, ai.GetValue(out mark));
 			Assert.IsTrue(mark);
 		}
 		[Test]
 			public void SerializeAndDeseralize()
 		{
-            AtomicMarkableReference<Integer> atomicMarkableReference = new AtomicMarkableReference<Integer>(one, true);	
+            AtomicMarkable<int> atomicMarkable = new AtomicMarkable<int>(one, true);	
 			MemoryStream bout = new MemoryStream(10000);
 
 			BinaryFormatter formatter = new BinaryFormatter();
-			formatter.Serialize(bout, atomicMarkableReference);
+			formatter.Serialize(bout, atomicMarkable);
 
 			MemoryStream bin = new MemoryStream(bout.ToArray());
 			BinaryFormatter formatter2 = new BinaryFormatter();
-            AtomicMarkableReference<Integer> atomicMarkableReference2 = (AtomicMarkableReference<Integer>)formatter2.Deserialize(bin);
+            AtomicMarkable<int> atomicMarkableReference2 = (AtomicMarkable<int>)formatter2.Deserialize(bin);
 
-			Assert.AreEqual(atomicMarkableReference.Value, atomicMarkableReference2.Value);
+			Assert.AreEqual(atomicMarkable.Value, atomicMarkableReference2.Value);
 			Assert.IsTrue(atomicMarkableReference2.IsMarked);
 		}
 	}

@@ -24,7 +24,7 @@ using System.Threading;
 namespace Spring.Threading.InterlockedAtomics
 {
     /// <summary>
-    /// A <see lang="bool"/> value that may be updated atomically. An <see cref="Spring.Threading.AtomicTypes.AtomicBoolean"/> 
+    /// A <see lang="bool"/> value that may be updated atomically. An <see cref="AtomicBoolean"/> 
     /// is used for instances of atomically updated flags, and cannot be used as a replacement for a <see lang="bool"/> value.
     /// <p/>
     /// Based on the on the back port of JCP JSR-166.
@@ -34,14 +34,14 @@ namespace Spring.Threading.InterlockedAtomics
     /// <author>Andreas Doehring (.NET)</author>
     /// <author>Kenneth Xu (Interlocked)</author>
     [Serializable]
-    public class AtomicBoolean {
+    public class AtomicBoolean : IAtomic<bool> {
         /// <summary>
         /// Holds a <see lang="Int32"/> representation of the flag value.
         /// </summary>
         private volatile int _booleanValue;
 
         /// <summary> 
-        /// Creates a new <see cref="Spring.Threading.AtomicTypes.AtomicBoolean"/> with the given initial value.
+        /// Creates a new <see cref="AtomicBoolean"/> with the given initial value.
         /// </summary>
         /// <param name="initialValue">
         /// The initial value
@@ -51,7 +51,7 @@ namespace Spring.Threading.InterlockedAtomics
         }
 
         /// <summary> 
-        /// Creates a new <see cref="Spring.Threading.AtomicTypes.AtomicBoolean"/> with initial value of <see lang="false"/>.
+        /// Creates a new <see cref="AtomicBoolean"/> with initial value of <see lang="false"/>.
         /// </summary>
         public AtomicBoolean()
             : this(false) {
@@ -135,6 +135,21 @@ namespace Spring.Threading.InterlockedAtomics
         public override String ToString() {
             return Value.ToString();
         }
+
+        /// <summary>
+        /// Implicit convert <see cref="AtomicBoolean"/> to bool.
+        /// </summary>
+        /// <param name="atomicBoolean">
+        /// Instance of <see cref="AtomicBoolean"/>
+        /// </param>
+        /// <returns>
+        /// The boolean value of <paramref name="atomicBoolean"/>.
+        /// </returns>
+        public static implicit operator bool(AtomicBoolean atomicBoolean)
+        {
+            return atomicBoolean.Value;
+        }
+
     }
 }
 

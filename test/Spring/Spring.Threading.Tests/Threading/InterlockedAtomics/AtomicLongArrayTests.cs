@@ -70,7 +70,7 @@ namespace Spring.Threading.InterlockedAtomics
 		{
 			long[] a = new long[] {17L, 3L, - 42L, 99L, - 7L};
 			AtomicLongArray ai = new AtomicLongArray(a);
-			Assert.AreEqual(a.Length, ai.Length);
+			Assert.AreEqual(a.Length, ai.Count);
 			for (int i = 0; i < a.Length; ++i)
 				Assert.AreEqual(a[i], ai[i]);
 		}
@@ -206,9 +206,9 @@ namespace Spring.Threading.InterlockedAtomics
 			for (int i = 0; i < DEFAULT_COLLECTION_SIZE; ++i)
 			{
 				ai[i] = 1;
-                Assert.AreEqual(1, ai.SetNewAtomicValue(i, 0));
-                Assert.AreEqual(0, ai.SetNewAtomicValue(i, -10));
-                Assert.AreEqual(-10, ai.SetNewAtomicValue(i, 1));
+                Assert.AreEqual(1, ai.Exchange(i, 0));
+                Assert.AreEqual(0, ai.Exchange(i, -10));
+                Assert.AreEqual(-10, ai.Exchange(i, 1));
 			}
 		}
 
@@ -339,7 +339,7 @@ namespace Spring.Threading.InterlockedAtomics
 				for (;; )
 				{
 					bool done = true;
-					for (int i = 0; i < ai.Length; ++i)
+					for (int i = 0; i < ai.Count; ++i)
 					{
 						long v = ai[i];
 						Assert.IsTrue(v >= 0);

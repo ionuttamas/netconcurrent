@@ -10,29 +10,55 @@ namespace Spring.Threading
 {
     public class BaseThreadingTestCase
     {
+        [Serializable]
+        public class Integer
+        {
+            internal readonly int Value;
+
+            public Integer(int value)
+            {
+                this.Value = value;
+            }
+
+            public static implicit operator int(Integer integer)
+            {
+                return integer.Value;
+            }
+
+            public static implicit operator Integer(int value)
+            {
+                return new Integer(value);
+            }
+
+            public override string ToString()
+            {
+                return string.Format("Integer({0})", Value);
+            }
+        }
+
         public const string TEST_STRING = "a test string";
         public static int DEFAULT_COLLECTION_SIZE = 20;
-        protected static Int32 eight = Int32.Parse("8");
-        protected static Int32 five = Int32.Parse("5");
-        protected static Int32 four = Int32.Parse("4");
+        protected static Integer eight = Int32.Parse("8");
+        protected static Integer five = Int32.Parse("5");
+        protected static Integer four = Int32.Parse("4");
         public static TimeSpan LONG_DELAY_MS;
-        protected static Int32 m1 = Int32.Parse("-1");
-        protected static Int32 m10 = Int32.Parse("-10");
-        protected static Int32 m2 = Int32.Parse("-2");
-        protected static Int32 m3 = Int32.Parse("-3");
-        protected static Int32 m4 = Int32.Parse("-4");
-        protected static Int32 m5 = Int32.Parse("-5");
+        protected static Integer m1 = Int32.Parse("-1");
+        protected static Integer m10 = Int32.Parse("-10");
+        protected static Integer m2 = Int32.Parse("-2");
+        protected static Integer m3 = Int32.Parse("-3");
+        protected static Integer m4 = Int32.Parse("-4");
+        protected static Integer m5 = Int32.Parse("-5");
         public static TimeSpan MEDIUM_DELAY_MS;
-        protected static Int32 nine = Int32.Parse("9");
-        protected static Int32 one = Int32.Parse("1");
-        protected static Int32 seven = Int32.Parse("7");
+        protected static Integer nine = Int32.Parse("9");
+        protected static Integer one = Int32.Parse("1");
+        protected static Integer seven = Int32.Parse("7");
 
         public static TimeSpan SHORT_DELAY_MS;
-        protected static Int32 six = Int32.Parse("6");
+        protected static Integer six = Int32.Parse("6");
         public static TimeSpan SMALL_DELAY_MS;
-        protected static Int32 three = Int32.Parse("3");
-        protected static Int32 two = Int32.Parse("2");
-        protected static Int32 zero = Int32.Parse("0");
+        protected static Integer three = Int32.Parse("3");
+        protected static Integer two = Int32.Parse("2");
+        protected static Integer zero = Int32.Parse("0");
 
         private volatile bool threadFailed;
 

@@ -129,9 +129,9 @@ namespace Spring.Threading.InterlockedAtomics
 		public void GetOldValueAndSetNewValue()
 		{
 			AtomicBoolean ai = new AtomicBoolean( true );
-			Assert.AreEqual( true, ai.SetNewAtomicValue( false ) );
-			Assert.AreEqual( false, ai.SetNewAtomicValue( false ) );
-			Assert.AreEqual( false, ai.SetNewAtomicValue( true ) );
+            Assert.AreEqual(true, ai.Exchange(false));
+            Assert.AreEqual(false, ai.Exchange(false));
+            Assert.AreEqual(false, ai.Exchange(true));
 			Assert.AreEqual( true, ai.Value );
 		}
 

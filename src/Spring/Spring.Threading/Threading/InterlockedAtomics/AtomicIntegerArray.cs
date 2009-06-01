@@ -19,8 +19,10 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
 using System.Text;
 using System.Threading;
+using Spring.Collections.Generic;
 
 namespace Spring.Threading.InterlockedAtomics
 {
@@ -33,11 +35,12 @@ namespace Spring.Threading.InterlockedAtomics
     /// <author>Andreas Doehring(.NET)</author>
     /// <author>Kenneth Xu (Interlock)</author>
     [Serializable]
-    public class AtomicIntegerArray {
+    public class AtomicIntegerArray : AbstractList<int>, IAtomicArray<int>
+    {
         private readonly int[] _intArray;
 
         /// <summary> 
-        /// Creates a new <see cref="Spring.Threading.AtomicTypes.AtomicIntegerArray"/> of given length.
+        /// Creates a new <see cref="AtomicIntegerArray"/> of given length.
         /// </summary>
         /// <param name="length">
         /// The length of the array
@@ -47,7 +50,7 @@ namespace Spring.Threading.InterlockedAtomics
         }
 
         /// <summary> 
-        /// Creates a new <see cref="Spring.Threading.AtomicTypes.AtomicIntegerArray"/> with the same length as, and
+        /// Creates a new <see cref="AtomicIntegerArray"/> with the same length as, and
         /// all elements copied from <paramref name="array"/>.
         /// </summary>
         /// <param name="array">
@@ -73,8 +76,28 @@ namespace Spring.Threading.InterlockedAtomics
         /// <returns> 
         /// The length of the array
         /// </returns>
-        public int Length {
+        public override int Count {
             get { return _intArray.Length; }
+        }
+        
+        /// <summary>
+        /// Returns an enumerator that iterates through the collection.
+        /// </summary>
+        /// <remarks>
+        /// Subclass must implement this method.
+        /// </remarks>
+        /// <returns>
+        /// A <see cref="IEnumerator{T}"/> that can be used to iterate 
+        /// through the collection.
+        /// </returns>
+        /// <filterpriority>1</filterpriority>
+        public override IEnumerator<int> GetEnumerator()
+        {
+            int length = Count;
+            for (int i = 0; i < length; i++)
+            {
+                yield return this[i];
+            }
         }
 
         /// <summary> 
@@ -86,7 +109,7 @@ namespace Spring.Threading.InterlockedAtomics
         /// <returns> 
         /// The current value
         /// </returns>
-        public int this[int index] {
+        public override int this[int index] {
             get { return Thread.VolatileRead(ref _intArray[index]); }
             set { Thread.VolatileWrite(ref _intArray[index], value); }
         }
