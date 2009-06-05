@@ -35,7 +35,7 @@ namespace Spring.Threading.InterlockedAtomics
     /// <author>Griffin Caprio (.NET)</author>
     /// <author>Andreas Doehring (.NET)</author>
     [Serializable]
-    public class AtomicLongArray : AbstractList<long>, IAtomicArray<long>
+    public class AtomicLongArray : AbstractAtomicArray<long>, IAtomicArray<long>
     {
         private long[] _longArray;
 
@@ -78,26 +78,6 @@ namespace Spring.Threading.InterlockedAtomics
         /// </returns>
         public override int Count {
             get { return _longArray.Length; }
-        }
-
-        /// <summary>
-        /// Returns an enumerator that iterates through the collection.
-        /// </summary>
-        /// <remarks>
-        /// Subclass must implement this method.
-        /// </remarks>
-        /// <returns>
-        /// A <see cref="IEnumerator{T}"/> that can be used to iterate 
-        /// through the collection.
-        /// </returns>
-        /// <filterpriority>1</filterpriority>
-        public override IEnumerator<long> GetEnumerator()
-        {
-            int length = Count;
-            for (int i = 0; i < length; i++)
-            {
-                yield return this[i];
-            }
         }
 
         /// <summary> 

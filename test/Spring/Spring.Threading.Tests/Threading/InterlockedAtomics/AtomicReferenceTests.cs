@@ -27,19 +27,6 @@ namespace Spring.Threading.InterlockedAtomics
 {
     [TestFixture]
     public class AtomicReferenceTests : BaseThreadingTestCase {
-        private class AnonymousClassRunnable {
-            private readonly AtomicReference<object> _atomicReference;
-
-            public AnonymousClassRunnable(AtomicReference<object> ai) {
-                _atomicReference = ai;
-            }
-
-            public void Run() {
-                while(!_atomicReference.CompareAndSet(two, three))
-                    Thread.Sleep(SHORT_DELAY_MS);
-            }
-        }
-
         [Test]
         public void Constructor() {
             AtomicReference<object> ai = new AtomicReference<object>(one);
@@ -89,38 +76,34 @@ namespace Spring.Threading.InterlockedAtomics
         [Test]
         public void CompareAndSetWithNullReference() {
             AtomicReference<string> sar = new AtomicReference<string>();
-            string expected = "test";
+            const string expected = "test";
             Assert.IsTrue(sar.CompareAndSet(null, expected));
             Assert.IsTrue(sar.Value.Equals(expected));
         }
 
         [Test]
         public void CompareAndSetInMultipleThreads() {
-            object o1 = new object(), o2 = new object(), o3 = new object(), o5 = new object(), o7 = new object();
-            AtomicReference<object> ai = new AtomicReference<object>(o1);
+            AtomicReference<object> ai = new AtomicReference<object>(one);
             Thread t = new Thread(delegate()
                                       {
-                                          while (!ai.CompareAndSet(o2, o3))
+                                          while (!ai.CompareAndSet(two, three))
                                               Thread.Sleep(SHORT_DELAY_MS);
 
                                       });
             t.Start();
-            Assert.IsTrue(ai.CompareAndSet(o1, o2), "Value did not equal 'one' reference");
+            Assert.IsTrue(ai.CompareAndSet(one, two), "Value did not equal 'one' reference");
             t.Join(SMALL_DELAY_MS);
             Assert.IsFalse(t.IsAlive, "Thread is still alive");
-            Assert.AreEqual(ai.Value, o3, "Object reference not switched from 'two' to 'three'");
+            Assert.AreEqual(ai.Value, three, "Object reference not switched from 'two' to 'three'");
         }
 
         [Test]
         public void WeakCompareAndSet() {
             AtomicReference<object> ai = new AtomicReference<object>(one);
-            while(!ai.WeakCompareAndSet(one, two))
-                ;
-            while(!ai.WeakCompareAndSet(two, m4))
-                ;
+            while(!ai.WeakCompareAndSet(one, two)){}
+            while(!ai.WeakCompareAndSet(two, m4)){}
             Assert.AreEqual(m4, ai.Value);
-            while(!ai.WeakCompareAndSet(m4, seven))
-                ;
+            while(!ai.WeakCompareAndSet(m4, seven)){}
             Assert.AreEqual(seven, ai.Value);
             Assert.IsFalse(ai.WeakCompareAndSet(m4, seven));
 
@@ -156,5 +139,17 @@ namespace Spring.Threading.InterlockedAtomics
             ai.Value = two;
             Assert.AreEqual(ai.ToString(), two.ToString());
         }
+
+        [Test]
+        public void ImplicitConverter()
+        {
+            AtomicReference<Integer> ai = new AtomicReference<Integer>(one);
+            Integer result = ai;
+            Assert.AreEqual(one, result);
+            ai.Value = two;
+            result = ai;
+            Assert.AreEqual(two, result);
+        }
+
     }
 }

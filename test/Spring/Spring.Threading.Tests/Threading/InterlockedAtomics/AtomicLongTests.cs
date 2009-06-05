@@ -33,19 +33,6 @@ namespace Spring.Threading.InterlockedAtomics
     /// <author>Andreas Doehring (.NET)</author>
     [TestFixture]
     public class AtomicLongTests : BaseThreadingTestCase {
-        private class AnonymousClassRunnable {
-            private readonly AtomicLong ai;
-
-            public AnonymousClassRunnable(AtomicLong ai) {
-                this.ai = ai;
-            }
-
-            public void Run() {
-                while(!ai.CompareAndSet(2, 3))
-                    Thread.Sleep(0);
-            }
-        }
-
         [Test]
         public void Constructor() {
             AtomicLong ai = new AtomicLong(1);
@@ -53,13 +40,14 @@ namespace Spring.Threading.InterlockedAtomics
         }
 
         [Test]
-        public void Constructor2() {
+        public void DefaultConstructor() {
             AtomicLong ai = new AtomicLong();
             Assert.AreEqual(0, ai.Value);
         }
 
         [Test]
-        public void GetSet() {
+        public void GetLastSetValue()
+        {
             AtomicLong ai = new AtomicLong(1);
             Assert.AreEqual(1, ai.Value);
             ai.Value = 2;
@@ -69,7 +57,8 @@ namespace Spring.Threading.InterlockedAtomics
         }
 
         [Test]
-        public void LazySet() {
+        public void GetLastLazySetValue()
+        {
             AtomicLong ai = new AtomicLong(1);
             Assert.AreEqual(1, ai.Value);
             ai.LazySet(2);
@@ -79,7 +68,8 @@ namespace Spring.Threading.InterlockedAtomics
         }
 
         [Test]
-        public void CompareAndSet() {
+        public void CompareExpectedValueAndSetNewValue()
+        {
             AtomicLong ai = new AtomicLong(1);
             Assert.IsTrue(ai.CompareAndSet(1, 2));
             Assert.IsTrue(ai.CompareAndSet(2, -4));
@@ -91,9 +81,14 @@ namespace Spring.Threading.InterlockedAtomics
         }
 
         [Test]
-        public void CompareAndSetInMultipleThreads() {
+        public void CompareExpectedValueAndSetNewValueInMultipleThreads()
+        {
             AtomicLong ai = new AtomicLong(1);
-            Thread t = new Thread(new ThreadStart(new AnonymousClassRunnable(ai).Run));
+            Thread t = new Thread(delegate()
+            {
+                while (!ai.CompareAndSet(2, 3))
+                    Thread.Sleep(0);
+            });
             t.Start();
             Assert.IsTrue(ai.CompareAndSet(1, 2));
             t.Join(LONG_DELAY_MS);
@@ -102,21 +97,20 @@ namespace Spring.Threading.InterlockedAtomics
         }
 
         [Test]
-        public void WeakCompareAndSet() {
+        public void WeakCompareExpectedValueAndSetNewValue()
+        {
             AtomicLong ai = new AtomicLong(1);
-            while(!ai.WeakCompareAndSet(1, 2))
-                ;
-            while(!ai.WeakCompareAndSet(2, -4))
-                ;
+            while(!ai.WeakCompareAndSet(1, 2)) {}
+            while(!ai.WeakCompareAndSet(2, -4)) {}
             Assert.AreEqual(-4, ai.Value);
-            while(!ai.WeakCompareAndSet(-4, 7))
-                ;
+            while(!ai.WeakCompareAndSet(-4, 7)) {}
             Assert.AreEqual(7, ai.Value);
             Assert.IsFalse(ai.WeakCompareAndSet(-4, 7));
         }
 
         [Test]
-        public void GetAndSet() {
+        public void Exchange()
+        {
             AtomicLong ai = new AtomicLong(1);
             Assert.AreEqual(1, ai.Exchange(0));
             Assert.AreEqual(0, ai.Exchange(-10));
@@ -124,7 +118,8 @@ namespace Spring.Threading.InterlockedAtomics
         }
 
         [Test]
-        public void GetAndAdd() {
+        public void AddDeltaAndReturnPreviousValue()
+        {
             AtomicLong ai = new AtomicLong(1);
             Assert.AreEqual(1, ai.AddDeltaAndReturnPreviousValue(2));
             Assert.AreEqual(3, ai.Value);
@@ -133,7 +128,8 @@ namespace Spring.Threading.InterlockedAtomics
         }
 
 
-		[Test] public void GetReturnValueAndDecrement()
+        [Test]
+        public void ReturnValueAndDecrement()
 		{
 			AtomicLong ai = new AtomicLong(1);
 			Assert.AreEqual(1, ai.ReturnValueAndDecrement());
@@ -142,7 +138,8 @@ namespace Spring.Threading.InterlockedAtomics
 		}
 
 
-		[Test] public void GetReturnValueAndIncrement()
+        [Test]
+        public void ReturnValueAndIncrement()
 		{
 			AtomicLong ai = new AtomicLong(1);
 			Assert.AreEqual(1, ai.ReturnValueAndIncrement());
@@ -155,7 +152,8 @@ namespace Spring.Threading.InterlockedAtomics
 		}
 
         [Test]
-        public void AddAndGet() {
+        public void AddDeltaAndReturnNewValue()
+        {
             AtomicLong ai = new AtomicLong(1);
             Assert.AreEqual(3, ai.AddDeltaAndReturnNewValue(2));
             Assert.AreEqual(3, ai.Value);
@@ -164,7 +162,8 @@ namespace Spring.Threading.InterlockedAtomics
         }
 
         [Test]
-        public void DecrementAndGet() {
+        public void DecrementValueAndReturn()
+        {
             AtomicLong ai = new AtomicLong(1);
             Assert.AreEqual(0, ai.DecrementValueAndReturn());
             Assert.AreEqual(-1, ai.DecrementValueAndReturn());
@@ -173,7 +172,8 @@ namespace Spring.Threading.InterlockedAtomics
         }
 
         [Test]
-        public void IncrementAndGet() {
+        public void IncrementValueAndReturn()
+        {
             AtomicLong ai = new AtomicLong(1);
             Assert.AreEqual(2, ai.IncrementValueAndReturn());
             Assert.AreEqual(2, ai.Value);
@@ -185,7 +185,8 @@ namespace Spring.Threading.InterlockedAtomics
         }
 
         [Test]
-        public void Serialization() {
+        public void SerializationAndDeserialization()
+        {
             AtomicLong l = new AtomicLong();
 
             l.Value = -22;
@@ -210,15 +211,20 @@ namespace Spring.Threading.InterlockedAtomics
         }
 
         [Test]
-        public void IntValue() {
+        public void Value() {
             AtomicLong ai = new AtomicLong(42);
-            Assert.AreEqual(ai.Value, 42);
+            Assert.AreEqual(ai.Value, 42L);
         }
 
         [Test]
-        public void LongValue() {
-            AtomicLong ai = new AtomicLong(42);
-            Assert.AreEqual(ai.Value, 42L);
+        public void ImplicitConverter()
+        {
+            AtomicLong ai = new AtomicLong(1);
+            long result = ai;
+            Assert.AreEqual(1L, result);
+            ai.Value = -3;
+            result = ai;
+            Assert.AreEqual(-3L, result);
         }
     }
 }

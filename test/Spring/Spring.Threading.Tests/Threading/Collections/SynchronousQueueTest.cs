@@ -1,7 +1,6 @@
 using System;
 using System.Threading;
 using NUnit.Framework;
-using NUnit.Framework.SyntaxHelpers;
 using Spring.Threading.Collections;
 
 namespace Spring.Threading.Tests.Collections {

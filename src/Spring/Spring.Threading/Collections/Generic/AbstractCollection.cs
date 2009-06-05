@@ -391,7 +391,7 @@ namespace Spring.Collections.Generic
         /// </summary>
         /// <remarks>This implementaiton always return <see langword="false"/>.</remarks>
         /// <returns>
-        /// true if access to the <see cref="T:System.Collections.ICollection"></see> 
+        /// true if access to the <see cref="ICollection"/> 
         /// is synchronized (thread safe); otherwise, false.
         /// </returns>
         /// <filterpriority>2</filterpriority>

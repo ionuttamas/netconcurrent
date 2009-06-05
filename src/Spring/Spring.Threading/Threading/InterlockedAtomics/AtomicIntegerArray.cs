@@ -19,10 +19,8 @@
 #endregion
 
 using System;
-using System.Collections.Generic;
 using System.Text;
 using System.Threading;
-using Spring.Collections.Generic;
 
 namespace Spring.Threading.InterlockedAtomics
 {
@@ -35,7 +33,7 @@ namespace Spring.Threading.InterlockedAtomics
     /// <author>Andreas Doehring(.NET)</author>
     /// <author>Kenneth Xu (Interlock)</author>
     [Serializable]
-    public class AtomicIntegerArray : AbstractList<int>, IAtomicArray<int>
+    public class AtomicIntegerArray : AbstractAtomicArray<int>, IAtomicArray<int>
     {
         private readonly int[] _intArray;
 
@@ -80,26 +78,6 @@ namespace Spring.Threading.InterlockedAtomics
             get { return _intArray.Length; }
         }
         
-        /// <summary>
-        /// Returns an enumerator that iterates through the collection.
-        /// </summary>
-        /// <remarks>
-        /// Subclass must implement this method.
-        /// </remarks>
-        /// <returns>
-        /// A <see cref="IEnumerator{T}"/> that can be used to iterate 
-        /// through the collection.
-        /// </returns>
-        /// <filterpriority>1</filterpriority>
-        public override IEnumerator<int> GetEnumerator()
-        {
-            int length = Count;
-            for (int i = 0; i < length; i++)
-            {
-                yield return this[i];
-            }
-        }
-
         /// <summary> 
         /// Gets / Sets the current value at position index.
         /// </summary>

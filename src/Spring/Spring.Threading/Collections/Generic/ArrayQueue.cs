@@ -160,10 +160,6 @@ namespace Spring.Collections.Generic
                     "collection", "Collection size greater than queue capacity");
 			foreach (T currentObject in collection)
 			{
-                if ( currentObject == null )
-                {
-                    throw new ArgumentNullException("collection");
-                }
 				insert(currentObject);
 			}
 		}

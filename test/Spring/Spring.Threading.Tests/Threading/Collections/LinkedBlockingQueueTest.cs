@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using NUnit.Framework;
-using NUnit.Framework.SyntaxHelpers;
 using Spring.Threading.Collections;
 using Spring.Threading.Collections.Generic;
 
