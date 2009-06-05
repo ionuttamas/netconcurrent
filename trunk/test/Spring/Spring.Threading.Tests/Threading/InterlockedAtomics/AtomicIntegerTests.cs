@@ -32,34 +32,25 @@ namespace Spring.Threading.InterlockedAtomics
     /// <author>Griffin Caprio (.NET)</author>
     /// <author>Andreas Doehring (.NET)</author>
     [TestFixture]
-    public class AtomicIntegerTests : BaseThreadingTestCase {
-        private class AnonymousClassRunnable {
-            private readonly AtomicInteger _ai;
-
-            public AnonymousClassRunnable(AtomicInteger ai) {
-                _ai = ai;
-            }
-
-            public void Run() {
-                while(!_ai.CompareAndSet(2, 3))
-                    Thread.Sleep(100);
-            }
-        }
-
+    public class AtomicIntegerTests : BaseThreadingTestCase
+    {
         [Test]
-        public void Constructor() {
+        public void Constructor()
+        {
             AtomicInteger ai = new AtomicInteger(1);
             Assert.AreEqual(1, ai.Value);
         }
 
         [Test]
-        public void Constructor2() {
+        public void DefaultConstructor()
+        {
             AtomicInteger ai = new AtomicInteger();
             Assert.AreEqual(0, ai.Value);
         }
 
         [Test]
-        public void GetSet() {
+        public void GetLastSetValue()
+        {
             AtomicInteger ai = new AtomicInteger(1);
             Assert.AreEqual(1, ai.Value);
             ai.Value = 2;
@@ -69,7 +60,8 @@ namespace Spring.Threading.InterlockedAtomics
         }
 
         [Test]
-        public void GetLazySet() {
+        public void GetLastLazySetValue()
+        {
             AtomicInteger ai = new AtomicInteger(1);
             Assert.AreEqual(1, ai.Value);
             ai.LazySet(2);
@@ -79,7 +71,8 @@ namespace Spring.Threading.InterlockedAtomics
         }
 
         [Test]
-        public void CompareAndSet() {
+        public void CompareExpectedValueAndSetNewValue()
+        {
             AtomicInteger ai = new AtomicInteger(1);
             Assert.IsTrue(ai.CompareAndSet(1, 2));
             Assert.IsTrue(ai.CompareAndSet(2, -4));
@@ -91,9 +84,14 @@ namespace Spring.Threading.InterlockedAtomics
         }
 
         [Test]
-        public void CompareAndSetInMultipleThreads() {
+        public void CompareExpectedValueAndSetNewValueInMultipleThreads()
+        {
             AtomicInteger ai = new AtomicInteger(1);
-            Thread t = new Thread(new ThreadStart(new AnonymousClassRunnable(ai).Run));
+            Thread t = new Thread(delegate()
+            {
+                while (!ai.CompareAndSet(2, 3))
+                    Thread.Sleep(100);
+            });
             t.Start();
             Assert.IsTrue(ai.CompareAndSet(1, 2));
             t.Join(LONG_DELAY_MS);
@@ -102,21 +100,20 @@ namespace Spring.Threading.InterlockedAtomics
         }
 
         [Test]
-        public void WeakCompareAndSet() {
+        public void WeakCompareExpectedValueAndSetNewValue()
+        {
             AtomicInteger ai = new AtomicInteger(1);
-            while(!ai.WeakCompareAndSet(1, 2))
-                ;
-            while(!ai.WeakCompareAndSet(2, -4))
-                ;
+            while (!ai.WeakCompareAndSet(1, 2)) { }
+            while (!ai.WeakCompareAndSet(2, -4)) { }
             Assert.AreEqual(-4, ai.Value);
-            while(!ai.WeakCompareAndSet(-4, 7))
-                ;
+            while (!ai.WeakCompareAndSet(-4, 7)) { }
             Assert.AreEqual(7, ai.Value);
             Assert.IsFalse(ai.WeakCompareAndSet(-4, 7));
         }
 
         [Test]
-        public void GetAndSet() {
+        public void Exchange()
+        {
             AtomicInteger ai = new AtomicInteger(1);
             Assert.AreEqual(1, ai.Exchange(0));
             Assert.AreEqual(0, ai.Exchange(-10));
@@ -124,7 +121,8 @@ namespace Spring.Threading.InterlockedAtomics
         }
 
         [Test]
-        public void GetAndAdd() {
+        public void AddDeltaAndReturnPreviousValue()
+        {
             AtomicInteger ai = new AtomicInteger(1);
             Assert.AreEqual(1, ai.AddDeltaAndReturnPreviousValue(2));
             Assert.AreEqual(3, ai.Value);
@@ -132,46 +130,51 @@ namespace Spring.Threading.InterlockedAtomics
             Assert.AreEqual(-1, ai.Value);
         }
 
-		[Test] public void GetReturnValueAndDecrement()
-		{
-			AtomicInteger ai = new AtomicInteger(1);
-			Assert.AreEqual(1, ai.ReturnValueAndDecrement());
-			Assert.AreEqual(0, ai.ReturnValueAndDecrement());
-			Assert.AreEqual(- 1, ai.ReturnValueAndDecrement());
-		}
-
-		[Test] public void GetReturnValueAndIncrement()
-		{
-			AtomicInteger ai = new AtomicInteger(1);
-			Assert.AreEqual(1, ai.ReturnValueAndIncrement());
-			Assert.AreEqual(2, ai.Value);
-			ai.Value = - 2;
-			Assert.AreEqual(- 2, ai.ReturnValueAndIncrement());
-			Assert.AreEqual(- 1, ai.ReturnValueAndIncrement());
-			Assert.AreEqual(0, ai.ReturnValueAndIncrement());
-			Assert.AreEqual(1, ai.Value);
-		}
-
-		[Test] public void AddAndGet()
-		{
-			AtomicInteger ai = new AtomicInteger(1);
-			Assert.AreEqual(3, ai.AddDeltaAndReturnNewValue(2));
-			Assert.AreEqual(3, ai.Value);
-			Assert.AreEqual(- 1, ai.AddDeltaAndReturnNewValue(- 4));
-			Assert.AreEqual(- 1, ai.Value);
-		}
-
-		[Test] public void DecrementAndGet()
-		{
-			AtomicInteger ai = new AtomicInteger(1);
-			Assert.AreEqual(0, ai.DecrementValueAndReturn());
-			Assert.AreEqual(- 1, ai.DecrementValueAndReturn());
-			Assert.AreEqual(- 2, ai.DecrementValueAndReturn());
-			Assert.AreEqual(- 2, ai.Value);
-		}
+        [Test]
+        public void ReturnValueAndDecrement()
+        {
+            AtomicInteger ai = new AtomicInteger(1);
+            Assert.AreEqual(1, ai.ReturnValueAndDecrement());
+            Assert.AreEqual(0, ai.ReturnValueAndDecrement());
+            Assert.AreEqual(-1, ai.ReturnValueAndDecrement());
+        }
 
         [Test]
-        public void IncrementAndGet() {
+        public void ReturnValueAndIncrement()
+        {
+            AtomicInteger ai = new AtomicInteger(1);
+            Assert.AreEqual(1, ai.ReturnValueAndIncrement());
+            Assert.AreEqual(2, ai.Value);
+            ai.Value = -2;
+            Assert.AreEqual(-2, ai.ReturnValueAndIncrement());
+            Assert.AreEqual(-1, ai.ReturnValueAndIncrement());
+            Assert.AreEqual(0, ai.ReturnValueAndIncrement());
+            Assert.AreEqual(1, ai.Value);
+        }
+
+        [Test]
+        public void AddDeltaAndReturnNewValue()
+        {
+            AtomicInteger ai = new AtomicInteger(1);
+            Assert.AreEqual(3, ai.AddDeltaAndReturnNewValue(2));
+            Assert.AreEqual(3, ai.Value);
+            Assert.AreEqual(-1, ai.AddDeltaAndReturnNewValue(-4));
+            Assert.AreEqual(-1, ai.Value);
+        }
+
+        [Test]
+        public void DecrementValueAndReturn()
+        {
+            AtomicInteger ai = new AtomicInteger(1);
+            Assert.AreEqual(0, ai.DecrementValueAndReturn());
+            Assert.AreEqual(-1, ai.DecrementValueAndReturn());
+            Assert.AreEqual(-2, ai.DecrementValueAndReturn());
+            Assert.AreEqual(-2, ai.Value);
+        }
+
+        [Test]
+        public void IncrementValueAndReturn()
+        {
             AtomicInteger ai = new AtomicInteger(1);
             Assert.AreEqual(2, ai.IncrementValueAndReturn());
             Assert.AreEqual(2, ai.Value);
@@ -183,7 +186,8 @@ namespace Spring.Threading.InterlockedAtomics
         }
 
         [Test]
-        public void Serialization() {
+        public void SerializationAndDeserialization()
+        {
             AtomicInteger l = new AtomicInteger();
 
             l.Value = 22;
@@ -199,12 +203,32 @@ namespace Spring.Threading.InterlockedAtomics
         }
 
         [Test]
-        public void AtomicIntegerToString() {
+        public void Value()
+        {
+            AtomicInteger ai = new AtomicInteger(42);
+            Assert.AreEqual(ai.Value, 42);
+        }
+
+        [Test]
+        public void ToStringTest()
+        {
             AtomicInteger ai = new AtomicInteger();
-            for(int i = -12; i < 6; ++i) {
+            for (int i = -12; i < 6; ++i)
+            {
                 ai.Value = i;
                 Assert.AreEqual(ai.ToString(), Convert.ToString(i));
             }
         }
-   }
+
+        [Test]
+        public void ImplicitConverter()
+        {
+            AtomicInteger ai = new AtomicInteger(1);
+            int result = ai;
+            Assert.AreEqual(1, result);
+            ai.Value = 3;
+            result = ai;
+            Assert.AreEqual(3, result);
+        }
+    }
 }

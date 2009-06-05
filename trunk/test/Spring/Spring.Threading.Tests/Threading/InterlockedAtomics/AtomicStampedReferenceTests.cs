@@ -28,39 +28,7 @@ namespace Spring.Threading.InterlockedAtomics
 	[TestFixture]
 	public class AtomicStampedReferenceTests : BaseThreadingTestCase
 	{
-		private class AnonymousClassChangingReference
-		{
-            private readonly AtomicStampedReference<Integer> ai;
-
-            public AnonymousClassChangingReference(AtomicStampedReference<Integer> ai)
-			{
-				this.ai = ai;
-			}
-
-			public void Run()
-			{
-				while (!ai.CompareAndSet(two, three, 0, 0))
-					Thread.Sleep(0);
-			}
-		}
-
-		private class AnonymousClassChangingStamp
-		{
-            private readonly AtomicStampedReference<Integer> ai;
-
-            public AnonymousClassChangingStamp(AtomicStampedReference<Integer> ai)
-			{
-				this.ai = ai;
-			}
-
-			public void Run()
-			{
-				while (!ai.CompareAndSet(one, one, 1, 2))
-					Thread.Sleep(0);
-			}
-		}
-
-		[Test]
+	    [Test]
 		public void Constructor()
 		{
             AtomicStampedReference<Integer> ai = new AtomicStampedReference<Integer>(one, 0);
@@ -136,7 +104,11 @@ namespace Spring.Threading.InterlockedAtomics
 		public void CompareAndSetInMultipleThreads()
 		{
             AtomicStampedReference<Integer> ai = new AtomicStampedReference<Integer>(one, 0);
-			Thread t = new Thread(new AnonymousClassChangingReference(ai).Run);
+            Thread t = new Thread(delegate()
+            {
+                while (!ai.CompareAndSet(two, three, 0, 0))
+                    Thread.Sleep(0);
+            });
 			t.Start();
 			Assert.IsTrue(ai.CompareAndSet(one, two, 0, 0));
 			t.Join(LONG_DELAY_MS);
@@ -149,7 +121,11 @@ namespace Spring.Threading.InterlockedAtomics
 		public void CompareAndSetInMultipleThreads2()
 		{
             AtomicStampedReference<Integer> ai = new AtomicStampedReference<Integer>(one, 0);
-            Thread t = new Thread(new AnonymousClassChangingStamp(ai).Run);
+            Thread t = new Thread(delegate()
+            {
+                while (!ai.CompareAndSet(one, one, 1, 2))
+                    Thread.Sleep(0);
+            });
 			t.Start();
 			Assert.IsTrue(ai.CompareAndSet(one, one, 0, 1));
 			t.Join(LONG_DELAY_MS);
@@ -180,18 +156,18 @@ namespace Spring.Threading.InterlockedAtomics
 		[Test]
 		public void SerializeAndDeseralize()
 		{
-            AtomicStampedReference<Integer> AtomicStampedReference = new AtomicStampedReference<Integer>(one, 0987654321);	
+            AtomicStampedReference<Integer> atomicStampedReference = new AtomicStampedReference<Integer>(one, 0987654321);	
 			MemoryStream bout = new MemoryStream(10000);
 
 			BinaryFormatter formatter = new BinaryFormatter();
-			formatter.Serialize(bout, AtomicStampedReference);
+			formatter.Serialize(bout, atomicStampedReference);
 
 			MemoryStream bin = new MemoryStream(bout.ToArray());
 			BinaryFormatter formatter2 = new BinaryFormatter();
-            AtomicStampedReference<Integer> AtomicStampedReferenceReference2 = (AtomicStampedReference<Integer>)formatter2.Deserialize(bin);
+            AtomicStampedReference<Integer> atomicStampedReferenceReference2 = (AtomicStampedReference<Integer>)formatter2.Deserialize(bin);
 
-			Assert.AreEqual(AtomicStampedReference.Value, AtomicStampedReferenceReference2.Value);
-			Assert.AreEqual( AtomicStampedReference.Stamp, AtomicStampedReferenceReference2.Stamp);
+			Assert.AreEqual(atomicStampedReference.Value, atomicStampedReferenceReference2.Value);
+			Assert.AreEqual( atomicStampedReference.Stamp, atomicStampedReferenceReference2.Stamp);
 		}
 	}
 }

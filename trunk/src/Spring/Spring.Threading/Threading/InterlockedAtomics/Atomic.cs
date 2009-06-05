@@ -42,14 +42,7 @@ namespace Spring.Threading.InterlockedAtomics
         /// <summary>
         /// Holds the <see cref="Atomic{T}"/> reference
         /// </summary>
-        private readonly AtomicReference<ValueHolder> _atomicReference;
-
-        [Serializable]
-        private class ValueHolder
-        {
-            internal readonly T Value;
-            internal ValueHolder(T value) { Value = value; }
-        }
+        private readonly AtomicReference<ValueHolder<T>> _atomicReference;
 
         /// <summary> 
         /// Creates a new <see cref="Atomic{T}"/> with the given
@@ -60,7 +53,7 @@ namespace Spring.Threading.InterlockedAtomics
         /// </param>
         public Atomic(T initialValue)
         {
-            _atomicReference = new AtomicReference<ValueHolder>(new ValueHolder(initialValue));
+            _atomicReference = new AtomicReference<ValueHolder<T>>(new ValueHolder<T>(initialValue));
         }
 
         /// <summary> 
@@ -72,9 +65,9 @@ namespace Spring.Threading.InterlockedAtomics
         }
 
         /// <summary>
-        /// Returns the <see cref="ValueHolder"/> held but this instance.
+        /// Returns the <see cref="ValueHolder{T}"/> held but this instance.
         /// </summary>
-        private ValueHolder Holder
+        private ValueHolder<T> Holder
         {
             get { return _atomicReference.Value; }
 
@@ -85,7 +78,7 @@ namespace Spring.Threading.InterlockedAtomics
         public T Value
         {
             get { return Holder.Value; }
-            set { _atomicReference.Value = new ValueHolder(value);}
+            set { _atomicReference.Value = new ValueHolder<T>(value);}
         }
 
         /// <summary> 
@@ -96,7 +89,7 @@ namespace Spring.Threading.InterlockedAtomics
         /// </param>
         public void LazySet(T newValue)
         {
-            _atomicReference.Value = new ValueHolder(newValue);
+            _atomicReference.Value = new ValueHolder<T>(newValue);
         }
 
         /// <summary> 
@@ -115,10 +108,10 @@ namespace Spring.Threading.InterlockedAtomics
         /// </returns>
         public bool CompareAndSet(T expectedValue, T newValue)
         {
-            ValueHolder current = Holder;
+            ValueHolder<T> current = Holder;
 
             return Equals(expectedValue, current.Value) &&
-                (Equals(newValue, current.Value) || _atomicReference.CompareAndSet(current, new ValueHolder(newValue)));
+                (Equals(newValue, current.Value) || _atomicReference.CompareAndSet(current, new ValueHolder<T>(newValue)));
         }
 
         /// <summary> 
@@ -138,10 +131,10 @@ namespace Spring.Threading.InterlockedAtomics
         /// </returns>
         public virtual bool WeakCompareAndSet(T expectedValue, T newValue)
         {
-            ValueHolder current = Holder;
+            ValueHolder<T> current = Holder;
 
             return Equals(expectedValue, current.Value) &&
-                (Equals(newValue, current.Value) || _atomicReference.CompareAndSet(current, new ValueHolder(newValue)));
+                (Equals(newValue, current.Value) || _atomicReference.CompareAndSet(current, new ValueHolder<T>(newValue)));
         }
 
         /// <summary> 
@@ -155,7 +148,7 @@ namespace Spring.Threading.InterlockedAtomics
         /// </returns>
         public T Exchange(T newValue)
         {
-            return _atomicReference.Exchange(new ValueHolder(newValue)).Value;
+            return _atomicReference.Exchange(new ValueHolder<T>(newValue)).Value;
         }
 
         /// <summary> 
@@ -183,4 +176,5 @@ namespace Spring.Threading.InterlockedAtomics
             return atomic.Value;
         }
     }
+
 }

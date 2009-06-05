@@ -12,7 +12,6 @@ using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Threading;
 using NUnit.Framework;
-using NUnit.Framework.SyntaxHelpers;
 using Spring.Collections;
 using Spring.Threading.AtomicTypes;
 using Spring.Threading.Collections.Generic;

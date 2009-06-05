@@ -426,6 +426,7 @@
     <Compile Include="Threading\Execution\ExecutionPolicy\CallerRunsPolicy.cs" />
     <Compile Include="Threading\Future\ContextCopyingFutureTask.cs" />
     <Compile Include="Threading\IContextCopier.cs" />
+    <Compile Include="Threading\InterlockedAtomics\AbstractAtomicArray.cs" />
     <Compile Include="Threading\InterlockedAtomics\AtomicBoolean.cs" />
     <Compile Include="Threading\InterlockedAtomics\AtomicInteger.cs" />
     <Compile Include="Threading\InterlockedAtomics\AtomicIntegerArray.cs" />
@@ -441,6 +442,7 @@
     <Compile Include="Threading\InterlockedAtomics\AtomicStampedReference.cs" />
     <Compile Include="Threading\InterlockedAtomics\IAtomic.cs" />
     <Compile Include="Threading\InterlockedAtomics\IAtomicArray.cs" />
+    <Compile Include="Threading\InterlockedAtomics\ValueHolder.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

@@ -28,39 +28,7 @@ namespace Spring.Threading.InterlockedAtomics
 	[TestFixture]
 	public class AtomicStampedTests : BaseThreadingTestCase
 	{
-		private class AnonymousClassChangingReference
-		{
-            private readonly AtomicStamped<int> ai;
-
-            public AnonymousClassChangingReference(AtomicStamped<int> ai)
-			{
-				this.ai = ai;
-			}
-
-			public void Run()
-			{
-				while (!ai.CompareAndSet(two, three, 0, 0))
-					Thread.Sleep(0);
-			}
-		}
-
-		private class AnonymousClassChangingStamp
-		{
-            private readonly AtomicStamped<int> ai;
-
-            public AnonymousClassChangingStamp(AtomicStamped<int> ai)
-			{
-				this.ai = ai;
-			}
-
-			public void Run()
-			{
-				while (!ai.CompareAndSet(one, one, 1, 2))
-					Thread.Sleep(0);
-			}
-		}
-
-		[Test]
+	    [Test]
 		public void Constructor()
 		{
             AtomicStamped<int> ai = new AtomicStamped<int>(one, 0);
@@ -136,7 +104,11 @@ namespace Spring.Threading.InterlockedAtomics
 		public void CompareAndSetInMultipleThreads()
 		{
             AtomicStamped<int> ai = new AtomicStamped<int>(one, 0);
-			Thread t = new Thread(new AnonymousClassChangingReference(ai).Run);
+            Thread t = new Thread(delegate()
+            {
+                while (!ai.CompareAndSet(two, three, 0, 0))
+                    Thread.Sleep(0);
+            });
 			t.Start();
 			Assert.IsTrue(ai.CompareAndSet(one, two, 0, 0));
 			t.Join(LONG_DELAY_MS);
@@ -149,7 +121,11 @@ namespace Spring.Threading.InterlockedAtomics
 		public void CompareAndSetInMultipleThreads2()
 		{
             AtomicStamped<int> ai = new AtomicStamped<int>(one, 0);
-            Thread t = new Thread(new AnonymousClassChangingStamp(ai).Run);
+            Thread t = new Thread(delegate()
+            {
+                while (!ai.CompareAndSet(one, one, 1, 2))
+                    Thread.Sleep(0);
+            });
 			t.Start();
 			Assert.IsTrue(ai.CompareAndSet(one, one, 0, 1));
 			t.Join(LONG_DELAY_MS);

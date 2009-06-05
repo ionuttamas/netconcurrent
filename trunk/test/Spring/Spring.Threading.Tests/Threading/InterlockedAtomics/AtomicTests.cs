@@ -27,19 +27,6 @@ namespace Spring.Threading.InterlockedAtomics
 {
     [TestFixture]
     public class AtomicTests : BaseThreadingTestCase {
-        private class AnonymousClassRunnable {
-            private readonly Atomic<int> _atomicReference;
-
-            public AnonymousClassRunnable(Atomic<int> ai) {
-                _atomicReference = ai;
-            }
-
-            public void Run() {
-                while(!_atomicReference.CompareAndSet(two, three))
-                    Thread.Sleep(SHORT_DELAY_MS);
-            }
-        }
-
         [Test]
         public void Constructor() {
             Atomic<int> ai = new Atomic<int>(one);
@@ -96,7 +83,11 @@ namespace Spring.Threading.InterlockedAtomics
         [Test]
         public void CompareAndSetInMultipleThreads() {
             Atomic<int> ai = new Atomic<int>(one);
-            Thread t = new Thread(new ThreadStart(new AnonymousClassRunnable(ai).Run));
+            Thread t = new Thread(delegate()
+            {
+                while (!ai.CompareAndSet(two, three))
+                    Thread.Sleep(SHORT_DELAY_MS);
+            });
             t.Start();
             Assert.IsTrue(ai.CompareAndSet(one, two), "Value did not equal 'one' reference");
             t.Join(SMALL_DELAY_MS);
@@ -107,13 +98,10 @@ namespace Spring.Threading.InterlockedAtomics
         [Test]
         public void WeakCompareAndSet() {
             Atomic<int> ai = new Atomic<int>(one);
-            while(!ai.WeakCompareAndSet(one, two))
-                ;
-            while(!ai.WeakCompareAndSet(two, m4))
-                ;
+            while(!ai.WeakCompareAndSet(one, two)){}
+            while(!ai.WeakCompareAndSet(two, m4)){}
             Assert.AreEqual(m4, ai.Value);
-            while(!ai.WeakCompareAndSet(m4, seven))
-                ;
+            while(!ai.WeakCompareAndSet(m4, seven)){}
             Assert.AreEqual(seven, ai.Value);
             Assert.IsFalse(ai.WeakCompareAndSet(m4, seven));
 
@@ -148,6 +136,13 @@ namespace Spring.Threading.InterlockedAtomics
             Assert.AreEqual(ai.ToString(), one.Value.ToString());
             ai.Value = two;
             Assert.AreEqual(ai.ToString(), two.Value.ToString());
+        }
+
+        [Test]
+        public void ImplicitConverter()
+        {
+            Atomic<int> ai = new Atomic<int>(one);
+            Assert.AreEqual(2, 1+ai);
         }
     }
 }

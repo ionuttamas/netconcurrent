@@ -18,7 +18,6 @@
 
 #endregion
 
-using System;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Threading;
@@ -29,39 +28,7 @@ namespace Spring.Threading.InterlockedAtomics
 	[TestFixture]
 	public class AtomicMarkableTests : BaseThreadingTestCase
 	{
-		private class AnonymousClassRunnable
-		{
-            private AtomicMarkable<int> ai;
-
-            public AnonymousClassRunnable(AtomicMarkable<int> ai)
-			{
-				this.ai = ai;
-			}
-
-			public void Run()
-			{
-				while (!ai.CompareAndSet(two, three, false, false))
-					Thread.Sleep(SHORT_DELAY_MS);
-			}
-		}
-
-		private class AnonymousClassRunnable1
-		{
-            private AtomicMarkable<int> ai;
-
-            public AnonymousClassRunnable1(AtomicMarkable<int> ai)
-			{
-				this.ai = ai;
-			}
-
-			public void Run()
-			{
-				while (!ai.CompareAndSet(one, one, true, false))
-					Thread.Sleep(SHORT_DELAY_MS);
-			}
-		}
-
-		[Test]
+	    [Test]
 		public void DefaultConstructor()
 		{
             AtomicMarkable<int> ai = new AtomicMarkable<int>(one, false);
@@ -137,7 +104,11 @@ namespace Spring.Threading.InterlockedAtomics
 		public void CompareAndSetInMultipleThreads()
 		{
             AtomicMarkable<int> ai = new AtomicMarkable<int>(one, false);
-			Thread t = new Thread(new ThreadStart(new AnonymousClassRunnable(ai).Run));
+            Thread t = new Thread(delegate()
+            {
+                while (!ai.CompareAndSet(two, three, false, false))
+                    Thread.Sleep(SHORT_DELAY_MS);
+            });
 			t.Start();
 			Assert.IsTrue(ai.CompareAndSet(one, two, false, false));
 			t.Join(LONG_DELAY_MS);
@@ -150,7 +121,11 @@ namespace Spring.Threading.InterlockedAtomics
 		public void CompareAndSetInMultipleThreadsChangedMarkBits()
 		{
             AtomicMarkable<int> ai = new AtomicMarkable<int>(one, false);
-			Thread t = new Thread(new ThreadStart(new AnonymousClassRunnable1(ai).Run));
+            Thread t = new Thread(delegate()
+            {
+                while (!ai.CompareAndSet(one, one, true, false))
+                    Thread.Sleep(SHORT_DELAY_MS);
+            });
 			t.Start();
 			Assert.IsTrue(ai.CompareAndSet(one, one, false, true));
 			t.Join(LONG_DELAY_MS);
@@ -168,13 +143,11 @@ namespace Spring.Threading.InterlockedAtomics
 			Assert.IsFalse(ai.IsMarked);
 			Assert.IsFalse(mark);
 
-			while (!ai.WeakCompareAndSet(one, two, false, false))
-				;
+			while (!ai.WeakCompareAndSet(one, two, false, false)) {}
             Assert.AreEqual(two, ai.GetValue(out mark));
 			Assert.IsFalse(mark);
 
-			while (!ai.WeakCompareAndSet(two, m3, false, true))
-				;
+			while (!ai.WeakCompareAndSet(two, m3, false, true)) {}
             Assert.AreEqual(m3, ai.GetValue(out mark));
 			Assert.IsTrue(mark);
 		}

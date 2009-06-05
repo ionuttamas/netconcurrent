@@ -30,25 +30,8 @@ namespace Spring.Threading.InterlockedAtomics
 	[TestFixture]
 	public class AtomicLongArrayTests : BaseThreadingTestCase
 	{
-		private class AnonymousClassRunnable
-		{
-			private AtomicLongArray a;
-
-			public AnonymousClassRunnable(AtomicLongArray a)
-			{
-				this.a = a;
-			}
-
-			public void Run()
-			{
-				while (!a.CompareAndSet(0, 2, 3))
-					Thread.Sleep(0);
-			}
-		}
-
-
-		[Test]
-		public void Constructor()
+	    [Test]
+        public void ConstructAtomicIntegerArryWithGivenSize()
 		{
 			AtomicLongArray ai = new AtomicLongArray(DEFAULT_COLLECTION_SIZE);
 			for (int i = 0; i < DEFAULT_COLLECTION_SIZE; ++i)
@@ -58,15 +41,15 @@ namespace Spring.Threading.InterlockedAtomics
 
 		[ExpectedException(typeof (ArgumentNullException))]
 		[Test]
-		public void Constructor2NPE()
+		public void ConstructorChokesOnNullArgument()
 		{
 			long[] a = null;
-			AtomicLongArray ai = new AtomicLongArray(a);
+			new AtomicLongArray(a);
 		}
 
 
 		[Test]
-		public void Constructor2()
+        public void ConstructFromExistingArray()
 		{
 			long[] a = new long[] {17L, 3L, - 42L, 99L, - 7L};
 			AtomicLongArray ai = new AtomicLongArray(a);
@@ -77,46 +60,25 @@ namespace Spring.Threading.InterlockedAtomics
 
 
 		[Test]
-		public void Indexing()
+        public void IndexerChokesOnOutOfRangeIndex()
 		{
 			AtomicLongArray ai = new AtomicLongArray(DEFAULT_COLLECTION_SIZE);
-			try
-			{
-				long foo = ai[DEFAULT_COLLECTION_SIZE];
-			}
-			catch (IndexOutOfRangeException success)
-			{
-                string s = success.Message;
-			}
-			try
-			{
-				long food = ai[-1];
-			}
-			catch (IndexOutOfRangeException success)
-			{
-                string s = success.Message;
-			}
-			try
-			{
-				ai[DEFAULT_COLLECTION_SIZE] = 0;
-			}
-			catch (IndexOutOfRangeException success)
-			{
-                string s = success.Message;
-			}
-			try
-			{
-				ai[- 1] = 0;
-			}
-			catch (IndexOutOfRangeException success)
-			{
-                string s = success.Message;
-			}
+
+            long a = 0;
+            TestHelper.AssertException<IndexOutOfRangeException>(
+                delegate { a = ai[DEFAULT_COLLECTION_SIZE]; });
+            TestHelper.AssertException<IndexOutOfRangeException>(
+                delegate { a = ai[-1]; });
+            TestHelper.AssertException<IndexOutOfRangeException>(
+                delegate { ai.Exchange(DEFAULT_COLLECTION_SIZE, 0); });
+            TestHelper.AssertException<IndexOutOfRangeException>(
+                delegate { ai.Exchange(-1, 0); });
+            Assert.AreEqual(0, a);
 		}
 
 
 		[Test]
-		public void GetSet()
+        public void GetReturnsLastValueSetAtIndex()
 		{
 			AtomicLongArray ai = new AtomicLongArray(DEFAULT_COLLECTION_SIZE);
 			for (int i = 0; i < DEFAULT_COLLECTION_SIZE; ++i)
@@ -132,7 +94,7 @@ namespace Spring.Threading.InterlockedAtomics
 
 
 		[Test]
-		public void GetLazySet()
+        public void GetReturnsLastValueLazySetAtIndex()
 		{
 			AtomicLongArray ai = new AtomicLongArray(DEFAULT_COLLECTION_SIZE);
 			for (int i = 0; i < DEFAULT_COLLECTION_SIZE; ++i)
@@ -148,7 +110,7 @@ namespace Spring.Threading.InterlockedAtomics
 
 
 		[Test]
-		public void CompareAndSet()
+        public void CompareExistingValueAndSetNewValue()
 		{
 			AtomicLongArray ai = new AtomicLongArray(DEFAULT_COLLECTION_SIZE);
 			for (int i = 0; i < DEFAULT_COLLECTION_SIZE; ++i)
@@ -170,7 +132,11 @@ namespace Spring.Threading.InterlockedAtomics
 		{
 			AtomicLongArray a = new AtomicLongArray(1);
 			a[0] = 1;
-			Thread t = new Thread(new ThreadStart(new AnonymousClassRunnable(a).Run));
+            Thread t = new Thread(delegate()
+            {
+                while (!a.CompareAndSet(0, 2, 3))
+                    Thread.Sleep(0);
+            });
 			t.Start();
 			Assert.IsTrue(a.CompareAndSet(0, 1, 2));
 			t.Join(LONG_DELAY_MS);
@@ -186,13 +152,10 @@ namespace Spring.Threading.InterlockedAtomics
 			for (int i = 0; i < DEFAULT_COLLECTION_SIZE; ++i)
 			{
 				ai[i] = 1;
-				while (!ai.WeakCompareAndSet(i, 1, 2))
-					;
-				while (!ai.WeakCompareAndSet(i, 2, - 4))
-					;
+				while (!ai.WeakCompareAndSet(i, 1, 2)) {}
+			    while (!ai.WeakCompareAndSet(i, 2, - 4)) {}
 				Assert.AreEqual(- 4, ai[i]);
-				while (!ai.WeakCompareAndSet(i, - 4, 7))
-					;
+				while (!ai.WeakCompareAndSet(i, - 4, 7)) {}
 				Assert.AreEqual(7, ai[i]);
 				Assert.IsFalse(ai.WeakCompareAndSet(i, -4, 7));
 			}
@@ -200,7 +163,7 @@ namespace Spring.Threading.InterlockedAtomics
 
 
 		[Test]
-		public void GetAndSet()
+        public void Exchange()
 		{
 			AtomicLongArray ai = new AtomicLongArray(DEFAULT_COLLECTION_SIZE);
 			for (int i = 0; i < DEFAULT_COLLECTION_SIZE; ++i)
@@ -214,7 +177,7 @@ namespace Spring.Threading.InterlockedAtomics
 
 
 		[Test]
-		public void GetAndAdd()
+        public void AddDeltaAndReturnPreviousValue()
 		{
 			AtomicLongArray ai = new AtomicLongArray(DEFAULT_COLLECTION_SIZE);
 			for (int i = 0; i < DEFAULT_COLLECTION_SIZE; ++i)
@@ -229,7 +192,7 @@ namespace Spring.Threading.InterlockedAtomics
 
 
 		[Test]
-		public void GetAndDecrement()
+        public void ReturnValueAndDecrement()
 		{
 			AtomicLongArray ai = new AtomicLongArray(DEFAULT_COLLECTION_SIZE);
 			for (int i = 0; i < DEFAULT_COLLECTION_SIZE; ++i)
@@ -243,7 +206,7 @@ namespace Spring.Threading.InterlockedAtomics
 
 
 		[Test]
-		public void GetAndIncrement()
+        public void ReturnValueAndIncrement()
 		{
 			AtomicLongArray ai = new AtomicLongArray(DEFAULT_COLLECTION_SIZE);
 			for (int i = 0; i < DEFAULT_COLLECTION_SIZE; ++i)
@@ -261,7 +224,7 @@ namespace Spring.Threading.InterlockedAtomics
 
 
 		[Test]
-		public void AddAndGet()
+        public void AddDeltaAndReturnNewValue()
 		{
 			AtomicLongArray ai = new AtomicLongArray(DEFAULT_COLLECTION_SIZE);
 			for (int i = 0; i < DEFAULT_COLLECTION_SIZE; ++i)
@@ -276,7 +239,7 @@ namespace Spring.Threading.InterlockedAtomics
 
 
 		[Test]
-		public void DecrementAndGet()
+        public void DecrementValueAndReturn()
 		{
 			AtomicLongArray ai = new AtomicLongArray(DEFAULT_COLLECTION_SIZE);
 			for (int i = 0; i < DEFAULT_COLLECTION_SIZE; ++i)
@@ -291,7 +254,7 @@ namespace Spring.Threading.InterlockedAtomics
 
 
 		[Test]
-		public void IncrementAndGet()
+        public void IncrementValueAndReturn()
 		{
 			AtomicLongArray ai = new AtomicLongArray(DEFAULT_COLLECTION_SIZE);
 			for (int i = 0; i < DEFAULT_COLLECTION_SIZE; ++i)
@@ -308,28 +271,13 @@ namespace Spring.Threading.InterlockedAtomics
 		}
 
 		internal const long COUNTDOWN = 100000;
-#if ! NET_1_0
 		internal class Counter
 		{
-			private void InitBlock(AtomicLongArrayTests enclosingInstance)
-			{
-				this.enclosingInstance = enclosingInstance;
-			}
-
-			private AtomicLongArrayTests enclosingInstance;
-
-			public AtomicLongArrayTests Enclosing_Instance
-			{
-				get { return enclosingInstance; }
-
-			}
-
-			internal AtomicLongArray ai;
+		    internal AtomicLongArray ai;
 			internal long counts;
 
-			internal Counter(AtomicLongArrayTests enclosingInstance, AtomicLongArray a)
+			internal Counter(AtomicLongArray a)
 			{
-				InitBlock(enclosingInstance);
 				ai = a;
 			}
 
@@ -363,10 +311,10 @@ namespace Spring.Threading.InterlockedAtomics
 			AtomicLongArray ai = new AtomicLongArray(DEFAULT_COLLECTION_SIZE);
 			for (int i = 0; i < DEFAULT_COLLECTION_SIZE; ++i)
 				ai[i] = COUNTDOWN;
-			Counter c1 = new Counter(this, ai);
-			Counter c2 = new Counter(this, ai);
-			Thread t1 = new Thread(new ThreadStart(c1.Run));
-			Thread t2 = new Thread(new ThreadStart(c2.Run));
+			Counter c1 = new Counter(ai);
+			Counter c2 = new Counter(ai);
+			Thread t1 = new Thread(c1.Run);
+			Thread t2 = new Thread(c2.Run);
 			t1.Start();
 			t2.Start();
 			t1.Join();
@@ -374,9 +322,8 @@ namespace Spring.Threading.InterlockedAtomics
 			Assert.AreEqual(c1.counts + c2.counts, DEFAULT_COLLECTION_SIZE*COUNTDOWN);
 		}
 
-#endif
 		[Test]
-		public void Serialization()
+        public void SerializeAndDeserialize()
 		{
 			AtomicLongArray l = new AtomicLongArray(DEFAULT_COLLECTION_SIZE);
 			for (int i = 0; i < DEFAULT_COLLECTION_SIZE; ++i)
@@ -390,7 +337,7 @@ namespace Spring.Threading.InterlockedAtomics
 			MemoryStream bin = new MemoryStream(bout.ToArray());
 			BinaryFormatter formatter2 = new BinaryFormatter();
 			AtomicLongArray r = (AtomicLongArray) formatter2.Deserialize(bin);
-			;
+			
 			for (int i = 0; i < DEFAULT_COLLECTION_SIZE; ++i)
 			{
 				Assert.AreEqual(l[i], r[i]);
@@ -403,13 +350,13 @@ namespace Spring.Threading.InterlockedAtomics
 		{
 			long[] a = new long[] {17, 3, - 42, 99, - 7};
 			AtomicLongArray ai = new AtomicLongArray(a);
-			Assert.AreEqual(toString(a), ai.ToString());
+			Assert.AreEqual(ToString(a), ai.ToString());
 
 			long[] b = new long[0];
 			Assert.AreEqual("[]", new AtomicLongArray(b).ToString());
 		}
 
-		private static String toString(long[] array)
+		private static String ToString(long[] array)
 		{
 			if (array.Length == 0)
 				return "[]";

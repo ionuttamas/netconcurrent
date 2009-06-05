@@ -126,7 +126,7 @@ namespace Spring.Threading.InterlockedAtomics
 		}
 
 		[Test]
-		public void GetOldValueAndSetNewValue()
+		public void Exchange()
 		{
 			AtomicBoolean ai = new AtomicBoolean( true );
             Assert.AreEqual(true, ai.Exchange(false));
@@ -136,7 +136,7 @@ namespace Spring.Threading.InterlockedAtomics
 		}
 
 		[Test]
-		public void SerializationOfAtomicBooleanValue()
+		public void SerializationAndDeserialization()
 		{
 			AtomicBoolean atomicBoolean = new AtomicBoolean();
 
@@ -153,12 +153,22 @@ namespace Spring.Threading.InterlockedAtomics
 		}
 
 		[Test]
-		public void ToStringRepresentation()
+        public void ToStringTest()
 		{
 			AtomicBoolean ai = new AtomicBoolean();
 			Assert.AreEqual( ai.ToString(), Boolean.FalseString );
 			ai.Value = true;
 			Assert.AreEqual( ai.ToString(), Boolean.TrueString );
 		}
+
+        [Test]
+        public void ImplicitConverter()
+        {
+            AtomicBoolean ai = new AtomicBoolean(true);
+            Assert.IsTrue(ai);
+            ai.Value = false;
+            Assert.IsFalse(ai);
+        }
+
 	}
 }

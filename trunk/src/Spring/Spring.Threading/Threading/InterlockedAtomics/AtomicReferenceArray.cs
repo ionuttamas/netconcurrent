@@ -37,7 +37,7 @@ namespace Spring.Threading.InterlockedAtomics
     /// <author>Andreas Doehring (.NET)</author>
     /// <author>Kenneth Xu (Interlocked)</author>
     [Serializable]
-    public class AtomicReferenceArray<T> : AbstractList<T>, IAtomicArray<T> where T : class
+    public class AtomicReferenceArray<T> : AbstractAtomicArray<T>, IAtomicArray<T> where T : class
     {
         /// <summary>
         /// Holds the object array reference
@@ -68,10 +68,8 @@ namespace Spring.Threading.InterlockedAtomics
             _referenceArray = new T[length];
             if (length > 0)
             {
-                int last = length - 1;
-                for (int i = 0; i < last; ++i) _referenceArray[i] = array[i];
-                // Do the last write as volatile
-                Thread.VolatileWrite(ref ((object[])_referenceArray)[last], array[last]);
+                for (int i = 0; i < length; ++i) _referenceArray[i] = array[i];
+                Thread.MemoryBarrier();
             }
         }
 
@@ -86,26 +84,6 @@ namespace Spring.Threading.InterlockedAtomics
             get { return _referenceArray.Length; }
         }
 
-        /// <summary>
-        /// Returns an enumerator that iterates through the collection.
-        /// </summary>
-        /// <remarks>
-        /// Subclass must implement this method.
-        /// </remarks>
-        /// <returns>
-        /// A <see cref="IEnumerator{T}"/> that can be used to iterate 
-        /// through the collection.
-        /// </returns>
-        /// <filterpriority>1</filterpriority>
-        public override IEnumerator<T> GetEnumerator()
-        {
-            int length = Count;
-            for (int i = 0; i < length; i++)
-            {
-                yield return this[i];
-            }
-        }
-
         /// <summary> 
         /// Indexer for getting and setting the current value at position <paramref name="index"/>.
         /// <p/>
@@ -114,8 +92,16 @@ namespace Spring.Threading.InterlockedAtomics
         /// The index to use.
         /// </param>
         public override T this[int index] {
-            get { return (T)Thread.VolatileRead(ref ((object[])_referenceArray)[index]); }
-            set { Thread.VolatileWrite(ref ((object[])_referenceArray)[index], value); }
+            get
+            {
+                Thread.MemoryBarrier(); 
+                return _referenceArray[index];
+            }
+            set
+            {
+                _referenceArray[index] = value;
+                Thread.MemoryBarrier();
+            }
         }
 
         /// <summary> 
@@ -128,7 +114,7 @@ namespace Spring.Threading.InterlockedAtomics
         /// the index to set
         /// </param>
         public virtual void LazySet(int index, T newValue) {
-            Thread.VolatileWrite(ref ((object[])_referenceArray)[index], newValue); 
+            this[index] = newValue; 
         }
 
 
