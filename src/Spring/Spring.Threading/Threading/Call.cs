@@ -30,6 +30,7 @@ namespace Spring.Threading
     /// <see cref="IRunnable"/>s or <see cref="Task"/>s that set
     /// <see cref="FutureResult{T}"/>.
     /// </remarks>
+    /// <typeparam name="T">Data type of the result to be returned.</typeparam>
     /// <seealso cref="ICallable{T}"/>
     /// <seealso cref="FutureResult{T}"/>
     /// <author>Kenneth Xu</author>

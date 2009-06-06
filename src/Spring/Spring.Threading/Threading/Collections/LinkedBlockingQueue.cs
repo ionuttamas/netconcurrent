@@ -5,9 +5,8 @@ using System.Runtime.Serialization;
 using System.Threading;
 using Spring.Collections;
 using Spring.Collections.Generic;
-using Spring.Threading.Collections.Generic;
 
-namespace Spring.Threading.Collections {
+namespace Spring.Threading.Collections.Generic {
     /// <summary> 
     /// An optionally-bounded <see cref="IBlockingQueue{T}"/> based on
     /// linked nodes.
@@ -115,14 +114,14 @@ namespace Spring.Threading.Collections {
 
         #region ctors
 
-        /// <summary> Creates a <see cref="Spring.Threading.Collections.LinkedBlockingQueue{T}"/> with a capacity of
+        /// <summary> Creates a <see cref="LinkedBlockingQueue{T}"/> with a capacity of
         /// <see cref="System.Int32.MaxValue"/>.
         /// </summary>
         public LinkedBlockingQueue()
             : this(Int32.MaxValue) {
         }
 
-        /// <summary> Creates a <see cref="Spring.Threading.Collections.LinkedBlockingQueue{T}"/> with the given (fixed) capacity.</summary>
+        /// <summary> Creates a <see cref="LinkedBlockingQueue{T}"/> with the given (fixed) capacity.</summary>
         /// <param name="capacity">the capacity of this queue</param>
         /// <exception cref="System.ArgumentException">if the <paramref name="capacity"/> is not greater than zero.</exception>
         public LinkedBlockingQueue(int capacity) {
@@ -134,7 +133,7 @@ namespace Spring.Threading.Collections {
             last = head = new Node(default(T));
         }
 
-        /// <summary> Creates a <see cref="Spring.Threading.Collections.LinkedBlockingQueue{T}"/> with a capacity of
+        /// <summary> Creates a <see cref="LinkedBlockingQueue{T}"/> with a capacity of
         /// <see cref="System.Int32.MaxValue"/>, initially containing the elements o)f the
         /// given collection, added in traversal order of the collection's iterator.
         /// </summary>
@@ -401,11 +400,11 @@ namespace Spring.Threading.Collections {
         /// Returns the number of additional elements that this queue can ideally
         /// (in the absence of memory or resource constraints) accept without
         /// blocking. This is always equal to the initial capacity of this queue
-        /// minus the current <see cref="Spring.Threading.Collections.LinkedBlockingQueue{T}.Count"/> of this queue.
+        /// minus the current <see cref="LinkedBlockingQueue{T}.Count"/> of this queue.
         /// </summary>
         /// <remarks> 
         /// Note that you <b>cannot</b> always tell if an attempt to insert
-        /// an element will succeed by inspecting <see cref="Spring.Threading.Collections.LinkedBlockingQueue{T}.RemainingCapacity"/>
+        /// an element will succeed by inspecting <see cref="LinkedBlockingQueue{T}.RemainingCapacity"/>
         /// because it may be the case that another thread is about to
         /// insert or remove an element.
         /// </remarks>
@@ -774,7 +773,7 @@ namespace Spring.Threading.Collections {
         /// the array immediately following the end of the queue is set to
         /// <see lang="null"/>.
         /// <p/>
-        /// Like the <see cref="Spring.Threading.Collections.LinkedBlockingQueue{T}.ToArray()"/>  method, this method acts as bridge between
+        /// Like the <see cref="LinkedBlockingQueue{T}.ToArray()"/>  method, this method acts as bridge between
         /// array-based and collection-based APIs.  Further, this method allows
         /// precise control over the runtime type of the output array, and may,
         /// under certain circumstances, be used to save allocation costs.
@@ -788,7 +787,7 @@ namespace Spring.Threading.Collections {
         ///	</code>
         ///	<p/>	
         /// Note that <i>toArray(new object[0])</i> is identical in function to
-        /// <see cref="Spring.Threading.Collections.LinkedBlockingQueue{T}.ToArray()"/>.
+        /// <see cref="LinkedBlockingQueue{T}.ToArray()"/>.
         /// 
         /// </remarks>
         /// <param name="targetArray">

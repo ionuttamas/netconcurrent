@@ -1,7 +1,7 @@
-﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5">
   <PropertyGroup>
     <ProjectType>Local</ProjectType>
-    <ProductVersion>8.0.50727</ProductVersion>
+    <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{4640D873-95DC-4130-98E2-2B931D390C20}</ProjectGuid>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -26,20 +26,21 @@
     </FileUpgradeFlags>
     <UpgradeBackupLocation>
     </UpgradeBackupLocation>
+    <OldToolsVersion>2.0</OldToolsVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <OutputPath>..\..\..\build\VS.Net.2005\Spring.Threading\Debug\</OutputPath>
+    <OutputPath>..\..\..\build\VS.Net.2008.P1\Spring.Threading\Debug\</OutputPath>
     <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
     <BaseAddress>285212672</BaseAddress>
     <CheckForOverflowUnderflow>false</CheckForOverflowUnderflow>
     <ConfigurationOverrideFile>
     </ConfigurationOverrideFile>
-    <DefineConstants>TRACE;DEBUG;_PHASE_I_</DefineConstants>
-    <DocumentationFile>Spring.Threading.xml</DocumentationFile>
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
+    <DocumentationFile>..\..\..\build\VS.Net.2008\Spring.Threading\Debug\Spring.Threading.XML</DocumentationFile>
     <DebugSymbols>true</DebugSymbols>
     <FileAlignment>4096</FileAlignment>
     <NoStdLib>false</NoStdLib>
-    <NoWarn>1591</NoWarn>
+    <NoWarn>1591, 1574</NoWarn>
     <Optimize>false</Optimize>
     <RegisterForComInterop>false</RegisterForComInterop>
     <RemoveIntegerChecks>false</RemoveIntegerChecks>
@@ -49,72 +50,81 @@
     <ErrorReport>prompt</ErrorReport>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <OutputPath>..\..\..\build\VS.Net.2005\Spring.Threading\Release\</OutputPath>
+    <OutputPath>..\..\..\build\VS.Net.2008.P1\Spring.Threading\Release\</OutputPath>
     <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
     <BaseAddress>285212672</BaseAddress>
     <CheckForOverflowUnderflow>false</CheckForOverflowUnderflow>
     <ConfigurationOverrideFile>
     </ConfigurationOverrideFile>
     <DefineConstants>TRACE;NET_2_0</DefineConstants>
-    <DocumentationFile>
-    </DocumentationFile>
+    <DocumentationFile>..\..\..\build\VS.Net.2008\Spring.Threading\Release\Spring.Threading.XML</DocumentationFile>
     <DebugSymbols>false</DebugSymbols>
     <FileAlignment>4096</FileAlignment>
     <NoStdLib>false</NoStdLib>
-    <NoWarn>
-    </NoWarn>
+    <NoWarn>1591, 1574</NoWarn>
     <Optimize>true</Optimize>
     <RegisterForComInterop>false</RegisterForComInterop>
     <RemoveIntegerChecks>false</RemoveIntegerChecks>
-    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <WarningLevel>4</WarningLevel>
     <DebugType>none</DebugType>
     <ErrorReport>prompt</ErrorReport>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Spring.Core, Version=1.1.2.20125, Culture=neutral, PublicKeyToken=65e474d141e25e07, processorArchitecture=MSIL">
+    <Reference Include="Spring.Core, Version=1.2.0.20313, Culture=neutral, PublicKeyToken=65e474d141e25e07, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\lib\net\2.0\Spring.Core.dll</HintPath>
     </Reference>
     <Reference Include="System">
       <Name>System</Name>
     </Reference>
-    <Reference Include="System.XML" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Collections\Generic\AbstractCollection.cs" />
-    <Compile Include="Collections\Generic\AbstractEnumerator.cs" />
-    <Compile Include="Collections\Generic\AbstractList.cs" />
-    <Compile Include="Collections\Generic\AbstractTransformingList.cs" />
-    <Compile Include="Collections\Generic\DictionarySet.cs" />
-    <Compile Include="Collections\Generic\HashedSet.cs" />
-    <Compile Include="Collections\Generic\INavigableDictionary.cs" />
-    <Compile Include="Collections\Generic\INavigableSet.cs" />
-    <Compile Include="Collections\Generic\ISet.cs" />
-    <Compile Include="Collections\Generic\ISortedDictionary.cs" />
-    <Compile Include="Collections\Generic\ISortedSet.cs" />
-    <Compile Include="Collections\Generic\PriorityQueue.cs" />
-    <Compile Include="Collections\Generic\Set.cs" />
-    <Compile Include="Collections\Generic\SortedSet.cs" />
-    <Compile Include="Collections\Generic\TransformingEnumerator.cs" />
-    <Compile Include="Collections\Generic\DownCastList.cs" />
-    <Compile Include="Collections\Generic\TransformingList.cs" />
+    <Compile Include="Collections\Generic\AbstractCollection.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Collections\Generic\AbstractEnumerator.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Collections\Generic\AbstractList.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Collections\Generic\AbstractQueue.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Collections\Generic\AbstractTransformingList.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Collections\Generic\ArrayQueue.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Collections\Generic\DownCastList.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Collections\Generic\IQueue.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Collections\Generic\PriorityQueue.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Collections\Generic\TransformingEnumerator.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Collections\Generic\TransformingList.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="CommonAssemblyInfo.cs" />
-    <Compile Include="Collections\Generic\AbstractQueue.cs" />
-    <Compile Include="Collections\Generic\ArrayQueue.cs" />
-    <Compile Include="Collections\Generic\IQueue.cs" />
+    <Compile Include="Threading\AbstractCallable.cs" />
     <Compile Include="Threading\AtomicTypes\AtomicInteger.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Threading\AtomicTypes\AtomicLong.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Threading\Call.cs">
-      <SubType>Code</SubType>
-    </Compile>
+    <Compile Include="Threading\Call.cs" />
+    <Compile Include="Threading\Callable.cs" />
     <Compile Include="Threading\Collections\Generic\AbstractBlockingQueue.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -184,9 +194,6 @@
     <Compile Include="Threading\Execution\ThreadPoolExecutor.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Threading\FutureResult.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="Threading\Future\FutureTask.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -241,15 +248,14 @@
     <Compile Include="Threading\Locks\ILock.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Threading\Locks\IReadWriteLock.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="Threading\Locks\ReentrantLock.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Threading\Task.cs">
+    <Compile Include="Threading\NullRunnable.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Threading\Runnable.cs" />
+    <Compile Include="Threading\Task.cs" />
     <Compile Include="Threading\ThreadedExecutor.cs">
       <SubType>Code</SubType>
     </Compile>

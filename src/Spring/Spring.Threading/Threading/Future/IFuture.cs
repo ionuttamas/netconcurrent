@@ -21,16 +21,16 @@ using System;
 namespace Spring.Threading.Future
 {
 	/// <summary>
-	/// A <see cref="Spring.Threading.Future.IFuture"/> represents the result of an asynchronous
+	/// A <see cref="IFuture"/> represents the result of an asynchronous
 	/// computation.  
 	/// </summary>
 	/// <remarks> 
 	/// Methods are provided to check if the computation is
 	/// complete, to wait for its completion, and to retrieve the result of
 	/// the computation.  The result can only be retrieved using method
-	/// <see cref="Spring.Threading.Future.IFuture.GetResult()"/> when the computation has completed, blocking if
+	/// <see cref="GetResult()"/> when the computation has completed, blocking if
 	/// necessary until it is ready.  Cancellation is performed by the
-	/// <see cref="Spring.Threading.Future.IFuture.Cancel()"/> method.  Additional methods are provided to
+	/// <see cref="Cancel()"/> method.  Additional methods are provided to
 	/// determine if the task completed normally or was cancelled. Once a
 	/// computation has completed, the computation cannot be cancelled.
 	/// 
@@ -40,10 +40,10 @@ namespace Spring.Threading.Future
 	/// <p/>
 	/// TODO: Provide code sample
 	/// <p/>
-	/// The <see cref="Spring.Threading.Future.FutureTask"/> class is an implementation of <see cref="Spring.Threading.Future.IFuture"/> that
+	/// The <see cref="FutureTask"/> class is an implementation of <see cref="IFuture"/> that
 	/// implements <see cref="Spring.Threading.IRunnable"/>, and so may be executed by an <see cref="Spring.Threading.IExecutor"/>.
 	/// </remarks>
-	/// <seealso cref="Spring.Threading.Future.FutureTask"/>
+	/// <seealso cref="FutureTask"/>
 	/// <seealso cref="Spring.Threading.IExecutor"/>
 	/// <author>Doug Lea</author>
 	/// <author>Griffin Caprio (.NET)</author>
@@ -60,7 +60,7 @@ namespace Spring.Threading.Future
 		/// <remarks> 
 		/// This attempt will fail if the task has already completed, already been cancelled,
 		/// or could not be cancelled for some other reason. If successful,
-		/// and this task has not started when <see cref="Spring.Threading.Future.IFuture.Cancel()"/> is called,
+		/// and this task has not started when <see cref="Cancel()"/> is called,
 		/// this task should never run.  If the task has already started, the in-progress tasks are allowed
 		/// to complete
 		/// </remarks>
@@ -75,7 +75,7 @@ namespace Spring.Threading.Future
 		/// <remarks> 
 		/// This attempt will fail if the task has already completed, already been cancelled,
 		/// or could not be cancelled for some other reason. If successful,
-		/// and this task has not started when <see cref="Spring.Threading.Future.IFuture.Cancel()"/> is called,
+		/// and this task has not started when <see cref="Cancel()"/> is called,
 		/// this task should never run.  If the task has already started,
 		/// then the <paramref name="mayInterruptIfRunning"/> parameter determines
 		/// whether the thread executing this task should be interrupted in
@@ -143,29 +143,53 @@ namespace Spring.Threading.Future
 	}
 
     /// <summary>
-    /// A <see cref="Spring.Threading.Future.IFuture{T}"/> represents the result of an asynchronous
+    /// A <see cref="IFuture{T}"/> represents the result of an asynchronous
     /// computation.  
     /// </summary>
     /// <remarks> 
     /// Methods are provided to check if the computation is
     /// complete, to wait for its completion, and to retrieve the result of
     /// the computation.  The result can only be retrieved using method
-    /// <see cref="Spring.Threading.Future.IFuture{T}.GetResult()"/> when the computation has completed, blocking if
+    /// <see cref="IFuture{T}.GetResult()"/> when the computation has completed, blocking if
     /// necessary until it is ready.  Cancellation is performed by the
-    /// <see cref="Spring.Threading.Future.IFuture.Cancel()"/> method.  Additional methods are provided to
+    /// <see cref="IFuture.Cancel()"/> method.  Additional methods are provided to
     /// determine if the task completed normally or was cancelled. Once a
     /// computation has completed, the computation cannot be cancelled.
     /// 
     /// <p/>
-    /// <b>Sample Usage</b> (Note that the following classes are all
+    /// <example>Sample Usage (Note that the following classes are all
     /// made-up.) 
-    /// <p/>
-    /// TODO: Provide code sample
-    /// <p/>
-    /// The <see cref="Spring.Threading.Future.FutureTask{T}"/> class is an implementation of <see cref="Spring.Threading.Future.IFuture{T}"/> that
+    /// <code language="c#">
+    /// interface IArchiveSearcher { string Search(string target); }
+    /// class App {
+    ///   IExecutorService executor = ...
+    ///   IArchiveSearcher searcher = ...
+    ///   void ShowSearch(string target) {
+    ///     IFuture&lt;String&gt; future
+    ///       = executor.Submit(delegate {
+    ///             return searcher.Search(target);
+    ///         });
+    ///     DisplayOtherThings(); // do other things while searching
+    ///     try {
+    ///       DisplayText(future.get()); // use future
+    ///     } catch (ExecutionException ex) { Cleanup(); return; }
+    ///   }
+    /// }
+    /// </code>
+    /// </example>
+    /// The <see cref="FutureTask{T}"/> class is an implementation of <see cref="IFuture{T}"/> that
     /// implements <see cref="Spring.Threading.IRunnable"/>, and so may be executed by an <see cref="Spring.Threading.IExecutor"/>.
+    /// <example>For example, the above construction with <c>Submit</c> could be replaced by:
+    /// <code language="c#">
+    ///     IFutureTask&lt;string&gt; future =
+    ///       new FutureTask&lt;string&gt;(delegate {
+    ///           return searcher.Search(target);
+    ///       });
+    ///     executor.Execute(future);
+    /// </code>
+    /// </example>
     /// </remarks>
-    /// <seealso cref="Spring.Threading.Future.FutureTask{T}"/>
+    /// <seealso cref="FutureTask{T}"/>
     /// <seealso cref="Spring.Threading.IExecutor"/>
     /// <author>Doug Lea</author>
     /// <author>Griffin Caprio (.NET)</author>
