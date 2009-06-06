@@ -237,9 +237,9 @@ namespace Spring.Collections.Generic
         private NonGenericTestFixture SetupNonGeneric()
         {
             NonGenericTestFixture fixture = new NonGenericTestFixture();
-            fixture.Generic = _mocks.CreateMock<IList<int>>();
-            fixture.OmniSync = _mocks.CreateMultiMock<IList<int>>(typeof(IList));
-            fixture.OmniUnsync = _mocks.CreateMultiMock<IList<int>>(typeof(IList));
+            fixture.Generic = _mocks.StrictMock<IList<int>>();
+            fixture.OmniSync = _mocks.StrictMultiMock<IList<int>>(typeof(IList));
+            fixture.OmniUnsync = _mocks.StrictMultiMock<IList<int>>(typeof(IList));
 
             fixture.FromGeneric = new TransformingList<int, string>(fixture.Generic, _intToString);
 

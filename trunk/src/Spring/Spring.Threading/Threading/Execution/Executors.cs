@@ -17,11 +17,10 @@
 #endregion
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
 using Spring.Threading.AtomicTypes;
-using Spring.Threading.Collections;
+using Spring.Threading.Collections.Generic;
 using Spring.Threading.Future;
 
 namespace Spring.Threading.Execution

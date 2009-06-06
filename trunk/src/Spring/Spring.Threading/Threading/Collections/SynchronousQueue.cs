@@ -2,11 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Xml.Serialization;
-using Spring.Collections.Generic;
-using Spring.Threading.Collections.Generic;
 using Spring.Threading.Locks;
 
-namespace Spring.Threading.Collections
+namespace Spring.Threading.Collections.Generic
 {
     /// <summary>
     /// A <see cref="IBlockingQueue{T}"/> in which each insert
