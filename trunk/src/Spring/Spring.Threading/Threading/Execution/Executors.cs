@@ -548,26 +548,6 @@ namespace Spring.Threading.Execution
                 return _executorService.Submit(task);
             }
 
-			public override IList<IFuture<T>> InvokeAll<T>(ICollection<ICallable<T>> tasks)
-			{
-				return _executorService.InvokeAll(tasks);
-			}
-
-            public override IList<IFuture<T>> InvokeAll<T>(ICollection<ICallable<T>> tasks, TimeSpan duration)
-			{
-				return _executorService.InvokeAll(tasks, duration);
-			}
-
-            public override IList<IFuture<T>> InvokeAll<T>(ICollection<Call<T>> tasks)
-            {
-                return _executorService.InvokeAll(tasks);
-            }
-
-            public override IList<IFuture<T>> InvokeAll<T>(ICollection<Call<T>> tasks, TimeSpan durationToWait)
-            {
-                return _executorService.InvokeAll(tasks, durationToWait);
-            }
-
             public override IList<IFuture<T>> InvokeAll<T>(IEnumerable<Call<T>> tasks)
             {
                 return _executorService.InvokeAll(tasks);
@@ -586,26 +566,6 @@ namespace Spring.Threading.Execution
             public override IList<IFuture<T>> InvokeAll<T>(IEnumerable<ICallable<T>> tasks, TimeSpan durationToWait)
             {
                 return _executorService.InvokeAll(tasks, durationToWait);
-            }
-
-            public override T InvokeAny<T>(ICollection<ICallable<T>> tasks)
-			{
-				return _executorService.InvokeAny(tasks);
-			}
-
-            public override T InvokeAny<T>(ICollection<ICallable<T>> tasks, TimeSpan duration)
-			{
-				return _executorService.InvokeAny(tasks, duration);
-			}
-
-            public override T InvokeAny<T>(ICollection<Call<T>> tasks)
-            {
-                return _executorService.InvokeAny(tasks);
-            }
-
-            public override T InvokeAny<T>(ICollection<Call<T>> tasks, TimeSpan durationToWait)
-            {
-                return _executorService.InvokeAny(tasks, durationToWait);
             }
 
             public override T InvokeAny<T>(IEnumerable<Call<T>> tasks)

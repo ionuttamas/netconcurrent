@@ -48,47 +48,12 @@ namespace Spring.Threading.Collections.Generic
 				return true;
 			}
 
-			public IFuture Submit(ICallable task)
+			public IFuture<object> Submit(IRunnable task)
 			{
 				throw new NotImplementedException();
 			}
 
-			public IFuture Submit(IRunnable task, object result)
-			{
-				throw new NotImplementedException();
-			}
-
-			public IFuture Submit(IRunnable task)
-			{
-				throw new NotImplementedException();
-			}
-
-			public IList InvokeAll(ICollection tasks)
-			{
-				throw new NotImplementedException();
-			}
-
-			public IList InvokeAll(ICollection tasks, TimeSpan durationToWait)
-			{
-				throw new NotImplementedException();
-			}
-
-			public object InvokeAny(ICollection tasks)
-			{
-				throw new NotImplementedException();
-			}
-
-			public object InvokeAny(ICollection tasks, TimeSpan durationToWait)
-			{
-				throw new NotImplementedException();
-			}
-
-            public IFuture Submit(Task task, object result)
-            {
-                throw new Exception("The method or operation is not implemented.");
-            }
-
-            public IFuture Submit(Task task)
+            public IFuture<object> Submit(Task task)
             {
                 throw new Exception("The method or operation is not implemented.");
             }
@@ -113,102 +78,42 @@ namespace Spring.Threading.Collections.Generic
                 throw new Exception("The method or operation is not implemented.");
             }
 
-            public System.Collections.Generic.IList<IFuture> InvokeAll(System.Collections.Generic.ICollection<ICallable> tasks)
+            public IList<IFuture<T>> InvokeAll<T>(IEnumerable<ICallable<T>> tasks)
             {
                 throw new Exception("The method or operation is not implemented.");
             }
 
-            public System.Collections.Generic.IList<IFuture<T>> InvokeAll<T>(System.Collections.Generic.ICollection<ICallable<T>> tasks)
+            public IList<IFuture<T>> InvokeAll<T>(IEnumerable<Call<T>> tasks)
             {
                 throw new Exception("The method or operation is not implemented.");
             }
 
-            public System.Collections.Generic.IList<IFuture<T>> InvokeAll<T>(System.Collections.Generic.ICollection<Call<T>> tasks)
+            public IList<IFuture<T>> InvokeAll<T>(IEnumerable<ICallable<T>> tasks, TimeSpan durationToWait)
             {
                 throw new Exception("The method or operation is not implemented.");
             }
 
-            public System.Collections.Generic.IList<IFuture<T>> InvokeAll<T>(System.Collections.Generic.IEnumerable<ICallable<T>> tasks)
+            public IList<IFuture<T>> InvokeAll<T>(IEnumerable<Call<T>> tasks, TimeSpan durationToWait)
             {
                 throw new Exception("The method or operation is not implemented.");
             }
 
-            public System.Collections.Generic.IList<IFuture<T>> InvokeAll<T>(System.Collections.Generic.IEnumerable<Call<T>> tasks)
+            public T InvokeAny<T>(IEnumerable<ICallable<T>> tasks)
             {
                 throw new Exception("The method or operation is not implemented.");
             }
 
-            public System.Collections.Generic.IList<IFuture> InvokeAll(System.Collections.Generic.ICollection<ICallable> tasks, TimeSpan durationToWait)
+            public T InvokeAny<T>(IEnumerable<Call<T>> tasks)
             {
                 throw new Exception("The method or operation is not implemented.");
             }
 
-            public System.Collections.Generic.IList<IFuture<T>> InvokeAll<T>(System.Collections.Generic.ICollection<ICallable<T>> tasks, TimeSpan durationToWait)
+            public T InvokeAny<T>(IEnumerable<ICallable<T>> tasks, TimeSpan durationToWait)
             {
                 throw new Exception("The method or operation is not implemented.");
             }
 
-            public System.Collections.Generic.IList<IFuture<T>> InvokeAll<T>(System.Collections.Generic.ICollection<Call<T>> tasks, TimeSpan durationToWait)
-            {
-                throw new Exception("The method or operation is not implemented.");
-            }
-
-            public System.Collections.Generic.IList<IFuture<T>> InvokeAll<T>(System.Collections.Generic.IEnumerable<ICallable<T>> tasks, TimeSpan durationToWait)
-            {
-                throw new Exception("The method or operation is not implemented.");
-            }
-
-            public System.Collections.Generic.IList<IFuture<T>> InvokeAll<T>(System.Collections.Generic.IEnumerable<Call<T>> tasks, TimeSpan durationToWait)
-            {
-                throw new Exception("The method or operation is not implemented.");
-            }
-
-            public object InvokeAny(System.Collections.Generic.ICollection<ICallable> tasks)
-            {
-                throw new Exception("The method or operation is not implemented.");
-            }
-
-            public T InvokeAny<T>(System.Collections.Generic.ICollection<ICallable<T>> tasks)
-            {
-                throw new Exception("The method or operation is not implemented.");
-            }
-
-            public T InvokeAny<T>(System.Collections.Generic.ICollection<Call<T>> tasks)
-            {
-                throw new Exception("The method or operation is not implemented.");
-            }
-
-            public T InvokeAny<T>(System.Collections.Generic.IEnumerable<ICallable<T>> tasks)
-            {
-                throw new Exception("The method or operation is not implemented.");
-            }
-
-            public T InvokeAny<T>(System.Collections.Generic.IEnumerable<Call<T>> tasks)
-            {
-                throw new Exception("The method or operation is not implemented.");
-            }
-
-            public object InvokeAny(System.Collections.Generic.ICollection<ICallable> tasks, TimeSpan durationToWait)
-            {
-                throw new Exception("The method or operation is not implemented.");
-            }
-
-            public T InvokeAny<T>(System.Collections.Generic.ICollection<ICallable<T>> tasks, TimeSpan durationToWait)
-            {
-                throw new Exception("The method or operation is not implemented.");
-            }
-
-            public T InvokeAny<T>(System.Collections.Generic.ICollection<Call<T>> tasks, TimeSpan durationToWait)
-            {
-                throw new Exception("The method or operation is not implemented.");
-            }
-
-            public T InvokeAny<T>(System.Collections.Generic.IEnumerable<ICallable<T>> tasks, TimeSpan durationToWait)
-            {
-                throw new Exception("The method or operation is not implemented.");
-            }
-
-            public T InvokeAny<T>(System.Collections.Generic.IEnumerable<Call<T>> tasks, TimeSpan durationToWait)
+            public T InvokeAny<T>(IEnumerable<Call<T>> tasks, TimeSpan durationToWait)
             {
                 throw new Exception("The method or operation is not implemented.");
             }

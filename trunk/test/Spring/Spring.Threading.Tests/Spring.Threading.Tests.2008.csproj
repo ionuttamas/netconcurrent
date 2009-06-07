@@ -218,6 +218,9 @@
   <ItemGroup>
     <Compile Include="Threading\Collections\PriorityBlockingQueueTest.cs" />
     <Compile Include="Threading\Collections\SynchronousQueueTest.cs" />
+    <Compile Include="Threading\Execution\ThreadPoolExecutorTests.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Threading\InterlockedAtomics\AbstractAtomicArrayTest.cs" />
     <Compile Include="Threading\InterlockedAtomics\AtomicBooleanTests.cs" />
     <Compile Include="Threading\InterlockedAtomics\AtomicIntegerArrayTests.cs" />
@@ -231,7 +234,6 @@
     <Compile Include="Threading\InterlockedAtomics\AtomicReferenceTests.cs" />
     <Compile Include="Threading\InterlockedAtomics\AtomicStampedReferenceTests.cs" />
     <Compile Include="Threading\Execution\ExecutionPolicy\CallerRunsPolicyTests.cs" />
-    <Compile Include="Threading\Execution\ThreadPoolExecutorTests.cs" />
     <Compile Include="Threading\InterlockedAtomics\AtomicStampedTests.cs" />
     <Compile Include="Threading\InterlockedAtomics\AtomicTests.cs" />
   </ItemGroup>
