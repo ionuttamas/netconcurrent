@@ -78,9 +78,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\lib\net\2.0\DotNetMock.dll</HintPath>
     </Reference>
-    <Reference Include="nunit.framework, Version=2.2.7.0, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
+    <Reference Include="nunit.framework, Version=2.5.0.9122, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\lib\Net\2.0\nunit.framework.dll</HintPath>
+      <HintPath>..\..\..\lib\net\2.0\nunit.framework.dll</HintPath>
     </Reference>
     <Reference Include="Rhino.Mocks, Version=3.5.0.1337, Culture=neutral, PublicKeyToken=0b3305902db7183f, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -95,18 +95,74 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Collections\Generic\AbstractCollectionTest.cs" />
-    <Compile Include="Collections\Generic\AbstractEnumeratorTest.cs" />
-    <Compile Include="Collections\Generic\AbstractListTest.cs" />
-    <Compile Include="Collections\Generic\CollectionTestUtils.cs" />
-    <Compile Include="Collections\Generic\EnumeratorFunctionTestBase.cs" />
-    <Compile Include="Collections\Generic\IOmniCollection.cs" />
-    <Compile Include="Collections\Generic\IOmniList.cs" />
-    <Compile Include="Collections\Generic\PriorityQueueTests.cs" />
-    <Compile Include="Collections\Generic\TestEnumerator.cs" />
-    <Compile Include="Collections\Generic\TransformingEnumeratorTest.cs" />
-    <Compile Include="Collections\Generic\TransformingListTest.cs" />
+    <Compile Include="BaseAbstractCollectionTest.cs" />
+    <Compile Include="BaseMockTestCase.cs" />
+    <Compile Include="BaseThreadingTestCase.cs" />
+    <Compile Include="Collections\Generic\AbstractCollectionTest.cs"/>
+    <Compile Include="Collections\Generic\AbstractEnumeratorTest.cs"/>
+    <Compile Include="Collections\Generic\AbstractListTest.cs"/>
+    <Compile Include="Collections\Generic\CollectionTestUtils.cs"/>
+    <Compile Include="Collections\Generic\EnumeratorFunctionTestBase.cs"/>
+    <Compile Include="Collections\Generic\PriorityQueueTests.cs"/>
+    <Compile Include="Collections\Generic\TestEnumerator.cs"/>
+    <Compile Include="Collections\Generic\TransformingEnumeratorTest.cs"/>
+    <Compile Include="Collections\Generic\TransformingListTest.cs"/>
+    <Compile Include="CoreExceptionTests.cs" />
+    <Compile Include="ExceptionsTest.cs" />
+    <Compile Include="StandardsComplianceTest.cs" />
     <Compile Include="TestHelper.cs" />
+    <Compile Include="Threading\AtomicTypes\AtomicBooleanTests.cs" />
+    <Compile Include="Threading\AtomicTypes\AtomicIntegerArrayTests.cs" />
+    <Compile Include="Threading\AtomicTypes\AtomicIntegerTests.cs" />
+    <Compile Include="Threading\AtomicTypes\AtomicLongArrayTests.cs" />
+    <Compile Include="Threading\AtomicTypes\AtomicLongTests.cs" />
+    <Compile Include="Threading\AtomicTypes\AtomicMarkableReferenceTests.cs" />
+    <Compile Include="Threading\AtomicTypes\AtomicReferenceArrayTests.cs" />
+    <Compile Include="Threading\AtomicTypes\AtomicReferenceTests.cs" />
+    <Compile Include="Threading\AtomicTypes\AtomicStampedReferenceTests.cs" />
+    <Compile Include="Threading\CallableTest.cs" />
+    <Compile Include="Threading\Collections\Generic\ArrayBlockingQueueTests.cs" />
+    <Compile Include="Threading\Collections\Generic\CopyOnWriteArrayListTests.cs" />
+    <Compile Include="Threading\Collections\Generic\DelayQueueTests.cs" />
+    <Compile Include="Threading\Collections\LinkedBlockingQueueTest.cs" />
+    <Compile Include="Threading\Collections\PriorityBlockingQueueTest.cs" />
+    <Compile Include="Threading\Collections\SynchronousQueueTest.cs" />
+    <Compile Include="Threading\CyclicBarrierTests.cs" />
+    <Compile Include="Threading\Execution\AbstractExecutorServiceTests.cs" />
+    <Compile Include="Threading\Execution\ExecutionExceptionTests.cs" />
+    <Compile Include="Threading\Execution\ExecutionPolicy\AbortPolicyTests.cs" />
+    <Compile Include="Threading\Execution\ExecutionPolicy\CallerRunsPolicyTests.cs" />
+    <Compile Include="Threading\Execution\RejectedExecutionExceptionTests.cs" />
+    <Compile Include="Threading\Execution\ThreadPoolExecutorTests.cs" />
+    <Compile Include="Threading\ForkJoin\FJTaskRunnerTest.cs" />
+    <Compile Include="Threading\Future\FutureTaskTests.cs" />
+    <Compile Include="Threading\Helpers\CountDownLatchTests.cs" />
+    <Compile Include="Threading\Helpers\ExchangerTests.cs" />
+    <Compile Include="Threading\Helpers\FIFOWaitNodeQueueTests.cs" />
+    <Compile Include="Threading\Helpers\ThreadExceptionHandlerHelpersTests.cs" />
+    <Compile Include="Threading\Helpers\WaitNodeTests.cs" />
+    <Compile Include="Threading\InterlockedAtomics\AbstractAtomicArrayTest.cs" />
+    <Compile Include="Threading\InterlockedAtomics\AtomicArrayTests.cs" />
+    <Compile Include="Threading\InterlockedAtomics\AtomicBooleanTests.cs" />
+    <Compile Include="Threading\InterlockedAtomics\AtomicIntegerArrayTests.cs" />
+    <Compile Include="Threading\InterlockedAtomics\AtomicIntegerTests.cs" />
+    <Compile Include="Threading\InterlockedAtomics\AtomicLongArrayTests.cs" />
+    <Compile Include="Threading\InterlockedAtomics\AtomicLongTests.cs" />
+    <Compile Include="Threading\InterlockedAtomics\AtomicMarkableReferenceTests.cs" />
+    <Compile Include="Threading\InterlockedAtomics\AtomicMarkableTests.cs" />
+    <Compile Include="Threading\InterlockedAtomics\AtomicReferenceArrayTests.cs" />
+    <Compile Include="Threading\InterlockedAtomics\AtomicReferenceTests.cs" />
+    <Compile Include="Threading\InterlockedAtomics\AtomicStampedReferenceTests.cs" />
+    <Compile Include="Threading\InterlockedAtomics\AtomicStampedTests.cs" />
+    <Compile Include="Threading\InterlockedAtomics\AtomicTests.cs" />
+    <Compile Include="Threading\LatchTest.cs" />
+    <Compile Include="Threading\Locks\ReentrantLockTests.cs" />
+    <Compile Include="Threading\Locks\ReentrantReadWriteLockTests.cs" />
+    <Compile Include="Threading\RunnableTest.cs"/>
+    <Compile Include="Threading\SemaphoreTest.cs" />
+    <Compile Include="Threading\SyncHolderTest.cs" />
+    <Compile Include="Threading\ThreadInterruptionTest.cs" />
+    <Compile Include="Threading\UtilsTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\src\Spring\Spring.Threading\Spring.Threading.2005.csproj">
