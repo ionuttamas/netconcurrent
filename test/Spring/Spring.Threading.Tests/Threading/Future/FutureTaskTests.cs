@@ -234,19 +234,19 @@ namespace Spring.Threading.Future
 
             public bool CallRunAndReset()
             {
-                return base.runAndReset();
+                return base.RunAndReset();
             }
 
             [Test]
             public void SetupResult(object result)
             {
-                base.setResult(result);
+                base.SetResult(result);
             }
 
             [Test]
             public void SetupException(Exception t)
             {
-                base.setException(t);
+                base.SetException(t);
             }
         }
 

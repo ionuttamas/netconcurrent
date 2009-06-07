@@ -61,7 +61,7 @@ namespace Spring.Threading.Collections.Generic
 
           When a put or take waiting for the actions of its counterpart
           aborts due to interruption or timeout, it marks the node
-          it created as "CANCELLED", which causes its counterpart to retry
+          it created as "Cancelled", which causes its counterpart to retry
           the entire put or take sequence.
 
           This requires keeping two simple queues, waitingProducers and

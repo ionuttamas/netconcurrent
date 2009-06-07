@@ -119,7 +119,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="CommonAssemblyInfo.cs" />
-    <Compile Include="Threading\AbstractCallable.cs" />
     <Compile Include="Threading\AtomicTypes\AtomicInteger.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -224,6 +223,7 @@
     <Compile Include="Threading\ICallable.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Threading\ICancellable.cs" />
     <Compile Include="Threading\IExecutor.cs">
       <SubType>Code</SubType>
     </Compile>

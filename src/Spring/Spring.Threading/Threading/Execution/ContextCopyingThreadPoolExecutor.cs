@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using Spring.Threading.Collections;
 using Spring.Threading.Collections.Generic;
 using Spring.Threading.Future;
 
@@ -36,14 +35,14 @@ namespace Spring.Threading.Execution
             set { _contextNames = value;}
         }
 
-        protected internal override IRunnableFuture NewTaskFor(ICallable callable)
+        protected internal override IRunnableFuture<T> NewTaskFor<T>(Task task, T result)
         {
-            return new ContextCopyingFutureTask<object>(callable.Call, _contextNames);
+            return new ContextCopyingFutureTask<T>(task, result, _contextNames);
         }
 
-        protected internal override IRunnableFuture NewTaskFor(IRunnable runnable, object defaultValue)
+        protected internal override IRunnableFuture<T> NewTaskFor<T>(IRunnable runnable, T result)
         {
-            return new ContextCopyingFutureTask<object>(runnable, defaultValue, _contextNames);
+            return new ContextCopyingFutureTask<T>(runnable, result, _contextNames);
         }
 
         protected internal override IRunnableFuture<T> NewTaskFor<T>(Call<T> call)

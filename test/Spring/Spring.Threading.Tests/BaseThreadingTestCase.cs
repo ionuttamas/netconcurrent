@@ -145,11 +145,11 @@ namespace Spring.Threading
         #endregion
     }
 
-    internal class SmallCallable : ICallable
+    internal class SmallCallable : ICallable<bool>
     {
         #region ICallable Members
 
-        public Object Call()
+        public bool Call()
         {
             try
             {
@@ -247,11 +247,11 @@ namespace Spring.Threading
         #endregion
     }
 
-    internal class StringTask : ICallable
+    internal class StringTask : ICallable<string>
     {
         #region ICallable Members
 
-        public object Call()
+        public string Call()
         {
             return BaseThreadingTestCase.TEST_STRING;
         }
@@ -271,11 +271,11 @@ namespace Spring.Threading
         #endregion
     }
 
-    internal class NPETask : ICallable
+    internal class NPETask<T> : ICallable<T>
     {
         #region ICallable Members
 
-        public virtual Object Call()
+        public virtual T Call()
         {
             throw new NullReferenceException();
         }
@@ -301,13 +301,13 @@ namespace Spring.Threading
         #endregion
     }
 
-    internal class TrackedCallable : ICallable
+    internal class TrackedCallable : ICallable<bool>
     {
         public volatile bool done;
 
         #region ICallable Members
 
-        public Object Call()
+        public bool Call()
         {
             try
             {
@@ -362,7 +362,7 @@ namespace Spring.Threading
             return null;
         }
 
-        public IFuture Submit(Task task)
+        public IFuture<object> Submit(Task task)
         {
             throw new NotImplementedException();
         }
@@ -396,26 +396,9 @@ namespace Spring.Threading
             }
         }
 
-        public IFuture Submit(IRunnable task)
+        public IFuture<object> Submit(IRunnable task)
         {
             // TODO:  Add NoOpExecutorService.Submit implementation
-            return null;
-        }
-
-        public IFuture Submit(Task task, object result)
-        {
-            throw new NotImplementedException();
-        }
-
-        IFuture IExecutorService.Submit(IRunnable task, object result)
-        {
-            // TODO:  Add NoOpExecutorService.Spring.Threading.Execution.IExecutorService.Submit implementation
-            return null;
-        }
-
-        IFuture IExecutorService.Submit(ICallable task)
-        {
-            // TODO:  Add NoOpExecutorService.Spring.Threading.Execution.IExecutorService.Submit implementation
             return null;
         }
 
@@ -440,7 +423,7 @@ namespace Spring.Threading
         #region IExecutorService Members
 
 
-        public IFuture<T> Submit<T>(IRunnable task, T result)
+        public IFuture<T> Submit<T>(IRunnable runnable, T result)
         {
             throw new NotImplementedException();
         }
@@ -456,11 +439,6 @@ namespace Spring.Threading
         }
 
         public IFuture<T> Submit<T>(Call<T> call)
-        {
-            throw new NotImplementedException();
-        }
-
-        public IList<IFuture> InvokeAll(ICollection<ICallable> tasks)
         {
             throw new NotImplementedException();
         }
@@ -485,11 +463,6 @@ namespace Spring.Threading
             throw new NotImplementedException();
         }
 
-        public IList<IFuture> InvokeAll(ICollection<ICallable> tasks, TimeSpan durationToWait)
-        {
-            throw new NotImplementedException();
-        }
-
         public IList<IFuture<T>> InvokeAll<T>(ICollection<ICallable<T>> tasks, TimeSpan durationToWait)
         {
             throw new NotImplementedException();
@@ -510,11 +483,6 @@ namespace Spring.Threading
             throw new NotImplementedException();
         }
 
-        public object InvokeAny(ICollection<ICallable> tasks)
-        {
-            throw new NotImplementedException();
-        }
-
         public T InvokeAny<T>(ICollection<ICallable<T>> tasks)
         {
             throw new NotImplementedException();
@@ -531,11 +499,6 @@ namespace Spring.Threading
         }
 
         public T InvokeAny<T>(IEnumerable<Call<T>> tasks)
-        {
-            throw new NotImplementedException();
-        }
-
-        public object InvokeAny(ICollection<ICallable> tasks, TimeSpan durationToWait)
         {
             throw new NotImplementedException();
         }
