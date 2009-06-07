@@ -35,7 +35,7 @@
     <CheckForOverflowUnderflow>false</CheckForOverflowUnderflow>
     <ConfigurationOverrideFile>
     </ConfigurationOverrideFile>
-    <DefineConstants>TRACE;DEBUG;NET_2_0</DefineConstants>
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
     <DocumentationFile>..\..\..\build\VS.Net.2008\Spring.Threading\Debug\Spring.Threading.XML</DocumentationFile>
     <DebugSymbols>true</DebugSymbols>
     <FileAlignment>4096</FileAlignment>
@@ -237,9 +237,6 @@
     <Compile Include="Threading\ForkJoin\ThreadClass.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Threading\FutureResult.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="Threading\Future\FutureTask.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -418,6 +415,7 @@
     <Compile Include="Collections\Generic\HashedSet.cs" />
     <Compile Include="Collections\Generic\Set.cs" />
     <Compile Include="Collections\Generic\SortedSet.cs" />
+    <Compile Include="Threading\Callable.cs" />
     <Compile Include="Threading\Collections\Generic\AbstractBlockingQueue.cs" />
     <Compile Include="Threading\Collections\PriorityBlockingQueue.cs" />
     <Compile Include="Threading\ContextCarrier.cs" />
@@ -425,6 +423,7 @@
     <Compile Include="Threading\Execution\ContextCopyingThreadPoolExecutor.cs" />
     <Compile Include="Threading\Execution\ExecutionPolicy\CallerRunsPolicy.cs" />
     <Compile Include="Threading\Future\ContextCopyingFutureTask.cs" />
+    <Compile Include="Threading\ICancellable.cs" />
     <Compile Include="Threading\IContextCopier.cs" />
     <Compile Include="Threading\InterlockedAtomics\AbstractAtomicArray.cs" />
     <Compile Include="Threading\InterlockedAtomics\AtomicBoolean.cs" />
@@ -443,6 +442,7 @@
     <Compile Include="Threading\InterlockedAtomics\IAtomic.cs" />
     <Compile Include="Threading\InterlockedAtomics\IAtomicArray.cs" />
     <Compile Include="Threading\InterlockedAtomics\ValueHolder.cs" />
+    <Compile Include="Threading\Runnable.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

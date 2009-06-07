@@ -93,7 +93,7 @@ namespace Spring.Threading.Collections.Generic
                 throw new Exception("The method or operation is not implemented.");
             }
 
-            public IFuture<T> Submit<T>(IRunnable task, T result)
+            public IFuture<T> Submit<T>(IRunnable runnable, T result)
             {
                 throw new Exception("The method or operation is not implemented.");
             }

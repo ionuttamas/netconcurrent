@@ -383,9 +383,9 @@ namespace Spring.Threading.Execution
         ///
         /// The runState provides the main lifecyle control, taking on values:
         ///
-        ///   RUNNING:  Accept new tasks and process queued tasks
+        ///   Running:  Accept new tasks and process queued tasks
         ///   SHUTDOWN: Don't accept new tasks, but process queued tasks
-        ///   STOP:     Don't accept new tasks, don't process queued tasks,
+        ///   Stop:     Don't accept new tasks, don't process queued tasks,
         ///             and interrupt in-progress tasks
         ///   TIDYING:  All tasks have terminated, workerCount is zero,
         ///             the thread transitioning to state TIDYING
@@ -396,13 +396,13 @@ namespace Spring.Threading.Execution
         /// ordered comparisons. The runState monotonically increases over
         /// time, but need not hit each state. The transitions are:
         ///
-        /// RUNNING -> SHUTDOWN
+        /// Running -> SHUTDOWN
         ///    On invocation of <see cref="Shutdown"/>, perhaps implicitly in ~ThreadPoolExecutor
-        /// (RUNNING or SHUTDOWN) -> STOP
+        /// (Running or SHUTDOWN) -> Stop
         ///    On invocation of <see cref="ShutdownNow"/>
         /// SHUTDOWN -> TIDYING
         ///    When both queue and pool are empty
-        /// STOP -> TIDYING
+        /// Stop -> TIDYING
         ///    When pool is empty
         /// TIDYING -> TERMINATED
         ///    When the <see cref="terminated"/> hook method has completed
@@ -946,7 +946,7 @@ namespace Spring.Threading.Execution
             //        {
             foreach (IRunnable runnable in q)
             {
-                if (runnable is IFuture && ((IFuture) runnable).IsCancelled)
+                if (runnable is ICancellable && ((ICancellable) runnable).IsCancelled)
                     _workQueue.Remove(runnable);
             }
             //        }
@@ -1190,7 +1190,7 @@ namespace Spring.Threading.Execution
             t.Start();
             // It is possible (but unlikely) for a thread to have been
             // added to workers, but not yet started, during transition to
-            // STOP, which could result in a rare missed interrupt,
+            // Stop, which could result in a rare missed interrupt,
             // because Thread.interrupt is not guaranteed to have any effect
             // on a non-yet-started Thread (see Thread#interrupt).
             if (runStateOf(_controlState.IntegerValue) == STOP && t.IsAlive)
@@ -1676,7 +1676,7 @@ namespace Spring.Threading.Execution
         /// Transitions control state to given target or leaves if alone if
         /// already at least the given target.
         /// </summary>
-        /// <param name="targetState">the desired state, either SHUTDOWN or STOP ( but 
+        /// <param name="targetState">the desired state, either SHUTDOWN or Stop ( but 
         /// not TIDYING or TERMINATED -- use TryTerminate for that )</param>
         private void advanceRunState(int targetState)
         {
@@ -1700,7 +1700,7 @@ namespace Spring.Threading.Execution
 
         /// <summary> 
         /// Transitions to TERMINATED state if either (SHUTDOWN and pool
-        /// and queue empty) or (STOP and pool empty).  If otherwise
+        /// and queue empty) or (Stop and pool empty).  If otherwise
         /// eligible to terminate but workerCount is nonzero, interrupts an
         /// idle worker to ensure that shutdown signals propagate. This
         /// method must be called following any action that might make

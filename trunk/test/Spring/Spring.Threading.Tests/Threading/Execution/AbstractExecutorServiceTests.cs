@@ -11,127 +11,6 @@ namespace Spring.Threading.Execution
     [TestFixture]
     public class AbstractExecutorServiceTests : BaseThreadingTestCase
     {
-        private sealed class AnonymousClassRunnable : IRunnable
-        {
-            private readonly ThreadPoolExecutor p;
-
-            public AnonymousClassRunnable(ThreadPoolExecutor p)
-            {
-                this.p = p;
-            }
-
-            #region IRunnable Members
-
-            public void Run()
-            {
-                try
-                {
-                    p.Submit(new AnonymousClassCallable()).GetResult();
-                }
-                catch (ThreadInterruptedException)
-                {
-                }
-            }
-
-            #endregion
-
-            #region Nested type: AnonymousClassCallable
-
-            private sealed class AnonymousClassCallable : ICallable
-            {
-                #region ICallable Members
-
-                public Object Call()
-                {
-                    try
-                    {
-                        Thread.Sleep(MEDIUM_DELAY_MS);
-                        Assert.Fail("Should throw an exception");
-                    }
-                    catch (ThreadInterruptedException)
-                    {
-                    }
-                    return null;
-                }
-
-                #endregion
-            }
-
-            #endregion
-        }
-
-        private sealed class AnonymousClassCallable : ICallable
-        {
-            private readonly ThreadPoolExecutor p;
-
-            public AnonymousClassCallable(ThreadPoolExecutor p)
-            {
-                this.p = p;
-            }
-
-            #region ICallable Members
-
-            public Object Call()
-            {
-                try
-                {
-                    p.Submit(new SmallCallable()).GetResult();
-                    Assert.Fail("Should throw an exception");
-                }
-                catch (ThreadInterruptedException)
-                {
-                }
-                catch (RejectedExecutionException)
-                {
-                }
-                catch (ExecutionException)
-                {
-                }
-                return true;
-            }
-
-            #endregion
-        }
-
-        private sealed class AnonymousClassRunnable1 : IRunnable
-        {
-            private readonly ICallable c;
-
-            public AnonymousClassRunnable1(ICallable c)
-            {
-                this.c = c;
-            }
-
-            #region IRunnable Members
-
-            public void Run()
-            {
-                try
-                {
-                    c.Call();
-                }
-                catch (Exception)
-                {
-                }
-            }
-
-            #endregion
-        }
-
-        private sealed class AnonymousClassCallable1 : ICallable
-        {
-            #region ICallable Members
-
-            public Object Call()
-            {
-                int zero = 0;
-                int i = 5/zero;
-                return true;
-            }
-
-            #endregion
-        }
-
         internal class DirectExecutorService : AbstractExecutorService
         {
             private volatile bool _shutdown;
@@ -167,7 +46,6 @@ namespace Spring.Threading.Execution
                 return IsShutdown;
             }
         }
-
 
         [Test]
         public void Execute1()
@@ -224,7 +102,7 @@ namespace Spring.Threading.Execution
             IExecutorService e = new DirectExecutorService();
             TrackedShortRunnable task = new TrackedShortRunnable();
             Assert.IsFalse(task.IsDone);
-            IFuture future = e.Submit(task);
+            IFuture<object> future = e.Submit(task);
             future.GetResult();
             Assert.IsTrue(task.IsDone);
         }
@@ -234,7 +112,27 @@ namespace Spring.Threading.Execution
         public void InterruptedSubmit()
         {
 			ThreadPoolExecutor p = new ThreadPoolExecutor(1, 1, new TimeSpan(0, 1, 0),  new ArrayBlockingQueue<IRunnable>(10));
-			Thread t = new Thread(new AnonymousClassRunnable(p).Run);
+            Thread t = new Thread(delegate()
+            {
+                try
+                {
+                    p.Submit(new Task(delegate
+                         {
+                             try
+                             {
+                                 Thread.Sleep(MEDIUM_DELAY_MS);
+                                 Assert.Fail("Should throw an exception");
+                             }
+                             catch (ThreadInterruptedException)
+                             {
+                             }
+
+                         })).GetResult();
+                }
+                catch (ThreadInterruptedException)
+                {
+                }
+            });
             t.Start();
             Thread.Sleep(SHORT_DELAY_MS);
             t.Interrupt();
@@ -243,12 +141,13 @@ namespace Spring.Threading.Execution
 
 
         [Test]
-        public void InvokeAll1()
+        [TestCase(typeof(string))]
+        public void InvokeAll1<T>()
         {
             IExecutorService e = new DirectExecutorService();
             try
             {
-                e.InvokeAll(null);
+                e.InvokeAll((IEnumerable<ICallable<T>>)null);
             }
             catch (ArgumentNullException)
             {
@@ -266,7 +165,7 @@ namespace Spring.Threading.Execution
             IExecutorService e = new DirectExecutorService();
             try
             {
-                IList<IFuture> r = e.InvokeAll(new List<ICallable>());
+                IList<IFuture<bool>> r = e.InvokeAll(new List<ICallable<bool>>());
                 Assert.IsTrue((r.Count == 0));
             }
             finally
@@ -282,7 +181,7 @@ namespace Spring.Threading.Execution
             IExecutorService e = new DirectExecutorService();
             try
             {
-                ICallable[] l = new ICallable[] { new StringTask(), null };
+                ICallable<string>[] l = new ICallable<string>[] { new StringTask(), null };
                 e.InvokeAll(l);
             }
             catch (ArgumentNullException)
@@ -296,15 +195,15 @@ namespace Spring.Threading.Execution
 
 
         [Test]
-        public void InvokeAll4()
+        public void InvokeAll4<T>()
         {
             IExecutorService e = new DirectExecutorService();
             try
             {
-                ICallable[] l = new ICallable[] {new NPETask()};
-                IList<IFuture> result = e.InvokeAll(l);
+                ICallable<T>[] l = new ICallable<T>[] { new NPETask<T>() };
+                IList<IFuture<T>> result = e.InvokeAll(l);
                 Assert.AreEqual(1, result.Count);
-                foreach (IFuture future in result)
+                foreach (IFuture<T> future in result)
                 {
                     future.GetResult();
                 }
@@ -325,10 +224,10 @@ namespace Spring.Threading.Execution
             IExecutorService e = new DirectExecutorService();
             try
             {
-                ICallable[] l = new ICallable[] {new StringTask(), new StringTask()};
-                IList<IFuture> result = e.InvokeAll(l);
+                ICallable<string>[] l = new ICallable<string>[] {new StringTask(), new StringTask()};
+                IList<IFuture<string>> result = e.InvokeAll(l);
                 Assert.AreEqual(2, result.Count);
-                foreach (IFuture future in result)
+                foreach (IFuture<string> future in result)
                 {
                     Assert.AreSame(TEST_STRING, future.GetResult());
                 }
@@ -348,7 +247,7 @@ namespace Spring.Threading.Execution
             IExecutorService e = new DirectExecutorService();
             try
             {
-                e.InvokeAny(null);
+                e.InvokeAny((IEnumerable<Call<bool>>)null);
             }
             catch (ArgumentNullException)
             {
@@ -366,7 +265,7 @@ namespace Spring.Threading.Execution
             IExecutorService e = new DirectExecutorService();
             try
             {
-                e.InvokeAny(new ICallable[0]);
+                e.InvokeAny(new ICallable<bool>[0]);
             }
             catch (ArgumentException)
             {
@@ -384,7 +283,7 @@ namespace Spring.Threading.Execution
             IExecutorService e = new DirectExecutorService();
             try
             {
-                ICallable[] l = new ICallable[] {new StringTask(), null};
+                ICallable<string>[] l = new ICallable<string>[] {new StringTask(), null};
                 e.InvokeAny(l);
             }
             catch (ArgumentNullException)
@@ -398,12 +297,12 @@ namespace Spring.Threading.Execution
 
 
         [Test]
-        public void InvokeAny4()
+        public void InvokeAny4<T>()
         {
             IExecutorService e = new DirectExecutorService();
             try
             {
-                ICallable[] l = new ICallable[] { new NPETask() };
+                ICallable<T>[] l = new ICallable<T>[] { new NPETask<T>() };
                 e.InvokeAny(l);
             }
             catch (ExecutionException)
@@ -422,8 +321,8 @@ namespace Spring.Threading.Execution
             IExecutorService e = new DirectExecutorService();
             try
             {
-                ICallable[] l = new ICallable[] { new StringTask(), new StringTask() };
-                string result = (String) e.InvokeAny(l);
+                ICallable<string>[] l = new ICallable<string>[] { new StringTask(), new StringTask() };
+                string result = e.InvokeAny(l);
                 Assert.AreSame(TEST_STRING, result);
             }
             catch (ExecutionException)
@@ -439,8 +338,8 @@ namespace Spring.Threading.Execution
         public void SubmitCallable()
         {
             IExecutorService e = new DirectExecutorService();
-            IFuture future = e.Submit(new StringTask());
-            string result = (String) future.GetResult();
+            IFuture<string> future = e.Submit(new StringTask());
+            string result = future.GetResult();
             Assert.AreSame(TEST_STRING, result);
         }
 
@@ -451,7 +350,13 @@ namespace Spring.Threading.Execution
 		
 			try
 			{
-				ICallable c = new AnonymousClassCallable1();
+			    Callable<bool> c = new Call<bool>(
+			        delegate
+			            {
+                            int zero = 0;
+                            int i = 5 / zero;
+                            return true;
+                        });
 			
 				for (int i = 0; i < 5; i++)
 				{
@@ -470,9 +375,27 @@ namespace Spring.Threading.Execution
         {
             ThreadPoolExecutor p = new ThreadPoolExecutor(1, 1, new TimeSpan(0, 60, 0), new ArrayBlockingQueue<IRunnable>(10));
 
-            ICallable c = new AnonymousClassCallable(p);
+            Callable<bool> c = new Call<bool>(
+                delegate
+                    {
+                        try
+                        {
+                            p.Submit(new SmallCallable()).GetResult();
+                            Assert.Fail("Should throw an exception.");
+                        }
+                        catch (ThreadInterruptedException)
+                        {
+                        }
+                        catch (RejectedExecutionException)
+                        {
+                        }
+                        catch (ExecutionException)
+                        {
+                        }
+                        return true;
+                    });
 
-            Thread t = new Thread(new AnonymousClassRunnable1(c).Run);
+            Thread t = new Thread(delegate() { try {c.Call();} catch(Exception){} });
             t.Start();
             Thread.Sleep(SHORT_DELAY_MS);
             t.Interrupt();
@@ -494,7 +417,7 @@ namespace Spring.Threading.Execution
         public void SubmitRunnable()
         {
             IExecutorService e = new DirectExecutorService();
-            IFuture future = e.Submit(new NullRunnable());
+            IFuture<object> future = e.Submit(new NullRunnable());
             future.GetResult();
             Assert.IsTrue(future.IsDone);
         }
@@ -504,8 +427,8 @@ namespace Spring.Threading.Execution
         public void SubmitRunnable2()
         {
             IExecutorService e = new DirectExecutorService();
-            IFuture future = e.Submit(new NullRunnable(), TEST_STRING);
-            string result = (String) future.GetResult();
+            IFuture<string> future = e.Submit(new NullRunnable(), TEST_STRING);
+            string result = future.GetResult();
             Assert.AreSame(TEST_STRING, result);
         }
 
@@ -516,7 +439,7 @@ namespace Spring.Threading.Execution
             IExecutorService e = new DirectExecutorService();
             try
             {
-                e.InvokeAll(null, MEDIUM_DELAY_MS);
+                e.InvokeAll((ICollection<Call<bool>>)null, MEDIUM_DELAY_MS);
             }
             catch (ArgumentNullException)
             {
@@ -534,7 +457,7 @@ namespace Spring.Threading.Execution
             IExecutorService e = new DirectExecutorService();
             try
             {
-                IList<IFuture> r = e.InvokeAll(new ICallable[0], MEDIUM_DELAY_MS);
+                IList<IFuture<bool>> r = e.InvokeAll<bool>(new ICallable<Call<bool>>[0], MEDIUM_DELAY_MS);
                 Assert.IsTrue((r.Count == 0));
             }
             finally

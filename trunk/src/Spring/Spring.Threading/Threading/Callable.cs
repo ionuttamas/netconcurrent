@@ -22,11 +22,12 @@ using System;
 namespace Spring.Threading
 {
     /// <summary>
-    /// A class converts <see cref="Call{T}"/> delegate to <see cref="ICallable{T}"/>.
+    /// A class converts <see cref="Spring.Threading.Call{T}"/> delegate to 
+    /// <see cref="ICallable{T}"/>.
     /// </summary>
     /// <typeparam name="T">Data type of the result to be returned.</typeparam>
     /// <author>Kenneth Xu</author>
-    public class Callable<T> : AbstractCallable<T>
+    public class Callable<T> : ICallable<T>
     {
         private readonly Call<T> _call;
 
@@ -48,13 +49,13 @@ namespace Spring.Threading
         /// Perform some action that returns a result or throws an exception.
         /// </summary>
         ///<returns>The result of the action.</returns>
-        public override T Call()
+        public virtual T Call()
         {
             return _call();
         }
 
         /// <summary>
-        /// Implicitly converts <see cref="Call{T}"/> delegate to an instance
+        /// Implicitly converts <see cref="Spring.Threading.Call{T}"/> delegate to an instance
         /// of <see cref="Callable{T}"/>.
         /// </summary>
         /// <param name="call">
@@ -69,14 +70,14 @@ namespace Spring.Threading
         }
 
         /// <summary>
-        /// Implicitly converts <see cref="Callable{T}"/> to <see cref="Call{T}"/>
+        /// Implicitly converts <see cref="Callable{T}"/> to <see cref="Spring.Threading.Call{T}"/>
         /// delegate.
         /// </summary>
         /// <param name="callable">
-        /// The callable to be converted to <see cref="Call{T}"/>.
+        /// The callable to be converted to <see cref="Spring.Threading.Call{T}"/>.
         /// </param>
         /// <returns>
-        /// The original <see cref="Call{T}"/> delegate used to construct the
+        /// The original <see cref="Spring.Threading.Call{T}"/> delegate used to construct the
         /// <paramref name="callable"/>.
         /// </returns>
         public static implicit operator Call<T>(Callable<T> callable)
