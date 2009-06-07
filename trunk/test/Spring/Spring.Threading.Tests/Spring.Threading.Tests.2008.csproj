@@ -98,12 +98,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BaseMockTestCase.cs" />
-    <Compile Include="BaseThreadingTestCase.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Collections\Generic\AbstractCollectionTest.cs" />
+    <ProjectReference Include="..\..\..\src\Spring\Spring.Threading\Spring.Threading.2008.csproj">
+      <Project>{4640D873-95DC-4130-98E2-2B931D390C20}</Project>
+      <Name>Spring.Threading.2008</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
     <Compile Include="BaseAbstractCollectionTest.cs" />
+    <Compile Include="BaseMockTestCase.cs" />
+    <Compile Include="BaseThreadingTestCase.cs"/>
+    <Compile Include="Collections\Generic\AbstractCollectionTest.cs" />
     <Compile Include="Collections\Generic\AbstractEnumeratorTest.cs" />
     <Compile Include="Collections\Generic\AbstractListTest.cs" />
     <Compile Include="Collections\Generic\CollectionTestUtils.cs" />
@@ -112,116 +116,42 @@
     <Compile Include="Collections\Generic\TestEnumerator.cs" />
     <Compile Include="Collections\Generic\TransformingEnumeratorTest.cs" />
     <Compile Include="Collections\Generic\TransformingListTest.cs" />
-    <Compile Include="Threading\Collections\LinkedBlockingQueueTest.cs" />
-    <Compile Include="CoreExceptionTests.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="ExceptionsTest.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="StandardsComplianceTest.cs">
-      <SubType>Code</SubType>
-    </Compile>
+    <Compile Include="CoreExceptionTests.cs"/>
+    <Compile Include="ExceptionsTest.cs"/>
+    <Compile Include="StandardsComplianceTest.cs"/>
     <Compile Include="TestHelper.cs" />
-    <Compile Include="Threading\AtomicTypes\AtomicBooleanTests.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Threading\AtomicTypes\AtomicIntegerArrayTests.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Threading\AtomicTypes\AtomicIntegerTests.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Threading\AtomicTypes\AtomicLongArrayTests.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Threading\AtomicTypes\AtomicLongTests.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Threading\AtomicTypes\AtomicMarkableReferenceTests.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Threading\AtomicTypes\AtomicReferenceArrayTests.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Threading\AtomicTypes\AtomicReferenceTests.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Threading\AtomicTypes\AtomicStampedReferenceTests.cs">
-      <SubType>Code</SubType>
-    </Compile>
+    <Compile Include="Threading\AtomicTypes\AtomicBooleanTests.cs"/>
+    <Compile Include="Threading\AtomicTypes\AtomicIntegerArrayTests.cs"/>
+    <Compile Include="Threading\AtomicTypes\AtomicIntegerTests.cs"/>
+    <Compile Include="Threading\AtomicTypes\AtomicLongArrayTests.cs"/>
+    <Compile Include="Threading\AtomicTypes\AtomicLongTests.cs"/>
+    <Compile Include="Threading\AtomicTypes\AtomicMarkableReferenceTests.cs"/>
+    <Compile Include="Threading\AtomicTypes\AtomicReferenceArrayTests.cs"/>
+    <Compile Include="Threading\AtomicTypes\AtomicReferenceTests.cs"/>
+    <Compile Include="Threading\AtomicTypes\AtomicStampedReferenceTests.cs"/>
+    <Compile Include="Threading\CallableTest.cs" />
     <Compile Include="Threading\Collections\Generic\ArrayBlockingQueueTests.cs" />
     <Compile Include="Threading\Collections\Generic\CopyOnWriteArrayListTests.cs" />
     <Compile Include="Threading\Collections\Generic\DelayQueueTests.cs" />
-    <Compile Include="Threading\CyclicBarrierTests.cs" />
-    <Compile Include="Threading\Execution\AbstractExecutorServiceTests.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Threading\Execution\ExecutionExceptionTests.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Threading\Execution\ExecutionPolicy\AbortPolicyTests.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Threading\Execution\RejectedExecutionExceptionTests.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Threading\ForkJoin\FJTaskRunnerTest.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Threading\Future\FutureTaskTests.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Threading\Helpers\CountDownLatchTests.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Threading\Helpers\ExchangerTests.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Threading\Helpers\FIFOWaitNodeQueueTests.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Threading\Helpers\ThreadExceptionHandlerHelpersTests.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Threading\Helpers\WaitNodeTests.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Threading\LatchTest.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Threading\Locks\ReentrantLockTests.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Threading\Locks\ReentrantReadWriteLockTests.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Threading\SemaphoreTest.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Threading\SyncHolderTest.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Threading\ThreadInterruptionTest.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Threading\UtilsTest.cs">
-      <SubType>Code</SubType>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\src\Spring\Spring.Threading\Spring.Threading.2008.csproj">
-      <Project>{4640D873-95DC-4130-98E2-2B931D390C20}</Project>
-      <Name>Spring.Threading.2008</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
+    <Compile Include="Threading\Collections\LinkedBlockingQueueTest.cs" />
     <Compile Include="Threading\Collections\PriorityBlockingQueueTest.cs" />
     <Compile Include="Threading\Collections\SynchronousQueueTest.cs" />
-    <Compile Include="Threading\Execution\ThreadPoolExecutorTests.cs">
-      <SubType>Code</SubType>
-    </Compile>
+    <Compile Include="Threading\CyclicBarrierTests.cs" />
+    <Compile Include="Threading\Execution\AbstractExecutorServiceTests.cs"/>
+    <Compile Include="Threading\Execution\ExecutionExceptionTests.cs"/>
+    <Compile Include="Threading\Execution\ExecutionPolicy\AbortPolicyTests.cs"/>
+    <Compile Include="Threading\Execution\ExecutionPolicy\CallerRunsPolicyTests.cs" />
+    <Compile Include="Threading\Execution\RejectedExecutionExceptionTests.cs"/>
+    <Compile Include="Threading\Execution\ThreadPoolExecutorTests.cs"/>
+    <Compile Include="Threading\ForkJoin\FJTaskRunnerTest.cs"/>
+    <Compile Include="Threading\Future\FutureTaskTests.cs"/>
+    <Compile Include="Threading\Helpers\CountDownLatchTests.cs"/>
+    <Compile Include="Threading\Helpers\ExchangerTests.cs"/>
+    <Compile Include="Threading\Helpers\FIFOWaitNodeQueueTests.cs"/>
+    <Compile Include="Threading\Helpers\ThreadExceptionHandlerHelpersTests.cs"/>
+    <Compile Include="Threading\Helpers\WaitNodeTests.cs"/>
     <Compile Include="Threading\InterlockedAtomics\AbstractAtomicArrayTest.cs" />
+    <Compile Include="Threading\InterlockedAtomics\AtomicArrayTests.cs" />
     <Compile Include="Threading\InterlockedAtomics\AtomicBooleanTests.cs" />
     <Compile Include="Threading\InterlockedAtomics\AtomicIntegerArrayTests.cs" />
     <Compile Include="Threading\InterlockedAtomics\AtomicIntegerTests.cs" />
@@ -230,12 +160,18 @@
     <Compile Include="Threading\InterlockedAtomics\AtomicMarkableReferenceTests.cs" />
     <Compile Include="Threading\InterlockedAtomics\AtomicMarkableTests.cs" />
     <Compile Include="Threading\InterlockedAtomics\AtomicReferenceArrayTests.cs" />
-    <Compile Include="Threading\InterlockedAtomics\AtomicArrayTests.cs" />
     <Compile Include="Threading\InterlockedAtomics\AtomicReferenceTests.cs" />
     <Compile Include="Threading\InterlockedAtomics\AtomicStampedReferenceTests.cs" />
-    <Compile Include="Threading\Execution\ExecutionPolicy\CallerRunsPolicyTests.cs" />
     <Compile Include="Threading\InterlockedAtomics\AtomicStampedTests.cs" />
     <Compile Include="Threading\InterlockedAtomics\AtomicTests.cs" />
+    <Compile Include="Threading\LatchTest.cs"/>
+    <Compile Include="Threading\Locks\ReentrantLockTests.cs"/>
+    <Compile Include="Threading\Locks\ReentrantReadWriteLockTests.cs"/>
+    <Compile Include="Threading\RunnableTest.cs" />
+    <Compile Include="Threading\SemaphoreTest.cs"/>
+    <Compile Include="Threading\SyncHolderTest.cs"/>
+    <Compile Include="Threading\ThreadInterruptionTest.cs"/>
+    <Compile Include="Threading\UtilsTest.cs"/>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
