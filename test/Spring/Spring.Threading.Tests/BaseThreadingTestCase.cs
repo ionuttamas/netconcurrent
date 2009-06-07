@@ -443,32 +443,12 @@ namespace Spring.Threading
             throw new NotImplementedException();
         }
 
-        public IList<IFuture<T>> InvokeAll<T>(ICollection<ICallable<T>> tasks)
-        {
-            throw new NotImplementedException();
-        }
-
-        public IList<IFuture<T>> InvokeAll<T>(ICollection<Call<T>> tasks)
-        {
-            throw new NotImplementedException();
-        }
-
         public IList<IFuture<T>> InvokeAll<T>(IEnumerable<ICallable<T>> tasks)
         {
             throw new NotImplementedException();
         }
 
         public IList<IFuture<T>> InvokeAll<T>(IEnumerable<Call<T>> tasks)
-        {
-            throw new NotImplementedException();
-        }
-
-        public IList<IFuture<T>> InvokeAll<T>(ICollection<ICallable<T>> tasks, TimeSpan durationToWait)
-        {
-            throw new NotImplementedException();
-        }
-
-        public IList<IFuture<T>> InvokeAll<T>(ICollection<Call<T>> tasks, TimeSpan durationToWait)
         {
             throw new NotImplementedException();
         }
@@ -483,32 +463,12 @@ namespace Spring.Threading
             throw new NotImplementedException();
         }
 
-        public T InvokeAny<T>(ICollection<ICallable<T>> tasks)
-        {
-            throw new NotImplementedException();
-        }
-
-        public T InvokeAny<T>(ICollection<Call<T>> tasks)
-        {
-            throw new NotImplementedException();
-        }
-
         public T InvokeAny<T>(IEnumerable<ICallable<T>> tasks)
         {
             throw new NotImplementedException();
         }
 
         public T InvokeAny<T>(IEnumerable<Call<T>> tasks)
-        {
-            throw new NotImplementedException();
-        }
-
-        public T InvokeAny<T>(ICollection<ICallable<T>> tasks, TimeSpan durationToWait)
-        {
-            throw new NotImplementedException();
-        }
-
-        public T InvokeAny<T>(ICollection<Call<T>> tasks, TimeSpan durationToWait)
         {
             throw new NotImplementedException();
         }

@@ -140,14 +140,13 @@ namespace Spring.Threading.Execution
         }
 
 
-        [Test]
-        [TestCase(typeof(string))]
-        public void InvokeAll1<T>()
+        [Test] 
+        public void InvokeAll1()
         {
             IExecutorService e = new DirectExecutorService();
             try
             {
-                e.InvokeAll((IEnumerable<ICallable<T>>)null);
+                e.InvokeAll((IEnumerable<ICallable<string>>)null);
             }
             catch (ArgumentNullException)
             {
@@ -395,7 +394,7 @@ namespace Spring.Threading.Execution
                         return true;
                     });
 
-            Thread t = new Thread(delegate() { try {c.Call();} catch(Exception){} });
+            Thread t = new Thread(delegate() { try { c.Call(); } catch (Exception) {} });
             t.Start();
             Thread.Sleep(SHORT_DELAY_MS);
             t.Interrupt();
@@ -457,7 +456,7 @@ namespace Spring.Threading.Execution
             IExecutorService e = new DirectExecutorService();
             try
             {
-                IList<IFuture<bool>> r = e.InvokeAll<bool>(new ICallable<Call<bool>>[0], MEDIUM_DELAY_MS);
+                IList<IFuture<bool>> r = e.InvokeAll(new ICallable<bool>[0], MEDIUM_DELAY_MS);
                 Assert.IsTrue((r.Count == 0));
             }
             finally
@@ -473,7 +472,7 @@ namespace Spring.Threading.Execution
             IExecutorService e = new DirectExecutorService();
             try
             {
-                ICallable[] l = new ICallable[] { new StringTask(), null };
+                ICallable<string>[] l = new ICallable<string>[] { new StringTask(), null };
                 e.InvokeAll(l, MEDIUM_DELAY_MS);
             }
             catch (ArgumentNullException)
@@ -486,16 +485,15 @@ namespace Spring.Threading.Execution
         }
 
 
-        [Test]
-        public void TimedInvokeAll4()
+        [Test] public void TimedInvokeAll4()
         {
             IExecutorService e = new DirectExecutorService();
             try
             {
-                ICallable[] l = new ICallable[] { new NPETask() };
-                IList<IFuture> result = e.InvokeAll(l, MEDIUM_DELAY_MS);
+                ICallable<string>[] l = new ICallable<string>[] { new NPETask<string>() };
+                IList<IFuture<string>> result = e.InvokeAll(l, MEDIUM_DELAY_MS);
                 Assert.AreEqual(1, result.Count);
-                foreach (IFuture future in result)
+                foreach (IFuture<string> future in result)
                 {
                     future.GetResult();
                 }
@@ -516,10 +514,10 @@ namespace Spring.Threading.Execution
             IExecutorService e = new DirectExecutorService();
             try
             {
-                ICallable[] l = new ICallable[] { new StringTask(), new StringTask() };
-                IList<IFuture> result = e.InvokeAll(l, MEDIUM_DELAY_MS);
+                ICallable<string>[] l = new ICallable<string>[] { new StringTask(), new StringTask() };
+                IList<IFuture<string>> result = e.InvokeAll(l, MEDIUM_DELAY_MS);
                 Assert.AreEqual(2, result.Count);
-                foreach (IFuture future in result)
+                foreach (IFuture<string> future in result)
                 {
                     Assert.AreSame(TEST_STRING, future.GetResult());
                 }
@@ -540,17 +538,17 @@ namespace Spring.Threading.Execution
             IExecutorService e = new DirectExecutorService();
             try
             {
-                ICallable[] list = new ICallable[] { new StringTask(), Executors.CreateCallable(new MediumPossiblyInterruptedRunnable(), TEST_STRING), new StringTask() };
-                IList<IFuture> result = e.InvokeAll(list, SMALL_DELAY_MS);
+                ICallable<string>[] list = new ICallable<string>[] { new StringTask(), Executors.CreateCallable(new MediumPossiblyInterruptedRunnable(), TEST_STRING), new StringTask() };
+                IList<IFuture<string>> result = e.InvokeAll(list, SMALL_DELAY_MS);
                 Assert.AreEqual(3, result.Count);
-                IEnumerator<IFuture> it = result.GetEnumerator();
-                IFuture f1 = null; 
-                IFuture f2 = null; 
-                IFuture f3 = null;
+                IEnumerator<IFuture<string>> it = result.GetEnumerator();
+                IFuture<string> f1 = null; 
+                IFuture<string> f2 = null; 
+                IFuture<string> f3 = null;
 
-                if (it.MoveNext()) f1 = (IFuture)it.Current;
-                if (it.MoveNext()) f2 = (IFuture)it.Current;
-                if (it.MoveNext()) f3 = (IFuture)it.Current;
+                if (it.MoveNext()) f1 = it.Current;
+                if (it.MoveNext()) f2 = it.Current;
+                if (it.MoveNext()) f3 = it.Current;
 
                 if ( f1 == null || f2 == null || f3 == null )
                 {
@@ -575,7 +573,7 @@ namespace Spring.Threading.Execution
             IExecutorService e = new DirectExecutorService();
             try
             {
-                e.InvokeAll(null, MEDIUM_DELAY_MS);
+                e.InvokeAll((IEnumerable<Call<bool>>)null, MEDIUM_DELAY_MS);
             }
             catch (ArgumentNullException)
             {
@@ -592,7 +590,7 @@ namespace Spring.Threading.Execution
             IExecutorService e = new DirectExecutorService();
             try
             {
-                e.InvokeAny(null, MEDIUM_DELAY_MS);
+                e.InvokeAny((IEnumerable<Call<bool>>)null, MEDIUM_DELAY_MS);
             }
             catch (ArgumentNullException)
             {
@@ -609,7 +607,7 @@ namespace Spring.Threading.Execution
             IExecutorService e = new DirectExecutorService();
             try
             {
-                e.InvokeAny(new ICallable[0], MEDIUM_DELAY_MS);
+                e.InvokeAny(new ICallable<bool>[0], MEDIUM_DELAY_MS);
             }
             catch (ArgumentException)
             {
@@ -627,7 +625,7 @@ namespace Spring.Threading.Execution
             IExecutorService e = new DirectExecutorService();
             try
             {
-                ICallable[] l = new ICallable[] { new StringTask(), null };
+                ICallable<string>[] l = new ICallable<string>[] { new StringTask(), null };
                 e.InvokeAny(l, MEDIUM_DELAY_MS);
             }
             catch (ArgumentNullException)
@@ -646,7 +644,7 @@ namespace Spring.Threading.Execution
             IExecutorService e = new DirectExecutorService();
             try
             {
-                ICallable[] l = new ICallable[] { new NPETask() };
+                ICallable<string>[] l = new ICallable<string>[] { new NPETask<string>() };
                 e.InvokeAny(l, MEDIUM_DELAY_MS);
             }
             catch (ExecutionException)
@@ -665,8 +663,8 @@ namespace Spring.Threading.Execution
             IExecutorService e = new DirectExecutorService();
             try
             {
-                ICallable[] l = new ICallable[] { new StringTask(), new StringTask() };
-                string result = (String) e.InvokeAny(l, MEDIUM_DELAY_MS);
+                ICallable<string>[] l = new ICallable<string>[] { new StringTask(), new StringTask() };
+                string result = e.InvokeAny(l, MEDIUM_DELAY_MS);
                 Assert.AreSame(TEST_STRING, result);
             }
             catch (ExecutionException)
@@ -684,7 +682,7 @@ namespace Spring.Threading.Execution
             IExecutorService e = new DirectExecutorService();
             try
             {
-                e.InvokeAny(null, new TimeSpan(0));
+                e.InvokeAny((IEnumerable<Call<bool>>)null, new TimeSpan(0));
             }
             catch (ArgumentNullException)
             {
