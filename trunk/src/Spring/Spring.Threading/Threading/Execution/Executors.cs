@@ -168,6 +168,28 @@ namespace Spring.Threading.Execution
 		}
 
 		/// <summary> 
+		/// Returns an object that delegates all defined 
+		/// <see cref="Spring.Threading.Execution.IExecutorService"/> 
+		/// methods to the given executor, but not any
+		/// other methods that might otherwise be accessible using
+		/// casts. 
+		/// </summary>
+		/// <remarks>
+		/// This provides a way to safely "freeze" configuration and
+		/// disallow tuning of a given concrete implementation.
+		/// </remarks>
+		/// <param name="executor">the underlying implementation</param>
+		/// <returns> an <see cref="Spring.Threading.Execution.IExecutorService"/> instance</returns>
+		/// <exception cref="System.ArgumentNullException">if <paramref name="executor"/> is null</exception>
+		public static IExecutorService UnconfigurableExecutorService(IExecutorService executor)
+		{
+			if (executor == null)
+				throw new ArgumentNullException("executor");
+			return new DelegatedExecutorService(executor);
+		}
+
+#if !PHASED
+		/// <summary> 
 		/// Creates a single-threaded executor that can schedule commands
 		/// to run after a given delay, or to execute periodically.
 		/// </summary>
@@ -231,28 +253,6 @@ namespace Spring.Threading.Execution
 			return new ScheduledThreadPoolExecutor(corePoolSize, threadFactory);
 		}
 
-
-		/// <summary> 
-		/// Returns an object that delegates all defined 
-		/// <see cref="Spring.Threading.Execution.IExecutorService"/> 
-		/// methods to the given executor, but not any
-		/// other methods that might otherwise be accessible using
-		/// casts. 
-		/// </summary>
-		/// <remarks>
-		/// This provides a way to safely "freeze" configuration and
-		/// disallow tuning of a given concrete implementation.
-		/// </remarks>
-		/// <param name="executor">the underlying implementation</param>
-		/// <returns> an <see cref="Spring.Threading.Execution.IExecutorService"/> instance</returns>
-		/// <exception cref="System.ArgumentNullException">if <paramref name="executor"/> is null</exception>
-		public static IExecutorService UnconfigurableExecutorService(IExecutorService executor)
-		{
-			if (executor == null)
-				throw new ArgumentNullException("executor");
-			return new DelegatedExecutorService(executor);
-		}
-
 		/// <summary> 
 		/// Returns an object that delegates all defined <see cref="Spring.Threading.Execution.IScheduledExecutorService"/> 
 		/// methods to the given executor, but not any other methods that might otherwise be accessible using
@@ -268,6 +268,7 @@ namespace Spring.Threading.Execution
 				throw new ArgumentNullException("executor");
 			return new DelegatedScheduledExecutorService(executor);
 		}
+#endif
 
 		/// <summary> 
 		/// Returns a default thread factory used to create new threads.
@@ -588,8 +589,7 @@ namespace Spring.Threading.Execution
                 return _executorService.InvokeAny(tasks, durationToWait);
             }
 		}
-
-
+        
         internal class FinalizableDelegatedExecutorService : DelegatedExecutorService
         {
             internal FinalizableDelegatedExecutorService(IExecutorService executor)
@@ -603,6 +603,7 @@ namespace Spring.Threading.Execution
             }
         }
 
+#if !PHASED
        /// <summary> A wrapper class that exposes only the <see cref="Spring.Threading.Execution.IExecutorService"/> and
 		/// <see cref="Spring.Threading.Execution.IScheduledExecutorService"/> methods of a <see cref="Spring.Threading.Execution.IScheduledExecutorService"/> implementation.
 		/// </summary>
@@ -635,6 +636,7 @@ namespace Spring.Threading.Execution
 				return e.ScheduleWithFixedDelay(command, initialDelay, delay);
 			}
 		}
+#endif
 		#endregion
 	}
 }

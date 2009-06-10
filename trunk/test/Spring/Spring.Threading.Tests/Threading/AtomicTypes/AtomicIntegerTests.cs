@@ -95,7 +95,7 @@ namespace Spring.Threading.AtomicTypes {
             Thread t = new Thread(new ThreadStart(new AnonymousClassRunnable(ai).Run));
             t.Start();
             Assert.IsTrue(ai.CompareAndSet(1, 2));
-            t.Join(LONG_DELAY_MS);
+            t.Join(LONG_DELAY);
             Assert.IsFalse(t.IsAlive);
             Assert.AreEqual(ai.IntegerValue, 3);
         }

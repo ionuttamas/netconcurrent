@@ -86,11 +86,11 @@ namespace Spring.Threading.InterlockedAtomics
             Thread t = new Thread(delegate()
             {
                 while (!ai.CompareAndSet(two, three))
-                    Thread.Sleep(SHORT_DELAY_MS);
+                    Thread.Sleep(SHORT_DELAY);
             });
             t.Start();
             Assert.IsTrue(ai.CompareAndSet(one, two), "Value did not equal 'one' reference");
-            t.Join(SMALL_DELAY_MS);
+            t.Join(SMALL_DELAY);
             Assert.IsFalse(t.IsAlive, "Thread is still alive");
             Assert.AreEqual(ai.Value, three, "Object reference not switched from 'two' to 'three'");
         }

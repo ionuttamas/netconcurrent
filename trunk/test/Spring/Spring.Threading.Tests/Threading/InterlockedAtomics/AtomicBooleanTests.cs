@@ -92,13 +92,13 @@ namespace Spring.Threading.InterlockedAtomics
             Thread t = new Thread(new ThreadStart(delegate 
                     {
                         while (!ai.CompareAndSet(false, true))
-                            Thread.Sleep(SHORT_DELAY_MS);
+                            Thread.Sleep(SHORT_DELAY);
                     }
                 ));
 
 			t.Start();
 			Assert.IsTrue( ai.CompareAndSet( true, false ), "Value" );
-			t.Join( SMALL_DELAY_MS );
+			t.Join( SMALL_DELAY );
 			Assert.IsFalse( t.IsAlive, "Thread is still alive." );
 			Assert.IsTrue( ai.Value );
 		}

@@ -9,7 +9,7 @@ namespace Spring.Threading.Locks
 	/// <seealso cref="Spring.Threading.Locks.WriterLock"/>
 	/// </summary>
 	[Serializable]
-	internal abstract class AbstractSignallerLock :  ISignaller, ILock
+	internal abstract class AbstractSignallerLock :  ISignaller, ILock, IDisposable
 	{	
 		private ReentrantReadWriteLock _reentrantReadWriteLock;
 
@@ -195,7 +195,7 @@ namespace Spring.Threading.Locks
 		/// if the current thread is interrupted while acquiring the lock 
 		/// ( and interruption of lock acquisition is supported )
 		/// </exception>
-		public abstract void LockInterruptibly();
+		public abstract IDisposable LockInterruptibly();
 		#endregion
 
 		#region Propertues
@@ -222,7 +222,7 @@ namespace Spring.Threading.Locks
 		/// the current thread becomes disabled for thread scheduling
 		/// purposes and lies dormant until the read lock has been acquired.
 		/// </remarks>
-		public  void Lock()
+		public virtual IDisposable Lock()
 		{
 			bool wasInterrupted = false;
 			while (true)
@@ -234,7 +234,7 @@ namespace Spring.Threading.Locks
 					{
 						Thread.CurrentThread.Interrupt();
 					}
-					return;
+					return this;
 				}
 				catch (ThreadInterruptedException)
 				{
@@ -255,5 +255,14 @@ namespace Spring.Threading.Locks
 			}
 		}
 		#endregion
-	}
+
+        #region IDisposable Members
+
+        public void Dispose()
+        {
+            Unlock();
+        }
+
+        #endregion
+    }
 }

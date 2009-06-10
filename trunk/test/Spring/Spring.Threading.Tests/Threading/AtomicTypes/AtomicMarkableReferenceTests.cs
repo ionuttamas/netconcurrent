@@ -41,7 +41,7 @@ namespace Spring.Threading.AtomicTypes
 			public void Run()
 			{
 				while (!ai.CompareAndSet(two, three, false, false))
-					Thread.Sleep(SHORT_DELAY_MS);
+					Thread.Sleep(SHORT_DELAY);
 			}
 		}
 
@@ -57,7 +57,7 @@ namespace Spring.Threading.AtomicTypes
 			public void Run()
 			{
 				while (!ai.CompareAndSet(one, one, true, false))
-					Thread.Sleep(SHORT_DELAY_MS);
+					Thread.Sleep(SHORT_DELAY);
 			}
 		}
 
@@ -140,7 +140,7 @@ namespace Spring.Threading.AtomicTypes
 			Thread t = new Thread(new ThreadStart(new AnonymousClassRunnable(ai).Run));
 			t.Start();
 			Assert.IsTrue(ai.CompareAndSet(one, two, false, false));
-			t.Join(LONG_DELAY_MS);
+			t.Join(LONG_DELAY);
 			Assert.IsFalse(t.IsAlive);
 			Assert.AreEqual(ai.Reference, three);
 			Assert.IsFalse(ai.IsReferenceMarked);
@@ -153,7 +153,7 @@ namespace Spring.Threading.AtomicTypes
 			Thread t = new Thread(new ThreadStart(new AnonymousClassRunnable1(ai).Run));
 			t.Start();
 			Assert.IsTrue(ai.CompareAndSet(one, one, false, true));
-			t.Join(LONG_DELAY_MS);
+			t.Join(LONG_DELAY);
 			Assert.IsFalse(t.IsAlive);
 			Assert.AreEqual(ai.Reference, one.Value);
 			Assert.IsFalse(ai.IsReferenceMarked);

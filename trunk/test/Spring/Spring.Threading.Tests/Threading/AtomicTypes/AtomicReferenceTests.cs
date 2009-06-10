@@ -35,7 +35,7 @@ namespace Spring.Threading.AtomicTypes {
 
             public void Run() {
                 while(!_atomicReference.CompareAndSet(two, three))
-                    Thread.Sleep(SHORT_DELAY_MS);
+                    Thread.Sleep(SHORT_DELAY);
             }
         }
 
@@ -98,7 +98,7 @@ namespace Spring.Threading.AtomicTypes {
             Thread t = new Thread(new ThreadStart(new AnonymousClassRunnable(ai).Run));
             t.Start();
             Assert.IsTrue(ai.CompareAndSet(one, two), "Reference did not equal 'one' reference");
-            t.Join(SMALL_DELAY_MS);
+            t.Join(SMALL_DELAY);
             Assert.IsFalse(t.IsAlive, "Thread is still alive");
             Assert.AreEqual(ai.Reference, three, "Object reference not switched from 'two' to 'three'");
         }

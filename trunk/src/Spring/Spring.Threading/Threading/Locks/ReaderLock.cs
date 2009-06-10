@@ -44,7 +44,7 @@ namespace Spring.Threading.Locks
 		/// lock.
 		/// </remarks> 
 		/// <exception cref="System.Threading.ThreadInterruptedException">if the current thread is interrupted.</exception>
-		public override void LockInterruptibly()
+		public override IDisposable LockInterruptibly()
 		{
 			ThreadInterruptedException ie = null;
 			lock (this)
@@ -57,7 +57,7 @@ namespace Spring.Threading.Locks
 						{
 							Monitor.Wait(this);
 							if (ReentrantReadWriteLock.StartReadFromWaitingReader())
-								return;
+								return this;
 						}
 						catch (ThreadInterruptedException ex)
 						{
@@ -73,6 +73,7 @@ namespace Spring.Threading.Locks
 				ReentrantReadWriteLock.SignallerWriterLock.SignalWaiters();
 				throw ie;
 			}
+		    return this;
 		}
 
 		/// <summary> Attempts to release this lock.</summary>	
