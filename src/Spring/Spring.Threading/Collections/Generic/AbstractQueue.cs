@@ -28,8 +28,8 @@ using System.Collections.Generic;
 namespace Spring.Collections.Generic
 {
 	/// <summary> 
-	/// This class provides skeletal implementations of some
-	/// <see cref="IQueue{T}"/> and <see cref="IQueue"/>operations.
+	/// This class provides skeletal implementations for some of
+	/// <see cref="IQueue{T}"/> and all of <see cref="IQueue"/> operations.
 	/// </summary>
 	/// <remarks>
 	/// <para>
@@ -52,7 +52,7 @@ namespace Spring.Collections.Generic
         /// </summary>
         /// <remarks>
         /// <para>
-        /// Attempts to <see cref="AddAll"/> of a queue to 
+        /// Attempts to <see cref="AddRange"/> of a queue to 
         /// itself result in <see cref="ArgumentException"/>. Further, the 
         /// behavior of this operation is undefined if the specified
         /// collection is modified while the operation is in progress.
@@ -71,11 +71,10 @@ namespace Spring.Collections.Generic
         /// <exception cref="System.ArgumentNullException">
         /// If the supplied <paramref name="collection"/> is <see langword="null"/>.
         /// </exception>
-        ///// <exception cref="System.ArgumentException">
-        ///// If the collection is the current queue or the collection size is 
-        ///// greater than the queue capacity.
-        ///// </exception>
-        public virtual bool AddAll(ICollection<T> collection)
+        /// <exception cref="System.ArgumentException">
+        /// If the collection is the current queue.
+        /// </exception>
+        public virtual bool AddRange(IEnumerable<T> collection)
         {
             if (collection == null)
             {
@@ -85,11 +84,6 @@ namespace Spring.Collections.Generic
             {
                 throw new ArgumentException("Cannot add to itself.");
             }
-            // TODO: check with Griffin current backport does not contain this constraint
-            //if (collection.Count > RemainingCapacity)
-            //{
-            //    throw new ArgumentException("Collcation size greater than queue capacity.");
-            //}
             bool modified = false;
             foreach (T element in collection)
             {
@@ -245,6 +239,7 @@ namespace Spring.Collections.Generic
 
         #region IQueue Members
 
+        //TODO: In IQueue, Why there is Add, which the same as Offer.
         bool IQueue.Add(object objectToAdd)
         {
             Add((T) objectToAdd);
@@ -287,6 +282,7 @@ namespace Spring.Collections.Generic
             return Poll(out element) ? (object)element : null;
         }
 
+        //TODO: In IQueue, Why there is Remove, which the same as Pull.
         object IQueue.Remove()
         {
             return Remove();
@@ -294,11 +290,5 @@ namespace Spring.Collections.Generic
 
         #endregion
 
-        /// <summary>
-        /// get whether the elements of the queue are reference types
-        /// </summary>
-        protected bool IsQueueOfReferenceType {
-            get { return !typeof (T).IsValueType; }
-        }
     }
 }

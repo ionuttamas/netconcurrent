@@ -162,7 +162,7 @@ namespace Spring.Threading.Future
             {
                 try
                 {
-                    Thread.Sleep(MEDIUM_DELAY_MS);
+                    Thread.Sleep(MEDIUM_DELAY);
                     Assert.Fail("Should throw an exception");
                 }
                 catch (ThreadInterruptedException)
@@ -173,7 +173,7 @@ namespace Spring.Threading.Future
             Thread t = new Thread(task.Run);
             t.Start();
 
-            Thread.Sleep(SHORT_DELAY_MS);
+            Thread.Sleep(SHORT_DELAY);
             Assert.IsTrue(task.Cancel(true));
             t.Join();
             Assert.IsTrue(task.IsDone);
@@ -186,13 +186,13 @@ namespace Spring.Threading.Future
         {
             FutureTask<bool> task = new FutureTask<bool>(delegate
             {
-                Thread.Sleep(SMALL_DELAY_MS);
+                Thread.Sleep(SMALL_DELAY);
                 return true;
             });
             Thread t = new Thread(new ThreadStart(task.Run));
             t.Start();
 
-            Thread.Sleep(SHORT_DELAY_MS);
+            Thread.Sleep(SHORT_DELAY);
             Assert.IsTrue(task.Cancel());
             t.Join();
             Assert.IsTrue(task.IsDone);
@@ -205,7 +205,7 @@ namespace Spring.Threading.Future
         {
             FutureTask<bool> ft = new FutureTask<bool>(delegate
             {
-                Thread.Sleep(SMALL_DELAY_MS);
+                Thread.Sleep(SMALL_DELAY);
                 return true;
             });
             Thread t = new Thread(delegate()
@@ -215,7 +215,7 @@ namespace Spring.Threading.Future
             Assert.IsFalse(ft.IsDone);
             Assert.IsFalse(ft.IsCancelled);
             t.Start();
-            Thread.Sleep(SHORT_DELAY_MS);
+            Thread.Sleep(SHORT_DELAY);
             ft.Run();
             t.Join();
             Assert.IsTrue((bool) ft.GetResult());
@@ -229,14 +229,14 @@ namespace Spring.Threading.Future
         {
             FutureTask<bool> ft = new FutureTask<bool>(delegate
             {
-                Thread.Sleep(SMALL_DELAY_MS);
+                Thread.Sleep(SMALL_DELAY);
                 return true;
             });
             Thread t = new Thread(delegate()
             {
                 try
                 {
-                    ft.GetResult(SHORT_DELAY_MS);
+                    ft.GetResult(SHORT_DELAY);
                 }
                 catch (TimeoutException)
                 {
@@ -259,7 +259,7 @@ namespace Spring.Threading.Future
             {
                 try
                 {
-                    Thread.Sleep(SMALL_DELAY_MS);
+                    Thread.Sleep(SMALL_DELAY);
                     Assert.Fail("Should throw an exception");
                 }
                 catch (ThreadInterruptedException)
@@ -271,7 +271,7 @@ namespace Spring.Threading.Future
             {
                 try
                 {
-                    ft.GetResult(MEDIUM_DELAY_MS);
+                    ft.GetResult(MEDIUM_DELAY);
                     Assert.Fail("Should throw an exception");
                 }
                 catch (CancellationException)
@@ -281,7 +281,7 @@ namespace Spring.Threading.Future
             Thread t2 = new Thread(ft.Run);
             t1.Start();
             t2.Start();
-            Thread.Sleep(SHORT_DELAY_MS);
+            Thread.Sleep(SHORT_DELAY);
             ft.Cancel(true);
             t1.Join();
             t2.Join();
@@ -294,7 +294,7 @@ namespace Spring.Threading.Future
             // 1. Sleep for SHORT, then return true
             FutureTask<bool> ft = new FutureTask<bool>(delegate
             {
-                Thread.Sleep(SMALL_DELAY_MS);
+                Thread.Sleep(SMALL_DELAY);
                 return true;
             });
             // 2. call GetResult, should throw exception
@@ -312,7 +312,7 @@ namespace Spring.Threading.Future
             Thread t2 = new Thread(new ThreadStart(ft.Run));
             t1.Start();
             t2.Start();
-            Thread.Sleep(SHORT_DELAY_MS);
+            Thread.Sleep(SHORT_DELAY);
             ft.Cancel(true);
             t1.Join();
             t2.Join();
@@ -352,7 +352,7 @@ namespace Spring.Threading.Future
             try
             {
                 ft.Run();
-                ft.GetResult(SHORT_DELAY_MS);
+                ft.GetResult(SHORT_DELAY);
                 Assert.Fail("Should throw an exception.");
             }
             catch (ExecutionException)
@@ -380,7 +380,7 @@ namespace Spring.Threading.Future
                 }
             });
             t.Start();
-            Thread.Sleep(SHORT_DELAY_MS);
+            Thread.Sleep(SHORT_DELAY);
             t.Interrupt();
             t.Join();
         }
@@ -394,7 +394,7 @@ namespace Spring.Threading.Future
             {
                 try
                 {
-                    ft.GetResult(MEDIUM_DELAY_MS);
+                    ft.GetResult(MEDIUM_DELAY);
                     Assert.Fail("Should throw an exception.");
                 }
                 catch (ThreadInterruptedException)
@@ -402,7 +402,7 @@ namespace Spring.Threading.Future
                 }
             });
             t.Start();
-            Thread.Sleep(SHORT_DELAY_MS);
+            Thread.Sleep(SHORT_DELAY);
             t.Interrupt();
             t.Join();
         }

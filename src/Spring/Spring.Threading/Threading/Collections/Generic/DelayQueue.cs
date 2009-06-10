@@ -36,7 +36,7 @@ namespace Spring.Threading.Collections.Generic
         /// <exception cref="NullReferenceException">if any of the elements of the collection are null</exception>
         public DelayQueue(System.Collections.Generic.ICollection<T> collection)
         {
-            AddAll(collection);
+            AddRange(collection);
         }
 
         /// <summary>

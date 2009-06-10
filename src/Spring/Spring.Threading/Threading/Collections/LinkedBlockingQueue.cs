@@ -149,10 +149,6 @@ namespace Spring.Threading.Collections.Generic {
                 throw new ArgumentException("Collection size exceeds the capacity of this queue.");
             }
             foreach(T currentobject in collection) {
-                if(currentobject.Equals(default(T)) && IsQueueOfReferenceType) {
-                    throw new ArgumentNullException("element", "Collection element cannot be null.");
-                }
-
                 Add(currentobject);
             }
         }
@@ -175,8 +171,6 @@ namespace Spring.Threading.Collections.Generic {
 
             for(; ; ) {
                 T item = (T)info.GetValue("Spring.Threading.Collections.LinkedBlockingQueuedata1", typeof(T));
-                if(IsQueueOfReferenceType && item.Equals(default(T)))
-                    break;
                 Add(item);
             }
         }
@@ -230,9 +224,6 @@ namespace Spring.Threading.Collections.Generic {
         /// it from being added to this queue.
         /// </exception>
         public override void Put(T element) {
-            if(IsQueueOfReferenceType && element.Equals(default(T)))
-                throw new ArgumentNullException("element", "Cannot add null elements to this queue.");
-
             int tempCount;
             lock(putLock) {
                 try {
@@ -280,9 +271,6 @@ namespace Spring.Threading.Collections.Generic {
         /// it from being added to this queue.
         /// </exception>
         public override bool Offer(T element, TimeSpan duration) {
-            if(IsQueueOfReferenceType && element.Equals(default(T)))
-                throw new ArgumentNullException("element", "Cannot offer null elements to this queue.");
-
             TimeSpan durationToWait = duration;
             int tempCount;
             lock(putLock) {
@@ -529,9 +517,6 @@ namespace Spring.Threading.Collections.Generic {
         /// <param name="objectToRemove">element to be removed from this queue, if present</param>
         /// <returns><see lang="true"/> if this queue changed as a result of the call</returns>
         public override bool Remove(T objectToRemove) {
-            if(IsQueueOfReferenceType && objectToRemove.Equals(default(T)))
-                return false;
-
             bool removed = false;
             lock(putLock) {
                 lock(takeLock) {
@@ -589,9 +574,6 @@ namespace Spring.Threading.Collections.Generic {
         /// it from being added to this queue.
         /// </exception>
         public override bool Offer(T element) {
-            if(IsQueueOfReferenceType && element.Equals(default(T)))
-                throw new ArgumentNullException("element", "Cannot offer null elements to this queue.");
-
             if(_activeCount == _capacity)
                 return false;
             int tempCount = -1;

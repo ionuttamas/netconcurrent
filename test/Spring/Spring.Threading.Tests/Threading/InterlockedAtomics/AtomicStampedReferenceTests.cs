@@ -111,7 +111,7 @@ namespace Spring.Threading.InterlockedAtomics
             });
 			t.Start();
 			Assert.IsTrue(ai.CompareAndSet(one, two, 0, 0));
-			t.Join(LONG_DELAY_MS);
+			t.Join(LONG_DELAY);
 			Assert.IsFalse(t.IsAlive);
 			Assert.AreEqual(ai.Value, three);
 			Assert.AreEqual(ai.Stamp, 0);
@@ -128,7 +128,7 @@ namespace Spring.Threading.InterlockedAtomics
             });
 			t.Start();
 			Assert.IsTrue(ai.CompareAndSet(one, one, 0, 1));
-			t.Join(LONG_DELAY_MS);
+			t.Join(LONG_DELAY);
 			Assert.IsFalse(t.IsAlive);
 			Assert.AreEqual(ai.Value, one);
 			Assert.AreEqual(ai.Stamp, 2);

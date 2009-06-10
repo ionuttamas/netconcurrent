@@ -165,7 +165,7 @@ namespace Spring.Threading.Collections.Generic
         /// </summary>
         public sealed override void Clear()
         {
-            using (_lock.LockAndUse())
+            using (_lock.Lock())
             {
                 _wrapped.Clear();
                 _notFullCondition.SignalAll();
@@ -296,7 +296,7 @@ namespace Spring.Threading.Collections.Generic
         /// <filterpriority>2</filterpriority>
         protected override void CopyTo(Array array, int index)
         {
-            using(_lock.LockAndUse())
+            using(_lock.Lock())
             {
                 base.CopyTo(array, index);
             }
@@ -332,7 +332,7 @@ namespace Spring.Threading.Collections.Generic
         /// </exception>
         public override void CopyTo(T[] array, int arrayIndex)
         {
-            using(_lock.LockAndUse())
+            using(_lock.Lock())
             {
                 base.CopyTo(array, arrayIndex);
             }
@@ -713,7 +713,7 @@ namespace Spring.Threading.Collections.Generic
             {
                 get
                 {
-                    using (_lock.LockAndUse())
+                    using (_lock.Lock())
                     {
                         return _wrapped.Current;
                     }
@@ -730,7 +730,7 @@ namespace Spring.Threading.Collections.Generic
 
             public bool MoveNext()
             {
-                using(_lock.LockAndUse())
+                using(_lock.Lock())
                 {
                     return _wrapped.MoveNext();
                 }
@@ -738,7 +738,7 @@ namespace Spring.Threading.Collections.Generic
 
             public void Reset()
             {
-                using(_lock.LockAndUse())
+                using(_lock.Lock())
                 {
                     _wrapped.Reset();
                 }
@@ -748,7 +748,7 @@ namespace Spring.Threading.Collections.Generic
 
             public void Dispose()
             {
-                using (_lock.LockAndUse())
+                using (_lock.Lock())
                 {
                     _wrapped.Dispose();
                 }

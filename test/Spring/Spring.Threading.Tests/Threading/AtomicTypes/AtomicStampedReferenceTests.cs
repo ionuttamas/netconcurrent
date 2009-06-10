@@ -139,7 +139,7 @@ namespace Spring.Threading.AtomicTypes
 			Thread t = new Thread(new AnonymousClassChangingReference(ai).Run);
 			t.Start();
 			Assert.IsTrue(ai.CompareAndSet(one, two, 0, 0));
-			t.Join(LONG_DELAY_MS);
+			t.Join(LONG_DELAY);
 			Assert.IsFalse(t.IsAlive);
 			Assert.AreEqual(ai.Reference, three);
 			Assert.AreEqual(ai.Stamp, 0);
@@ -152,7 +152,7 @@ namespace Spring.Threading.AtomicTypes
             Thread t = new Thread(new AnonymousClassChangingStamp(ai).Run);
 			t.Start();
 			Assert.IsTrue(ai.CompareAndSet(one, one, 0, 1));
-			t.Join(LONG_DELAY_MS);
+			t.Join(LONG_DELAY);
 			Assert.IsFalse(t.IsAlive);
 			Assert.AreEqual(ai.Reference, one);
 			Assert.AreEqual(ai.Stamp, 2);

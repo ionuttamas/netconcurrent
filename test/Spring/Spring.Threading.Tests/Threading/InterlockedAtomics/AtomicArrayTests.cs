@@ -131,12 +131,12 @@ namespace Spring.Threading.InterlockedAtomics
             Thread t = new Thread(delegate()
             {
                 while (!a.CompareAndSet(0, two, three))
-                    Thread.Sleep(SHORT_DELAY_MS);
+                    Thread.Sleep(SHORT_DELAY);
             });
 
             t.Start();
             Assert.IsTrue(a.CompareAndSet(0, one, two));
-            t.Join(LONG_DELAY_MS);
+            t.Join(LONG_DELAY);
             Assert.IsFalse(t.IsAlive);
             Assert.AreEqual(a[0], three);
         }

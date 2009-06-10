@@ -36,26 +36,31 @@ namespace Spring.Threading
             }
         }
 
+        public const long SHORT_DELAY_MS = 300;
+        public const long SMALL_DELAY_MS = SHORT_DELAY_MS * 5;
+        public const long MEDIUM_DELAY_MS = SHORT_DELAY_MS * 10;
+        public const long LONG_DELAY_MS = SHORT_DELAY_MS * 50;
+        public static readonly TimeSpan SHORT_DELAY = TimeSpan.FromMilliseconds(SHORT_DELAY_MS);
+        public static readonly TimeSpan SMALL_DELAY = TimeSpan.FromMilliseconds(SMALL_DELAY_MS);
+        public static readonly TimeSpan MEDIUM_DELAY = TimeSpan.FromMilliseconds(MEDIUM_DELAY_MS);
+        public static readonly TimeSpan LONG_DELAY = TimeSpan.FromMilliseconds(LONG_DELAY_MS);
+
         public const string TEST_STRING = "a test string";
         public static int DEFAULT_COLLECTION_SIZE = 20;
         protected static Integer eight = Int32.Parse("8");
         protected static Integer five = Int32.Parse("5");
         protected static Integer four = Int32.Parse("4");
-        public static TimeSpan LONG_DELAY_MS;
         protected static Integer m1 = Int32.Parse("-1");
         protected static Integer m10 = Int32.Parse("-10");
         protected static Integer m2 = Int32.Parse("-2");
         protected static Integer m3 = Int32.Parse("-3");
         protected static Integer m4 = Int32.Parse("-4");
         protected static Integer m5 = Int32.Parse("-5");
-        public static TimeSpan MEDIUM_DELAY_MS;
         protected static Integer nine = Int32.Parse("9");
         protected static Integer one = Int32.Parse("1");
         protected static Integer seven = Int32.Parse("7");
 
-        public static TimeSpan SHORT_DELAY_MS;
         protected static Integer six = Int32.Parse("6");
-        public static TimeSpan SMALL_DELAY_MS;
         protected static Integer three = Int32.Parse("3");
         protected static Integer two = Int32.Parse("2");
         protected static Integer zero = Int32.Parse("0");
@@ -64,10 +69,6 @@ namespace Spring.Threading
 
         protected BaseThreadingTestCase()
         {
-            SHORT_DELAY_MS = new TimeSpan(0, 0, 0, 0, 300);
-            SMALL_DELAY_MS = new TimeSpan(0, 0, 0, 0, SHORT_DELAY_MS.Milliseconds*5);
-            MEDIUM_DELAY_MS = new TimeSpan(0, 0, 0, 0, SHORT_DELAY_MS.Milliseconds*10);
-            LONG_DELAY_MS = new TimeSpan(0, 0, 0, 0, SHORT_DELAY_MS.Milliseconds*50);
         }
 
         public void UnexpectedException()
@@ -80,7 +81,7 @@ namespace Spring.Threading
             try
             {
                 exec.Shutdown();
-                Assert.IsTrue(exec.AwaitTermination(LONG_DELAY_MS));
+                Assert.IsTrue(exec.AwaitTermination(LONG_DELAY));
             }
             catch (ThreadInterruptedException)
             {
@@ -101,7 +102,7 @@ namespace Spring.Threading
 
         public void Run()
         {
-            Thread.Sleep(BaseThreadingTestCase.SMALL_DELAY_MS);
+            Thread.Sleep(BaseThreadingTestCase.SMALL_DELAY);
         }
 
         #endregion
@@ -113,7 +114,7 @@ namespace Spring.Threading
 
         public virtual void Run()
         {
-            Thread.Sleep(BaseThreadingTestCase.SHORT_DELAY_MS);
+            Thread.Sleep(BaseThreadingTestCase.SHORT_DELAY);
         }
 
         #endregion
@@ -134,7 +135,7 @@ namespace Spring.Threading
         {
             try
             {
-                Thread.Sleep(BaseThreadingTestCase.SHORT_DELAY_MS);
+                Thread.Sleep(BaseThreadingTestCase.SHORT_DELAY);
                 done = true;
             }
             catch (Exception)
@@ -153,7 +154,7 @@ namespace Spring.Threading
         {
             try
             {
-                Thread.Sleep(BaseThreadingTestCase.SMALL_DELAY_MS);
+                Thread.Sleep(BaseThreadingTestCase.SMALL_DELAY);
             }
             catch (Exception e)
             {
@@ -180,7 +181,7 @@ namespace Spring.Threading
         {
             try
             {
-                Thread.Sleep(BaseThreadingTestCase.LONG_DELAY_MS);
+                Thread.Sleep(BaseThreadingTestCase.LONG_DELAY);
                 done = true;
             }
             catch (Exception)
@@ -236,7 +237,7 @@ namespace Spring.Threading
         {
             try
             {
-                Thread.Sleep(BaseThreadingTestCase.SMALL_DELAY_MS);
+                Thread.Sleep(BaseThreadingTestCase.SMALL_DELAY);
                 done = true;
             }
             catch (Exception)
@@ -265,7 +266,7 @@ namespace Spring.Threading
 
         public virtual void Run()
         {
-            Thread.Sleep(BaseThreadingTestCase.MEDIUM_DELAY_MS);
+            Thread.Sleep(BaseThreadingTestCase.MEDIUM_DELAY);
         }
 
         #endregion
@@ -291,7 +292,7 @@ namespace Spring.Threading
         {
             try
             {
-                Thread.Sleep(BaseThreadingTestCase.MEDIUM_DELAY_MS);
+                Thread.Sleep(BaseThreadingTestCase.MEDIUM_DELAY);
             }
             catch (ThreadInterruptedException)
             {
@@ -311,7 +312,7 @@ namespace Spring.Threading
         {
             try
             {
-                Thread.Sleep(BaseThreadingTestCase.SMALL_DELAY_MS);
+                Thread.Sleep(BaseThreadingTestCase.SMALL_DELAY);
                 done = true;
             }
             catch (Exception)
@@ -325,13 +326,10 @@ namespace Spring.Threading
 
     internal class NoOpREHandler : IRejectedExecutionHandler
     {
-        #region IRejectedExecutionHandler Members
-
-        public void RejectedExecution(IRunnable r, IExecutorService executor)
+        public void RejectedExecution(IRunnable runnable, ThreadPoolExecutor executor)
         {
+            throw new NotImplementedException();
         }
-
-        #endregion
     }
 
     internal class SimpleThreadFactory : IThreadFactory

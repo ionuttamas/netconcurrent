@@ -48,7 +48,7 @@ namespace Spring.Threading.AtomicTypes
 			public void Run()
 			{
 				while (!a.CompareAndSet(0, two, three))
-					Thread.Sleep(SHORT_DELAY_MS);
+					Thread.Sleep(SHORT_DELAY);
 			}
 		}
 
@@ -175,7 +175,7 @@ namespace Spring.Threading.AtomicTypes
 
 			t.Start();
 			Assert.IsTrue(a.CompareAndSet(0, one, two));
-			t.Join(LONG_DELAY_MS);
+			t.Join(LONG_DELAY);
 			Assert.IsFalse(t.IsAlive);
 			Assert.AreEqual(a[0], three);
 		}
