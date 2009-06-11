@@ -21,7 +21,7 @@ using System.Threading;
 
 #pragma warning disable 420
 
-namespace Spring.Threading.InterlockedAtomics
+namespace Spring.Threading.AtomicTypes
 {
     /// <summary>
     /// A <see lang="bool"/> value that may be updated atomically. An <see cref="AtomicBoolean"/> 

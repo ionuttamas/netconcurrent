@@ -19,7 +19,7 @@
 
 using System.Collections.Generic;
 
-namespace Spring.Threading.InterlockedAtomics
+namespace Spring.Threading.AtomicTypes
 {
     /// <summary>
     /// Provide atomic access to an array of <typeparamref name="T"/>.

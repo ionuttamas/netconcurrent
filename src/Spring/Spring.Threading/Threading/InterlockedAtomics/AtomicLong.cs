@@ -21,7 +21,7 @@
 using System;
 using System.Threading;
 
-namespace Spring.Threading.InterlockedAtomics
+namespace Spring.Threading.AtomicTypes
 {
 	/// <summary> A <see lang="long"/> value that may be updated atomically.  See the
 	/// An <see cref="AtomicLong"/> is used in applications such as atomically

@@ -22,7 +22,7 @@ using System;
 using System.Text;
 using System.Threading;
 
-namespace Spring.Threading.InterlockedAtomics
+namespace Spring.Threading.AtomicTypes
 {
     /// <summary> A <see lang="int"/> array in which elements may be updated atomically.
     /// <p/>

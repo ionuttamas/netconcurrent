@@ -20,7 +20,7 @@
 
 using System;
 
-namespace Spring.Threading.InterlockedAtomics
+namespace Spring.Threading.AtomicTypes
 {
     /// <summary> 
     /// <see cref="Atomic{T}"/> provide atomic access to an instance of type

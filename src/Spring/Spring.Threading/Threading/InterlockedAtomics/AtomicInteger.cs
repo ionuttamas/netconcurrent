@@ -22,7 +22,7 @@ using System;
 using System.Threading;
 
 #pragma warning disable 420
-namespace Spring.Threading.InterlockedAtomics
+namespace Spring.Threading.AtomicTypes
 {
 	/// <summary> 
 	/// An <see lang="int"/> value that may be updated atomically.

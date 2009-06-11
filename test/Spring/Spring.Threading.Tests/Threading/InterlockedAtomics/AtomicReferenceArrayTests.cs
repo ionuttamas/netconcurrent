@@ -25,7 +25,7 @@ using System.Text;
 using System.Threading;
 using NUnit.Framework;
 
-namespace Spring.Threading.InterlockedAtomics
+namespace Spring.Threading.AtomicTypes
 {
 	[TestFixture]
 	public class AtomicReferenceArrayTests : BaseThreadingTestCase
