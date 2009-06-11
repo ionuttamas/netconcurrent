@@ -1613,7 +1613,7 @@ namespace Spring.Threading.Execution
                 }
             }
             Thread.Sleep(5000); // enough time to run all tasks
-            Assert.AreEqual(nRun.IntegerValue, nTasks);
+            Assert.AreEqual(nRun.Value, nTasks);
         } catch(Exception ex) {
             Assert.Fail("Unexpected Exception");
         } finally {

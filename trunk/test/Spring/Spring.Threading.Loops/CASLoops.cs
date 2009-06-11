@@ -336,7 +336,7 @@ public class CASLoops
             this.iters = iters;
             this.obj = obj;
             this.barrier = b;
-            obj.IntegerValue = (CASLoops.rng.next());
+            obj.Value = (CASLoops.rng.next());
         }
 
         public void Run()
@@ -351,7 +351,7 @@ public class CASLoops
                 {
                     for (int k = 0; k < CASLoops.innerPerOuter; ++k)
                     {
-                        int x = obj.IntegerValue;
+                        int x = obj.Value;
                         int z = y + LoopHelpers.compute6(x);
                         if (obj.CompareAndSet(x, z))
                             ++succ;
@@ -359,7 +359,7 @@ public class CASLoops
                     }
                     i -= CASLoops.innerPerOuter;
                 }
-                CASLoops.sum.AddDeltaAndReturnPreviousValue(obj.IntegerValue);
+                CASLoops.sum.AddDeltaAndReturnPreviousValue(obj.Value);
                 CASLoops.successes.AddDeltaAndReturnPreviousValue(succ);
                 barrier.Await();
             }
@@ -609,16 +609,16 @@ public class CASLoops
         long now = (System.DateTime.Now.Ticks - 621355968000000000) / 10000;
         long endTime = now + nms;
         CyclicBarrier b = new CyclicBarrier(n + 1);
-        totalIters.LongValue = (0);
+        totalIters.Value = (0);
         NonAtomicInteger a = new NonAtomicInteger();
         for (int j = 0; j < n; ++j)
             new SupportClass.ThreadClass(new System.Threading.ThreadStart(new NACalibrationLoop(endTime, a, b).Run)).Start();
         b.Await();
         b.Await();
-        long ipt = totalIters.LongValue / n;
+        long ipt = totalIters.Value / n;
         if (ipt > loopIters[n])
             loopIters[n] = ipt;
-        if (sum.IntegerValue == 0)
+        if (sum.Value == 0)
             System.Console.Out.Write(" ");
     }
 
@@ -631,7 +631,7 @@ public class CASLoops
             new SupportClass.ThreadClass(new System.Threading.ThreadStart(new NonAtomicLoop(iters, a, b).Run)).Start();
         b.Await();
         b.Await();
-        if (sum.IntegerValue == 0)
+        if (sum.Value == 0)
             System.Console.Out.Write(" ");
         return timer.Time;
     }
@@ -657,7 +657,7 @@ public class CASLoops
             new SupportClass.ThreadClass(new System.Threading.ThreadStart(new AtomicLoop(iters, a, b).Run)).Start();
         b.Await();
         b.Await();
-        if (sum.IntegerValue == 0)
+        if (sum.Value == 0)
             System.Console.Out.Write(" ");
         return timer.Time;
     }
@@ -671,7 +671,7 @@ public class CASLoops
             new SupportClass.ThreadClass(new System.Threading.ThreadStart(new VolatileLoop(iters, a, b).Run)).Start();
         b.Await();
         b.Await();
-        if (sum.IntegerValue == 0)
+        if (sum.Value == 0)
             System.Console.Out.Write(" ");
         return timer.Time;
     }
@@ -686,7 +686,7 @@ public class CASLoops
             new SupportClass.ThreadClass(new System.Threading.ThreadStart(new SynchedLoop(iters, a, b).Run)).Start();
         b.Await();
         b.Await();
-        if (sum.IntegerValue == 0)
+        if (sum.Value == 0)
             System.Console.Out.Write(" ");
         return timer.Time;
     }
@@ -700,7 +700,7 @@ public class CASLoops
             new SupportClass.ThreadClass(new System.Threading.ThreadStart(new LockedLoop(iters, a, b).Run)).Start();
         b.Await();
         b.Await();
-        if (sum.IntegerValue == 0)
+        if (sum.Value == 0)
             System.Console.Out.Write(" ");
         return timer.Time;
     }

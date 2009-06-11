@@ -12,8 +12,8 @@ namespace Spring.Threading.Execution.ExecutionPolicy
         [ExpectedException(typeof (RejectedExecutionException))]
         public void AbortPolicyThrowsExceptionUponHandling()
         {
-            var queue = MockRepository.GenerateStub<IBlockingQueue<IRunnable>>();
-            var executor = new ThreadPoolExecutor(1, 1, TimeSpan.FromSeconds(1),queue);
+            IBlockingQueue<IRunnable> queue = MockRepository.GenerateStub<IBlockingQueue<IRunnable>>();
+            ThreadPoolExecutor executor = new ThreadPoolExecutor(1, 1, TimeSpan.FromSeconds(1),queue);
             AbortPolicy abortPolicy = new AbortPolicy();
             abortPolicy.RejectedExecution(new NullRunnable(), executor);
         }
