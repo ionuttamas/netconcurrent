@@ -101,7 +101,11 @@
     <Compile Include="BaseAbstractCollectionTest.cs" />
     <Compile Include="BaseMockTestCase.cs" />
     <Compile Include="BaseThreadingTestCase.cs" />
+    <Compile Include="Collections\CollectionFunctionTestBase.cs" />
+    <Compile Include="Collections\EnumeratorFunctionTestBase.cs" />
     <Compile Include="Collections\Generic\AbstractQueueTest.cs" />
+    <Compile Include="Collections\QueueFunctionTestBase.cs" />
+    <Compile Include="Collections\EnumerableFunctionTestBase.cs" />
     <Compile Include="TestData.cs" />
     <Compile Include="Threading\CallableTest.cs" />
     <Compile Include="Collections\Generic\AbstractCollectionTest.cs" />

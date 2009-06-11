@@ -14,11 +14,45 @@ namespace Spring.Threading.Locks
     {
         private Exception _threadException;
 
-        private ReentrantLock _testee;
+        private ReentrantLock _lock;
+
+        private ThreadCounter _threadCounter;
+
+
 
         [SetUp] public void SetUp()
         {
-            _threadException = null;  
+            _threadException = null;
+            _threadCounter = new ThreadCounter();
+        }
+
+        private class ThreadCounter
+        {
+            private volatile int _count;
+
+            public void Increment()
+            {
+                lock(this)
+                {
+                    _count++;
+                    Monitor.PulseAll(this);
+                }
+            }
+
+            public void AssertThreadCount(int expected, TimeSpan timeToWait)
+            {
+                lock (this  )
+                {
+                    DateTime deadline = DateTime.UtcNow + timeToWait;
+                    while (timeToWait.Ticks > 0 && expected != _count)
+                    {
+                        Monitor.Wait(this, timeToWait);
+                        timeToWait = deadline - DateTime.UtcNow;
+                    }
+                    Assert.That(_count, Is.EqualTo(expected), "Thread count is not as expected.");
+                }
+            }
+
         }
 
         private class UninterruptableThread
@@ -77,6 +111,29 @@ namespace Spring.Threading.Locks
             Assert.IsFalse(new ReentrantLock(false).IsFair);
         }
 
+        [Test] public void LockIsNotInterruptibe([Values(true, false)] bool isFair)
+        {
+            _lock = new ReentrantLock(isFair);
+            _lock.Lock();
+            Thread t1 = ExceptionRecordingThread(
+                delegate
+                    {
+                        _lock.Lock();
+                        Assert.IsTrue(IsCurrentThreadInterrupted());
+                        Assert.IsTrue(_lock.IsLocked);
+                        Assert.IsTrue(_lock.IsHeldByCurrentThread);
+                        _lock.Unlock();
+                    }, "T1");
+            StartAndVerifyThread(t1);
+            t1.Interrupt();
+            Thread.Sleep(SHORT_DELAY);
+            Assert.IsTrue(t1.IsAlive);
+            Assert.IsTrue(_lock.IsLocked);
+            Assert.IsTrue(_lock.IsHeldByCurrentThread);
+            _lock.Unlock();
+            JoinAndVerifyThreads(t1);
+        }
+
         [Test] public void LockSucceedsOnUnlockedLock([Values(true, false)] bool isFair)
         {
             ReentrantLock rl = new ReentrantLock(isFair);
@@ -103,24 +160,24 @@ namespace Spring.Threading.Locks
         [TestCase(false, ExpectedException = typeof(NotSupportedException))]
         public void HasQueuedThreadsReportsExistenceOfWaitingThreads(bool isFair)
         {
-            _testee = new ReentrantLock(isFair);
-            Thread t1 = new Thread(InterruptedLock);
-            Thread t2 = new Thread(InterruptibleLock);
+            _lock = new ReentrantLock(isFair);
+            Thread t1 = ExceptionRecordingThread(InterruptedLock, "T1");
+            Thread t2 = ExceptionRecordingThread(InterruptibleLock, "T2");
 
-            Assert.IsFalse(_testee.HasQueuedThreads);
-            _testee.Lock();
+            Assert.IsFalse(_lock.HasQueuedThreads);
+            _lock.Lock();
             t1.Start();
             Thread.Sleep(SHORT_DELAY);
-            Assert.IsTrue(_testee.HasQueuedThreads);
+            Assert.IsTrue(_lock.HasQueuedThreads);
             t2.Start();
             Thread.Sleep(SHORT_DELAY);
-            Assert.IsTrue(_testee.HasQueuedThreads);
+            Assert.IsTrue(_lock.HasQueuedThreads);
             t1.Interrupt();
             Thread.Sleep(SHORT_DELAY);
-            Assert.IsTrue(_testee.HasQueuedThreads);
-            _testee.Unlock();
+            Assert.IsTrue(_lock.HasQueuedThreads);
+            _lock.Unlock();
             Thread.Sleep(SHORT_DELAY);
-            Assert.IsFalse(_testee.HasQueuedThreads);
+            Assert.IsFalse(_lock.HasQueuedThreads);
 
             JoinAndVerifyThreads(t1, t2);
         }
@@ -129,28 +186,28 @@ namespace Spring.Threading.Locks
         [TestCase(false, ExpectedException = typeof(NotSupportedException))]
         public void GetQueueLengthReportsNumberOfWaitingThreads(bool isFair)
         {
-            _testee = new ReentrantLock(isFair);
-            Thread t1 = new Thread(InterruptedLock);
-            Thread t2 = new Thread(InterruptibleLock);
+            _lock = new ReentrantLock(isFair);
+            Thread t1 = ExceptionRecordingThread(InterruptedLock, "T1");
+            Thread t2 = ExceptionRecordingThread(InterruptibleLock, "T2");
 
-            Assert.AreEqual(0, _testee.QueueLength);
-            _testee.Lock();
+            Assert.AreEqual(0, _lock.QueueLength);
+            _lock.Lock();
             t1.Start();
 
             Thread.Sleep(SHORT_DELAY);
-            Assert.AreEqual(1, _testee.QueueLength);
+            Assert.AreEqual(1, _lock.QueueLength);
             t2.Start();
 
             Thread.Sleep(SHORT_DELAY);
-            Assert.AreEqual(2, _testee.QueueLength);
+            Assert.AreEqual(2, _lock.QueueLength);
             t1.Interrupt();
 
             Thread.Sleep(SHORT_DELAY);
-            Assert.AreEqual(1, _testee.QueueLength);
-            _testee.Unlock();
+            Assert.AreEqual(1, _lock.QueueLength);
+            _lock.Unlock();
 
             Thread.Sleep(SHORT_DELAY);
-            Assert.AreEqual(0, _testee.QueueLength);
+            Assert.AreEqual(0, _lock.QueueLength);
 
             JoinAndVerifyThreads(t1, t2);
         }
@@ -167,33 +224,33 @@ namespace Spring.Threading.Locks
         [TestCase(false, ExpectedException = typeof(NotSupportedException))]
         public void IsQueuedThreadReportsWhetherThreadIsQueued(bool isFair)
         {
-            _testee = new ReentrantLock(isFair);
-            Thread t1 = new Thread(InterruptedLock);
-            Thread t2 = new Thread(InterruptibleLock);
-            Assert.IsFalse(_testee.IsQueuedThread(t1));
-            Assert.IsFalse(_testee.IsQueuedThread(t2));
-            _testee.Lock();
+            _lock = new ReentrantLock(isFair);
+            Thread t1 = ExceptionRecordingThread(InterruptedLock, "T1");
+            Thread t2 = ExceptionRecordingThread(InterruptibleLock, "T2");
+            Assert.IsFalse(_lock.IsQueuedThread(t1));
+            Assert.IsFalse(_lock.IsQueuedThread(t2));
+            _lock.Lock();
             t1.Start();
 
             Thread.Sleep(SHORT_DELAY);
-            Assert.IsTrue(_testee.IsQueuedThread(t1));
+            Assert.IsTrue(_lock.IsQueuedThread(t1));
             t2.Start();
 
             Thread.Sleep(SHORT_DELAY);
-            Assert.IsTrue(_testee.IsQueuedThread(t1));
-            Assert.IsTrue(_testee.IsQueuedThread(t2));
+            Assert.IsTrue(_lock.IsQueuedThread(t1));
+            Assert.IsTrue(_lock.IsQueuedThread(t2));
             t1.Interrupt();
 
             Thread.Sleep(SHORT_DELAY);
-            Assert.IsFalse(_testee.IsQueuedThread(t1));
-            Assert.IsTrue(_testee.IsQueuedThread(t2));
-            _testee.Unlock();
+            Assert.IsFalse(_lock.IsQueuedThread(t1));
+            Assert.IsTrue(_lock.IsQueuedThread(t2));
+            _lock.Unlock();
 
             Thread.Sleep(SHORT_DELAY);
-            Assert.IsFalse(_testee.IsQueuedThread(t1));
+            Assert.IsFalse(_lock.IsQueuedThread(t1));
 
             Thread.Sleep(SHORT_DELAY);
-            Assert.IsFalse(_testee.IsQueuedThread(t2));
+            Assert.IsFalse(_lock.IsQueuedThread(t2));
 
             JoinAndVerifyThreads(t1, t2);
         }
@@ -202,46 +259,46 @@ namespace Spring.Threading.Locks
         [TestCase(false, ExpectedException = typeof(NotSupportedException))]
         public void GetQueuedThreadsIncludeWaitingThreads(bool isFair)
         {
-            _testee = new PublicReentrantLock(isFair);
-            Thread t1 = new Thread(InterruptedLock);
-            Thread t2 = new Thread(InterruptibleLock);
+            _lock = new PublicReentrantLock(isFair);
+            Thread t1 = ExceptionRecordingThread(InterruptedLock, "T1");
+            Thread t2 = ExceptionRecordingThread(InterruptibleLock, "T2");
 
-            Assert.That(_testee.QueuedThreads.Count, Is.EqualTo(0));
-            _testee.Lock();
-            Assert.IsTrue((_testee.QueuedThreads.Count == 0));
+            Assert.That(_lock.QueuedThreads.Count, Is.EqualTo(0));
+            _lock.Lock();
+            Assert.IsTrue((_lock.QueuedThreads.Count == 0));
             t1.Start();
 
             Thread.Sleep(SHORT_DELAY);
-            Assert.IsTrue(_testee.QueuedThreads.Contains(t1));
+            Assert.IsTrue(_lock.QueuedThreads.Contains(t1));
             t2.Start();
 
             Thread.Sleep(SHORT_DELAY);
-            Assert.IsTrue(_testee.QueuedThreads.Contains(t1));
-            Assert.IsTrue(_testee.QueuedThreads.Contains(t2));
+            Assert.IsTrue(_lock.QueuedThreads.Contains(t1));
+            Assert.IsTrue(_lock.QueuedThreads.Contains(t2));
             t1.Interrupt();
 
             Thread.Sleep(SHORT_DELAY);
-            Assert.IsFalse(_testee.QueuedThreads.Contains(t1));
-            Assert.IsTrue(_testee.QueuedThreads.Contains(t2));
-            _testee.Unlock();
+            Assert.IsFalse(_lock.QueuedThreads.Contains(t1));
+            Assert.IsTrue(_lock.QueuedThreads.Contains(t2));
+            _lock.Unlock();
 
             Thread.Sleep(SHORT_DELAY);
-            Assert.IsTrue((_testee.QueuedThreads.Count == 0));
+            Assert.IsTrue((_lock.QueuedThreads.Count == 0));
             
             JoinAndVerifyThreads(t1, t2);
         }
 
         [Test] public void TimedTryLockIsInterruptible([Values(true, false)] bool isFair)
         {
-            ReentrantLock myLock = new ReentrantLock(isFair);
-            myLock.Lock();
+            _lock = new ReentrantLock(isFair);
+            _lock.Lock();
             Thread t = new Thread(ExceptionRecordingAction(
                 delegate
                 {
                     Assert.Throws<ThreadInterruptedException>(
                         delegate
                         {
-                            myLock.TryLock(MEDIUM_DELAY);
+                            _lock.TryLock(MEDIUM_DELAY);
                         });
                 }));
             t.Start();
@@ -250,183 +307,214 @@ namespace Spring.Threading.Locks
             JoinAndVerifyThreads(t);
         }
 
+        [Test] public void TimedTryLockAllSucceedsFromMultipleThreads([Values(true, false)] bool isFair)
+        {
+            _lock = new ReentrantLock(isFair);
+            _lock.LockInterruptibly();
+            ThreadStart action =
+                delegate
+                    {
+                        Assert.IsTrue(_lock.TryLock(LONG_DELAY));
+                        try
+                        {
+                            Thread.Sleep(SHORT_DELAY);
+                        }
+                        finally
+                        {
+                            _lock.Unlock();
+                        }
+
+                    };
+            Thread t1 = ExceptionRecordingThread(action, "T1");
+            Thread t2 = ExceptionRecordingThread(action, "T2");
+            StartAndVerifyThread(t1, t2);
+            Assert.IsTrue(_lock.IsLocked);
+            Assert.IsTrue(_lock.IsHeldByCurrentThread);
+            _lock.Unlock();
+            JoinAndVerifyThreads(t1, t2);
+        }
+
         [Test] public void TryLockChokesWhenIsLocked([Values(true, false)] bool isFair)
         {
-            ReentrantLock myLock = new ReentrantLock(isFair);
-            myLock.Lock();
+            _lock = new ReentrantLock(isFair);
+            _lock.Lock();
             Thread t = new Thread(ExceptionRecordingAction(
-                delegate { Assert.IsFalse(myLock.TryLock());}));
+                delegate { Assert.IsFalse(_lock.TryLock());}));
             t.Start();
             JoinAndVerifyThreads(SHORT_DELAY, t);
-            myLock.Unlock();
+            _lock.Unlock();
         }
 
         [Test] public void TimedTryLockTimesOutOnLockedLock([Values(true, false)] bool isFair)
         {
-            ReentrantLock myLock = new ReentrantLock(isFair);
-            myLock.Lock();
+            _lock = new ReentrantLock(isFair);
+            _lock.Lock();
             Thread t = ExceptionRecordingThread(delegate
             {
-                Assert.IsFalse(myLock.TryLock(new TimeSpan(0, 0, 1 / 1000)));
+                Assert.IsFalse(_lock.TryLock(new TimeSpan(0, 0, 1 / 1000)));
             });
             t.Start();
             JoinAndVerifyThreads(SHORT_DELAY, t);
-            myLock.Unlock();
+            _lock.Unlock();
         }
 
         [Test] public void GetHoldCountReturnsNumberOfRecursiveHolds([Values(true, false)] bool isFair)
         {
-            ReentrantLock myLock = new ReentrantLock(isFair);
+            _lock = new ReentrantLock(isFair);
+
+            RecursiveHolds(delegate { _lock.Lock(); });
+            RecursiveHolds((delegate
+            {
+                Assert.IsTrue(_lock.TryLock());
+            }));
+            RecursiveHolds(delegate
+            {
+                Assert.IsTrue(_lock.TryLock(SHORT_DELAY));
+            });
+            RecursiveHolds(delegate { _lock.LockInterruptibly(); });
+        }
+
+        private void RecursiveHolds(Task lockTask)
+        {
             for (int i = 1; i <= DEFAULT_COLLECTION_SIZE; i++)
             {
-                myLock.Lock();
-                Assert.AreEqual(i, myLock.HoldCount);
+                lockTask();
+                Assert.AreEqual(i, _lock.HoldCount);
             }
-            for (int i = 1; i <= DEFAULT_COLLECTION_SIZE; i++)
+            for (int i = DEFAULT_COLLECTION_SIZE; i > 0; i--)
             {
-                Assert.IsTrue(myLock.TryLock());
-                Assert.AreEqual(i, myLock.HoldCount);
-            }
-            for (int i = 1; i <= DEFAULT_COLLECTION_SIZE; i++)
-            {
-                Assert.IsTrue(myLock.TryLock(SHORT_DELAY));
-                Assert.AreEqual(i, myLock.HoldCount);
-            }
-            for (int i = 1; i <= DEFAULT_COLLECTION_SIZE; i++)
-            {
-                myLock.LockInterruptibly();
-                Assert.AreEqual(i, myLock.HoldCount);
-            }
-            for (int i = DEFAULT_COLLECTION_SIZE * 4; i > 0; i--)
-            {
-                myLock.Unlock();
-                Assert.AreEqual(i - 1, myLock.HoldCount);
+                _lock.Unlock();
+                Assert.AreEqual(i - 1, _lock.HoldCount);
             }
         }
 
         [Test] public void IsIsLockedReportsIfLockOwnedByCurrnetThread([Values(true, false)] bool isFair)
         {
-            ReentrantLock myLock = new ReentrantLock(isFair);
-            myLock.Lock();
-            Assert.IsTrue(myLock.IsLocked);
-            myLock.Unlock();
-            Assert.IsFalse(myLock.IsLocked);
+            _lock = new ReentrantLock(isFair);
+            _lock.Lock();
+            Assert.IsTrue(_lock.IsLocked);
+            _lock.Unlock();
+            Assert.IsFalse(_lock.IsLocked);
             Thread t = ExceptionRecordingThread(
                 delegate
                 {
-                    myLock.Lock();
+                    _lock.Lock();
                     Thread.Sleep(new TimeSpan(10000 * SMALL_DELAY.Milliseconds));
-                    myLock.Unlock();
+                    _lock.Unlock();
                 });
             t.Start();
 
             Thread.Sleep(SHORT_DELAY);
-            Assert.IsTrue(myLock.IsLocked);
+            Assert.IsTrue(_lock.IsLocked);
             JoinAndVerifyThreads(t);
-            Assert.IsFalse(myLock.IsLocked);
+            Assert.IsFalse(_lock.IsLocked);
         }
 
         [Test] public void LockInterruptiblySucceedsWhenUnlockedElseIsInterruptible([Values(true, false)] bool isFair)
         {
-            ReentrantLock myLock = new ReentrantLock(isFair);
-            myLock.LockInterruptibly();
-            Thread t = new Thread(InterruptedLock);
-            t.Start();
-            t.Interrupt();
-            Assert.IsTrue(myLock.IsLocked);
-            Assert.IsTrue(myLock.IsHeldByCurrentThread);
-            JoinAndVerifyThreads(t);
+            _lock = new ReentrantLock(isFair);
+            _lock.LockInterruptibly();
+            Thread t1 = ExceptionRecordingThread(InterruptedLock, "T1");
+            Thread t2 = ExceptionRecordingThread(delegate { using (_lock.LockInterruptibly()) ;}, "T2");
+            Thread t3 = ExceptionRecordingThread(delegate { using (_lock.LockInterruptibly()) ;}, "T3");
+            StartAndVerifyThread(t1, t2, t3);
+            t1.Interrupt();
+            JoinAndVerifyThreads(t1);
+            Assert.IsTrue(_lock.IsLocked);
+            Assert.IsTrue(_lock.IsHeldByCurrentThread);
+            _lock.Unlock();
+            JoinAndVerifyThreads(t2, t3);
         }
 
         [Test, ExpectedException(typeof(SynchronizationLockException))]
         public void AwaitChokesWhenLockIsNotOwned([Values(true, false)] bool isFair)
         {
-            ReentrantLock myLock = new ReentrantLock(isFair);
-            ICondition c = myLock.NewCondition();
+            _lock = new ReentrantLock(isFair);
+            ICondition c = _lock.NewCondition();
             c.Await();
         }
 
         [Test, ExpectedException(typeof(SynchronizationLockException))]
         public void SignalChokesWhenLockIsNotOwned([Values(true, false)] bool isFair)
         {
-            ReentrantLock myLock = new ReentrantLock(isFair);
-            ICondition c = myLock.NewCondition();
+            _lock = new ReentrantLock(isFair);
+            ICondition c = _lock.NewCondition();
             c.Signal();
         }
 
         [Test] public void AwaitTimeoutInNanosWithoutSignal([Values(true, false)] bool isFair)
         {
             TimeSpan timeToWait = new TimeSpan(1);
-            ReentrantLock myLock = new ReentrantLock(isFair);
-            ICondition c = myLock.NewCondition();
-            myLock.Lock();
+            _lock = new ReentrantLock(isFair);
+            ICondition c = _lock.NewCondition();
+            _lock.Lock();
             Stopwatch sw = new Stopwatch();
             sw.Start();
             bool result = c.Await(timeToWait);
             sw.Stop();
             Assert.IsFalse(result);
             Assert.That(sw.Elapsed, Is.Not.LessThan(timeToWait));
-            myLock.Unlock();
+            _lock.Unlock();
         }
 
         [Test] public void AwaitTimeoutWithoutSignal([Values(true, false)] bool isFair)
         {
             TimeSpan timeToWait = SHORT_DELAY;
-            ReentrantLock myLock = new ReentrantLock(isFair);
-            ICondition c = myLock.NewCondition();
-            myLock.Lock();
+            _lock = new ReentrantLock(isFair);
+            ICondition c = _lock.NewCondition();
+            _lock.Lock();
             Stopwatch sw = new Stopwatch();
             sw.Start();
             bool result = c.Await(timeToWait);
             sw.Stop();
             Assert.IsFalse(result);
             Assert.That(sw.Elapsed, Is.Not.LessThan(timeToWait));
-            myLock.Unlock();
+            _lock.Unlock();
         }
 
         [Test] public void AwaitUntilTimeoutWithoutSignal([Values(true, false)] bool isFair)
         {
-            ReentrantLock myLock = new ReentrantLock(isFair);
-            ICondition c = myLock.NewCondition();
-            myLock.Lock();
+            _lock = new ReentrantLock(isFair);
+            ICondition c = _lock.NewCondition();
+            _lock.Lock();
             DateTime until = DateTime.Now.AddMilliseconds(10);
             bool result = c.AwaitUntil(until);
             Assert.That(DateTime.Now, Is.GreaterThanOrEqualTo(until));
             Assert.IsFalse(result);
-            myLock.Unlock();
+            _lock.Unlock();
         }
 
         [Test] public void AwaitReturnsWhenSignalled([Values(true, false)] bool isFair)
         {
-            ReentrantLock myLock = new ReentrantLock(isFair);
-            ICondition c = myLock.NewCondition();
+            _lock = new ReentrantLock(isFair);
+            ICondition c = _lock.NewCondition();
             Thread t = ExceptionRecordingThread(delegate
             {
-                myLock.Lock();
+                _lock.Lock();
                 c.Await();
-                myLock.Unlock();
+                _lock.Unlock();
             });
 
             t.Start();
             Thread.Sleep(SHORT_DELAY);
-            myLock.Lock();
+            _lock.Lock();
             c.Signal();
-            myLock.Unlock();
+            _lock.Unlock();
             JoinAndVerifyThreads(SHORT_DELAY, t);
         }
 
         [Test, ExpectedException(typeof(ArgumentNullException))]
         public void HasWaitersChokesOnNullParameter([Values(true, false)] bool isFair)
         {
-            ReentrantLock myLock = new ReentrantLock(isFair);
-            myLock.HasWaiters(null);
+            _lock = new ReentrantLock(isFair);
+            _lock.HasWaiters(null);
         }
 
         [Test, ExpectedException(typeof(ArgumentNullException))]
         public void GetWaitQueueLengthChokesOnNullParameter([Values(true, false)] bool isFair)
         {
-            ReentrantLock myLock = new ReentrantLock(isFair);
-            myLock.GetWaitQueueLength(null);
+            _lock = new ReentrantLock(isFair);
+            _lock.GetWaitQueueLength(null);
         }
 
         [Test, ExpectedException(typeof(ArgumentNullException))]
@@ -439,8 +527,8 @@ namespace Spring.Threading.Locks
         [Test, ExpectedException(typeof(ArgumentException))]
         public void HasWaitersChokesWhenNotOwned([Values(true, false)] bool isFair)
         {
-            ReentrantLock myLock = new ReentrantLock(isFair);
-            ICondition c = myLock.NewCondition();
+            _lock = new ReentrantLock(isFair);
+            ICondition c = _lock.NewCondition();
             ReentrantLock lock2 = new ReentrantLock(isFair);
             lock2.HasWaiters(c);
         }
@@ -449,16 +537,16 @@ namespace Spring.Threading.Locks
         [TestCase(false, ExpectedException = typeof(NotSupportedException))]
         public void HasWaitersChokesWhenNotLocked(bool isFair)
         {
-            ReentrantLock myLock = new ReentrantLock(isFair);
-            ICondition c = myLock.NewCondition();
-            myLock.HasWaiters(c);
+            _lock = new ReentrantLock(isFair);
+            ICondition c = _lock.NewCondition();
+            _lock.HasWaiters(c);
         }
 
         [Test, ExpectedException(typeof(ArgumentException))]
         public void GetWaitQueueLengthChokesWhenNotOwned([Values(true, false)] bool isFair)
         {
-            ReentrantLock myLock = new ReentrantLock(isFair);
-            ICondition c = (myLock.NewCondition());
+            _lock = new ReentrantLock(isFair);
+            ICondition c = (_lock.NewCondition());
             ReentrantLock lock2 = new ReentrantLock(isFair);
             lock2.GetWaitQueueLength(c);
         }
@@ -467,9 +555,9 @@ namespace Spring.Threading.Locks
         [TestCase(false, ExpectedException = typeof(NotSupportedException))]
         public void GetWaitQueueLengthChokesWhenNotLocked(bool isFair)
         {
-            ReentrantLock myLock = new ReentrantLock(isFair);
-            ICondition c = (myLock.NewCondition());
-            myLock.GetWaitQueueLength(c);
+            _lock = new ReentrantLock(isFair);
+            ICondition c = (_lock.NewCondition());
+            _lock.GetWaitQueueLength(c);
         }
 
         [Test, ExpectedException(typeof(ArgumentException))]
@@ -492,14 +580,14 @@ namespace Spring.Threading.Locks
 
         [Test] public void HasWaitersReturnTrueWhenThreadIsWaitingElseFalse([Values(true, false)] bool isFair)
         {
-            ReentrantLock myLock = new ReentrantLock(true);
-            ICondition c = myLock.NewCondition();
+            _lock = new ReentrantLock(true);
+            ICondition c = _lock.NewCondition();
             Thread t = ExceptionRecordingThread(delegate
             {
-                using(myLock.Lock())
+                using(_lock.Lock())
                 {
-                    Assert.IsFalse(myLock.HasWaiters(c));
-                    Assert.That(myLock.GetWaitQueueLength(c), Is.EqualTo(0));
+                    Assert.IsFalse(_lock.HasWaiters(c));
+                    Assert.That(_lock.GetWaitQueueLength(c), Is.EqualTo(0));
                     c.Await();
                 }
             });
@@ -507,17 +595,17 @@ namespace Spring.Threading.Locks
             t.Start();
 
             Thread.Sleep(SHORT_DELAY);
-            myLock.Lock();
-            Assert.IsTrue(myLock.HasWaiters(c));
-            Assert.AreEqual(1, myLock.GetWaitQueueLength(c));
+            _lock.Lock();
+            Assert.IsTrue(_lock.HasWaiters(c));
+            Assert.AreEqual(1, _lock.GetWaitQueueLength(c));
             c.Signal();
-            myLock.Unlock();
+            _lock.Unlock();
 
             Thread.Sleep(SHORT_DELAY);
-            myLock.Lock();
-            Assert.IsFalse(myLock.HasWaiters(c));
-            Assert.AreEqual(0, myLock.GetWaitQueueLength(c));
-            myLock.Unlock();
+            _lock.Lock();
+            Assert.IsFalse(_lock.HasWaiters(c));
+            Assert.AreEqual(0, _lock.GetWaitQueueLength(c));
+            _lock.Unlock();
             JoinAndVerifyThreads(SHORT_DELAY, t);
         }
 
@@ -525,28 +613,28 @@ namespace Spring.Threading.Locks
         [TestCase(false, ExpectedException = typeof(NotSupportedException))]
         public void GetWaitQueueLengthReturnsNumberOfThreads(bool isFair)
         {
-            ReentrantLock myLock = new ReentrantLock(isFair);
+            _lock = new ReentrantLock(isFair);
 
-            ICondition c = myLock.NewCondition();
+            ICondition c = _lock.NewCondition();
             Thread t1 = ExceptionRecordingThread(delegate
             {
-                using (myLock.Lock())
+                using (_lock.Lock())
                 {
-                    Assert.IsFalse(myLock.HasWaiters(c));
-                    Assert.AreEqual(0, myLock.GetWaitQueueLength(c));
+                    Assert.IsFalse(_lock.HasWaiters(c));
+                    Assert.AreEqual(0, _lock.GetWaitQueueLength(c));
                     c.Await();
                 }
-            });
+            }, "T1");
 
             Thread t2 = ExceptionRecordingThread(delegate
             {
-                using (myLock.Lock())
+                using (_lock.Lock())
                 {
-                    Assert.IsTrue(myLock.HasWaiters(c));
-                    Assert.AreEqual(1, myLock.GetWaitQueueLength(c));
+                    Assert.IsTrue(_lock.HasWaiters(c));
+                    Assert.AreEqual(1, _lock.GetWaitQueueLength(c));
                     c.Await();
                 }
-            });
+            }, "T2");
 
             t1.Start();
 
@@ -554,17 +642,17 @@ namespace Spring.Threading.Locks
             t2.Start();
 
             Thread.Sleep(SHORT_DELAY);
-            myLock.Lock();
-            Assert.IsTrue(myLock.HasWaiters(c));
-            Assert.AreEqual(2, myLock.GetWaitQueueLength(c));
+            _lock.Lock();
+            Assert.IsTrue(_lock.HasWaiters(c));
+            Assert.AreEqual(2, _lock.GetWaitQueueLength(c));
             c.SignalAll();
-            myLock.Unlock();
+            _lock.Unlock();
 
             Thread.Sleep(SHORT_DELAY);
-            myLock.Lock();
-            Assert.IsFalse(myLock.HasWaiters(c));
-            Assert.AreEqual(0, myLock.GetWaitQueueLength(c));
-            myLock.Unlock();
+            _lock.Lock();
+            Assert.IsFalse(_lock.HasWaiters(c));
+            Assert.AreEqual(0, _lock.GetWaitQueueLength(c));
+            _lock.Unlock();
 
             JoinAndVerifyThreads(SHORT_DELAY, t1, t2);
         }
@@ -621,9 +709,9 @@ namespace Spring.Threading.Locks
 
         [Test] public void AwaitUninterruptiblyCannotBeInterrupted([Values(true, false)] bool isFair)
         {
-            ReentrantLock myLock = new ReentrantLock(isFair);
-            ICondition c = myLock.NewCondition();
-            UninterruptableThread thread = new UninterruptableThread(myLock, c);
+            _lock = new ReentrantLock(isFair);
+            ICondition c = _lock.NewCondition();
+            UninterruptableThread thread = new UninterruptableThread(_lock, c);
 
             thread.InternalThread.Start();
 
@@ -632,7 +720,7 @@ namespace Spring.Threading.Locks
                 Thread.Sleep(100);
             }
 
-            myLock.Lock();
+            _lock.Lock();
             try
             {
                 thread.InternalThread.Interrupt();
@@ -641,7 +729,7 @@ namespace Spring.Threading.Locks
             }
             finally
             {
-                myLock.Unlock();
+                _lock.Unlock();
             }
 
             JoinAndVerifyThreads(thread.InternalThread);
@@ -650,14 +738,14 @@ namespace Spring.Threading.Locks
 
         [Test] public void AwaitIsInterruptible([Values(true, false)] bool isFair)
         {
-            ReentrantLock myLock = new ReentrantLock(isFair);
+            _lock = new ReentrantLock(isFair);
 
-            ICondition c = myLock.NewCondition();
+            ICondition c = _lock.NewCondition();
             Thread t = ExceptionRecordingThread(delegate
             {
                 Assert.Throws<ThreadInterruptedException>(delegate
                 {
-                    using(myLock.Lock()) c.Await();
+                    using(_lock.Lock()) c.Await();
                 });
             });
 
@@ -671,14 +759,14 @@ namespace Spring.Threading.Locks
 
         [Test] public void AwaitNanosIsInterruptible([Values(true, false)] bool isFair)
         {
-            ReentrantLock myLock = new ReentrantLock(isFair);
+            _lock = new ReentrantLock(isFair);
 
-            ICondition c = myLock.NewCondition();
+            ICondition c = _lock.NewCondition();
             Thread t = ExceptionRecordingThread(delegate
             {
                 Assert.Throws<ThreadInterruptedException>(delegate
                 {
-                    using(myLock.Lock()) c.Await(new TimeSpan(0, 0, 0, 1));
+                    using(_lock.Lock()) c.Await(new TimeSpan(0, 0, 0, 1));
                 });
             });
 
@@ -692,14 +780,14 @@ namespace Spring.Threading.Locks
 
         [Test] public void AwaitUntilIsInterruptible([Values(true, false)] bool isFair)
         {
-            ReentrantLock myLock = new ReentrantLock(isFair);
+            _lock = new ReentrantLock(isFair);
 
-            ICondition c = myLock.NewCondition();
+            ICondition c = _lock.NewCondition();
             Thread t = ExceptionRecordingThread(delegate
             {
                 Assert.Throws<ThreadInterruptedException>(delegate
                 {
-                    using(myLock.Lock())
+                    using(_lock.Lock())
                         c.AwaitUntil(DateTime.Now.AddMilliseconds(10000));
                 });
             });
@@ -714,59 +802,59 @@ namespace Spring.Threading.Locks
 
         [Test] public void SignalAllWakesUpAllThreads([Values(true, false)] bool isFair)
         {
-            ReentrantLock myLock = new ReentrantLock(isFair);
+            _lock = new ReentrantLock(isFair);
 
-            ICondition c = myLock.NewCondition();
+            ICondition c = _lock.NewCondition();
             Thread t1 = ExceptionRecordingThread(delegate
             {
-                using(myLock.Lock()) c.Await();
-            });
+                using(_lock.Lock()) c.Await();
+            }, "T1");
 
             Thread t2 = ExceptionRecordingThread(delegate
             {
-                using(myLock.Lock()) c.Await();
-            });
+                using(_lock.Lock()) c.Await();
+            }, "T2");
 
             t1.Start();
             t2.Start();
 
             Thread.Sleep(SHORT_DELAY);
-            myLock.Lock();
+            _lock.Lock();
             c.SignalAll();
-            myLock.Unlock();
+            _lock.Unlock();
 
             JoinAndVerifyThreads(SHORT_DELAY, t1, t2);
         }
 
         [Test] public void AwaitAfterMultipleReentrantLockingPreservesLockCount([Values(true, false)] bool isFair)
         {
-            ReentrantLock myLock = new ReentrantLock(isFair);
-            ICondition c = myLock.NewCondition();
+            _lock = new ReentrantLock(isFair);
+            ICondition c = _lock.NewCondition();
             Thread t1 = ExceptionRecordingThread(delegate
             {
-                using (myLock.Lock())
+                using (_lock.Lock())
                 {
-                    Assert.That(myLock.HoldCount, Is.EqualTo(1));
+                    Assert.That(_lock.HoldCount, Is.EqualTo(1));
                     c.Await();
-                    Assert.That(myLock.HoldCount, Is.EqualTo(1));
+                    Assert.That(_lock.HoldCount, Is.EqualTo(1));
                 }
-            });
+            }, "T1");
             Thread t2 = ExceptionRecordingThread(delegate
             {
-                using (myLock.Lock())
-                    using (myLock.Lock())
+                using (_lock.Lock())
+                    using (_lock.Lock())
                     {
-                        Assert.That(myLock.HoldCount, Is.EqualTo(2));
+                        Assert.That(_lock.HoldCount, Is.EqualTo(2));
                         c.Await();
-                        Assert.That(myLock.HoldCount, Is.EqualTo(2));
+                        Assert.That(_lock.HoldCount, Is.EqualTo(2));
                     }
-            });
+            }, "T2");
 
             t1.Start();
             t2.Start();
             Thread.Sleep(SHORT_DELAY);
-            Assert.IsFalse(myLock.IsLocked);
-            using(myLock.Lock()) c.SignalAll();
+            Assert.IsFalse(_lock.IsLocked);
+            using(_lock.Lock()) c.SignalAll();
 
             JoinAndVerifyThreads(SHORT_DELAY, t1, t2);
         }
@@ -790,21 +878,46 @@ namespace Spring.Threading.Locks
 
         [Test] public void ToStringVerification([Values(true, false)] bool isFair)
         {
-            ReentrantLock myLock = new ReentrantLock(isFair);
-            StringAssert.Contains("Unlocked", myLock.ToString());
-            using (myLock.Lock())
+            _lock = new ReentrantLock(isFair);
+            StringAssert.Contains("Unlocked", _lock.ToString());
+            using (_lock.Lock())
             {
-                StringAssert.Contains("Locked by thread", myLock.ToString());
+                StringAssert.Contains("Locked by thread", _lock.ToString());
             }
-            StringAssert.Contains("Unlocked", myLock.ToString());
+            StringAssert.Contains("Unlocked", _lock.ToString());
         }
 
         #region Private Methods
+
+        private void StartAndVerifyThread(params Thread[] threads)
+        {
+            StartAndVerifyThread(threads.Length, SMALL_DELAY, threads);
+        }
+
+        private void StartAndVerifyThread(int count, params Thread[] threads)
+        {
+            StartAndVerifyThread(count, SMALL_DELAY, threads);
+        }
+
+        private void StartAndVerifyThread(TimeSpan timeToWait, params Thread[] threads)
+        {
+            StartAndVerifyThread(threads.Length, timeToWait, threads);
+        }
+
+        private void StartAndVerifyThread(int count, TimeSpan timeToWait, params Thread[] threads)
+        {
+            foreach (Thread thread in threads)
+            {
+                thread.Start();
+            }
+            _threadCounter.AssertThreadCount(count, timeToWait);
+        }
 
         private ThreadStart ExceptionRecordingAction(ThreadStart action)
         {
             return delegate
             {
+                _threadCounter.Increment();
                 try
                 {
                     action();
@@ -822,36 +935,32 @@ namespace Spring.Threading.Locks
 
         private Thread ExceptionRecordingThread(ThreadStart action)
         {
-            return new Thread(ExceptionRecordingAction(action));
+            return ExceptionRecordingThread(action, "Test Thread");
+        }
+
+        private Thread ExceptionRecordingThread(ThreadStart action, string name)
+        {
+            Thread t = new Thread(ExceptionRecordingAction(action));
+            t.Name = name;
+            return t;
         }
 
         private void InterruptedLock()
         {
-            try
+            Assert.Throws<ThreadInterruptedException>(delegate
             {
-                Assert.Throws<ThreadInterruptedException>(delegate
-                {
-                    _testee.LockInterruptibly();
-                });
-            }
-            catch (Exception e)
-            {
-                if (_threadException != null) _threadException = e;
-            }
+                _lock.LockInterruptibly();
+            });
         }
 
         private void InterruptibleLock()
         {
             try
             {
-                _testee.LockInterruptibly();
+                _lock.LockInterruptibly();
             }
             catch (ThreadInterruptedException)
             {
-            }
-            catch (Exception e)
-            {
-                if (_threadException != null) _threadException = e;
             }
         }
 
@@ -878,10 +987,7 @@ namespace Spring.Threading.Locks
             foreach (Thread thread in threads)
             {
                 thread.Join(timeToWait);
-            }
-            foreach (Thread thread in threads)
-            {
-                Assert.IsFalse(thread.IsAlive, "Thread {0} is expected to be terminated but still alive.", thread);
+                Assert.IsFalse(thread.IsAlive, "Thread {0} is expected to be terminated but still alive.", thread.Name);
             }
             VerifyThreads();
         }

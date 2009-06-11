@@ -12,7 +12,7 @@ using Spring.Threading.Future;
 
 namespace Spring.Threading.Execution
 {
-    [TestFixture]
+    [TestFixture, Ignore]
     public class ThreadPoolExecutorTests : BaseThreadingTestCase
     {
         private class ExtendedTPE : ThreadPoolExecutor

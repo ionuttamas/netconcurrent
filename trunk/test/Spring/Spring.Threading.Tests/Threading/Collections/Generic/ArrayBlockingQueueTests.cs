@@ -902,6 +902,7 @@ namespace Spring.Threading.Collections.Generic
 		[Test]
 		public void TimedPollWithOffer()
 		{
+            Assert.Fail("this hangs!");
 			ArrayBlockingQueue<object> q = new ArrayBlockingQueue<object>(2);
 			Thread t = new Thread(new AnonymousClassRunnable6(q).Run);
 			t.Start();
