@@ -146,32 +146,13 @@ namespace Spring.Threading.Locks
 
 			}
 
-            protected void IncreaseHold()
-            {
-                int nextHolds = ++_holds;
-                if (nextHolds < 0)
-                    throw new SystemException("Maximum lock count exceeded");
-                _holds = nextHolds;
-            }
-
 
             public virtual bool TryLock()
 			{
 				Thread caller = Thread.CurrentThread;
 				lock (this)
 				{
-					if (_owner == null)
-					{
-						_owner = caller;
-						_holds = 1;
-						return true;
-					}
-				    if (caller == _owner)
-				    {
-                        IncreaseHold();
-				        return true;
-				    }
-				    return false;
+				    return GetHold(caller);
 				}
 			}
 
@@ -201,6 +182,24 @@ namespace Spring.Threading.Locks
 			public abstract bool TryLock(TimeSpan timespan);
 			public abstract void Unlock();
 
+            protected bool GetHold(Thread caller)
+            {
+                if (_owner == null)
+                {
+                    _owner = caller;
+                    _holds = 1;
+                    return true;
+                }
+                if (caller == _owner)
+                {
+                    int holds = _holds;
+                    if (++holds < 0)
+                        throw new SystemException("Maximum lock count exceeded");
+                    _holds = holds;
+                    return true;
+                }
+                return false;
+            }
 		}
 
 		[Serializable]
@@ -220,47 +219,34 @@ namespace Spring.Threading.Locks
                 Thread caller = Thread.CurrentThread;
                 lock (this)
                 {
-                    if (_owner == null)
+                    if (GetHold(caller)) return;
+                    bool wasInterrupted = false;
+                    try
                     {
-                        _owner = caller;
-                        _holds = 1;
-                        return;
-                    }
-                    else if (caller == _owner)
-                    {
-                        IncreaseHold();
-                        return;
-                    }
-                    else
-                    {
-                        bool wasInterrupted = false;
-                        try
+                        while (true)
                         {
-                            while (true)
+                            try
                             {
-                                try
-                                {
-                                    Monitor.Wait(this);
-                                }
-                                catch (ThreadInterruptedException)
-                                {
-                                    wasInterrupted = true;
-                                    // no need to notify; if we were signalled, we
-                                    // will act as signalled, ignoring the
-                                    // interruption
-                                }
-                                if (_owner == null)
-                                {
-                                    _owner = caller;
-                                    _holds = 1;
-                                    return;
-                                }
+                                Monitor.Wait(this);
+                            }
+                            catch (ThreadInterruptedException)
+                            {
+                                wasInterrupted = true;
+                                // no need to notify; if we were signalled, we
+                                // will act as signalled, ignoring the
+                                // interruption
+                            }
+                            if (_owner == null)
+                            {
+                                _owner = caller;
+                                _holds = 1;
+                                return;
                             }
                         }
-                        finally
-                        {
-                            if (wasInterrupted) Thread.CurrentThread.Interrupt();
-                        }
+                    }
+                    finally
+                    {
+                        if (wasInterrupted) Thread.CurrentThread.Interrupt();
                     }
                 }
             }
@@ -271,18 +257,8 @@ namespace Spring.Threading.Locks
 				Thread caller = Thread.CurrentThread;
 				lock (this)
 				{
-				    if (_owner == null)
-					{
-						_owner = caller;
-						_holds = 1;
-						return;
-					}
-				    if (caller == _owner)
-				    {
-				        IncreaseHold();
-				        return;
-				    }
-				    try
+                    if (GetHold(caller)) return;
+                    try
 				    {
 				        do
 				        {
@@ -306,37 +282,22 @@ namespace Spring.Threading.Locks
 
 				lock (this)
 				{
-				    if (_owner == null)
-					{
-						_owner = caller;
-						_holds = 1;
-						return true;
-					}
-				    if (caller == _owner)
-				    {
-				        IncreaseHold();
-				        return true;
-				    }
+				    if (GetHold(caller)) return true;
 				    if (durationToWait.Ticks <= 0)
 				        return false;
-				    DateTime deadline = DateTime.Now + durationToWait;
+				    DateTime deadline = DateTime.UtcNow + durationToWait;
 				    try
 				    {
 				        for (;; )
 				        {
 				            Monitor.Wait(this, durationToWait);
-				            if (caller == _owner)
-				            {
-				                IncreaseHold();
-				                return true;
-				            }
-				            if (_owner == null)
-				            {
-				                _owner = caller;
-				                _holds = 1;
-				                return true;
-				            }
-				            durationToWait = deadline - DateTime.Now;
+                            if (_owner == null)
+                            {
+                                _owner = caller;
+                                _holds = 1;
+                                return true;
+                            }
+                            durationToWait = deadline - DateTime.UtcNow;
 				            if ( durationToWait.Ticks <= 0)
 				                return false;
 				        }
@@ -349,7 +310,7 @@ namespace Spring.Threading.Locks
 				}
 			}
 
-			public override void Unlock()
+		    public override void Unlock()
 			{
 				lock (this)
 				{
@@ -381,20 +342,10 @@ namespace Spring.Threading.Locks
 
 			public bool Recheck(WaitNode node)
 			{
+				Thread caller = Thread.CurrentThread;
 				lock (this)
 				{
-					Thread caller = Thread.CurrentThread;
-					if (_owner == null)
-					{
-						_owner = caller;
-						_holds = 1;
-						return true;
-					}
-				    if (caller == _owner)
-				    {
-				        IncreaseHold();
-				        return true;
-				    }
+                    if(GetHold(caller)) return true;
 				    _wq.Enqueue(node);
 					return false;
 				}
@@ -414,17 +365,7 @@ namespace Spring.Threading.Locks
                 Thread caller = Thread.CurrentThread;
                 lock (this)
                 {
-                    if (_owner == null)
-                    {
-                        _owner = caller;
-                        _holds = 1;
-                        return;
-                    }
-                    else if (caller == _owner)
-                    {
-                        IncreaseHold();
-                        return;
-                    }
+                    if(GetHold(caller)) return;
                 }
                 WaitNode n = new WaitNode();
                 n.DoWaitUninterruptibly(this);
@@ -436,18 +377,8 @@ namespace Spring.Threading.Locks
 				Thread caller = Thread.CurrentThread;
 				lock (this)
 				{
-					if (_owner == null)
-					{
-						_owner = caller;
-						_holds = 1;
-						return;
-					}
-					if (caller == _owner)
-					{
-						IncreaseHold();
-						return;
-					}
-				}
+                    if (GetHold(caller)) return;
+                }
 				WaitNode n = new WaitNode();
 				n.DoWait(this);
 			}
@@ -457,18 +388,8 @@ namespace Spring.Threading.Locks
 				Thread caller = Thread.CurrentThread;
 				lock (this)
 				{
-				    if (_owner == null)
-					{
-						_owner = caller;
-						_holds = 1;
-						return true;
-					}
-				    if (caller == _owner)
-				    {
-				        IncreaseHold();
-				        return true;
-				    }
-				}
+                    if (GetHold(caller)) return true;
+                }
 			    WaitNode n = new WaitNode();
 				return n.DoTimedWait(this, timespan);
 			}
