@@ -17,7 +17,7 @@
  */
 #endregion
 
-namespace Spring.Threading.InterlockedAtomics
+namespace Spring.Threading.AtomicTypes
 {
     /// <summary>
     /// Provide atomic access to an instance of <typeparamref name="T"/>.

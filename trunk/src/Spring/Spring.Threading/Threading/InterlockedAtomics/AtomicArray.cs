@@ -20,7 +20,7 @@
 
 using System;
 
-namespace Spring.Threading.InterlockedAtomics
+namespace Spring.Threading.AtomicTypes
 {
     /// <summary> 
     /// An array of instances of type <typeparamref name="T"/> in which 

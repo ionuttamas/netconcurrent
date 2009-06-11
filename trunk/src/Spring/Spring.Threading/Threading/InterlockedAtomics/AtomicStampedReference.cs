@@ -20,7 +20,7 @@
 
 using System;
 
-namespace Spring.Threading.InterlockedAtomics
+namespace Spring.Threading.AtomicTypes
 {
     /// <summary>
     /// An <see cref="AtomicStampedReference{T}"/> maintains an object reference

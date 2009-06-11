@@ -19,7 +19,7 @@
 #endregion
 using System;
 
-namespace Spring.Threading.InterlockedAtomics
+namespace Spring.Threading.AtomicTypes
 {
     /// <summary>
     /// Used to hold a value type in a reference type.

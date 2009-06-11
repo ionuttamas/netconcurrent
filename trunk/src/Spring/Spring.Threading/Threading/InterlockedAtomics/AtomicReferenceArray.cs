@@ -24,7 +24,7 @@ using System.Text;
 using System.Threading;
 using Spring.Collections.Generic;
 
-namespace Spring.Threading.InterlockedAtomics
+namespace Spring.Threading.AtomicTypes
 {
     /// <summary> 
     /// An array of object references in which elements may be updated

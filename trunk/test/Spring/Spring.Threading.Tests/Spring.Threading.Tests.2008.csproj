@@ -122,15 +122,6 @@
     <Compile Include="StandardsComplianceTest.cs" />
     <Compile Include="TestData.cs" />
     <Compile Include="TestHelper.cs" />
-    <Compile Include="Threading\AtomicTypes\AtomicBooleanTests.cs" />
-    <Compile Include="Threading\AtomicTypes\AtomicIntegerArrayTests.cs" />
-    <Compile Include="Threading\AtomicTypes\AtomicIntegerTests.cs" />
-    <Compile Include="Threading\AtomicTypes\AtomicLongArrayTests.cs" />
-    <Compile Include="Threading\AtomicTypes\AtomicLongTests.cs" />
-    <Compile Include="Threading\AtomicTypes\AtomicMarkableReferenceTests.cs" />
-    <Compile Include="Threading\AtomicTypes\AtomicReferenceArrayTests.cs" />
-    <Compile Include="Threading\AtomicTypes\AtomicReferenceTests.cs" />
-    <Compile Include="Threading\AtomicTypes\AtomicStampedReferenceTests.cs" />
     <Compile Include="Threading\CallableTest.cs" />
     <Compile Include="Threading\Collections\Generic\ArrayBlockingQueueTests.cs" />
     <Compile Include="Threading\Collections\Generic\CopyOnWriteArrayListTests.cs" />

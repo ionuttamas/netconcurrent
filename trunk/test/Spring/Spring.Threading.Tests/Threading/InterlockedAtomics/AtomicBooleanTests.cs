@@ -24,7 +24,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.Threading;
 using NUnit.Framework;
 
-namespace Spring.Threading.InterlockedAtomics
+namespace Spring.Threading.AtomicTypes
 {
     /// <summary>
     /// Unit tests for the AtomicBoolean class

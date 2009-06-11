@@ -3,7 +3,7 @@ using System.Collections;
 using NUnit.Framework;
 using Rhino.Mocks;
 
-namespace Spring.Threading.InterlockedAtomics
+namespace Spring.Threading.AtomicTypes
 {
     /// <summary>
     /// Test cases for <see cref="AbstractAtomicArray{T}"/>
