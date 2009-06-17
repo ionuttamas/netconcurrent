@@ -104,6 +104,7 @@
     <Compile Include="Collections\Generic\TransformingEnumerator.cs" />
     <Compile Include="Collections\Generic\TransformingList.cs" />
     <Compile Include="CommonAssemblyInfo.cs" />
+    <Compile Include="ExceptionExtensions.cs" />
     <Compile Include="Threading\BoundedBuffer.cs" />
     <Compile Include="Threading\BoundedLinkedQueue.cs" />
     <Compile Include="Threading\BoundedPriorityQueue.cs" />
