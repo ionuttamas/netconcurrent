@@ -1,36 +1,83 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Text;
 using NUnit.Framework;
 
 namespace Spring.Collections
 {
+
+    /*
+
+    [TestFixture(typeof(string))]
+    [TestFixture(typeof(int))]
+    public class ListAsCollectionTest<T> : CollectionTestFixture
+    {
+        protected override ICollection NewCollection()
+        {
+            return new System.Collections.Generic.List<T>(TestData<T>.MakeTestArray(55));
+        }
+    }
+
+    [TestFixture(typeof(string))]
+    [TestFixture(typeof(int))]
+    public class ArrayListAsCollectionTest<T> : CollectionTestFixture
+    {
+        protected override ICollection NewCollection()
+        {
+            return new ArrayList(TestData<T>.MakeTestArray(55));
+        }
+    }
+
+    [TestFixture(typeof(string))]
+    [TestFixture(typeof(int))]
+    public class ArrayAsCollectionTest<T> : CollectionTestFixture
+    {
+        [SetUp]
+        public void SetUp()
+        {
+            AntiHangingLimit = 600;
+        }
+        protected override ICollection NewCollection()
+        {
+            return TestData<T>.MakeTestArray(555);
+        }
+    }
+
+     */
+
     /// <summary>
     /// Basic functionality test cases for implementation of <see cref="ICollection"/>.
     /// </summary>
     /// <author>Kenneth Xu</author>
-    public abstract class CollectionFunctionTestBase : EnumerableFunctionTestBase
+    public abstract class CollectionTestFixture : EnumerableTestFixture
     {
-        protected sealed override IEnumerable Enumerable
+        protected override sealed IEnumerable NewEnumerable()
         {
-            get { return Collection; }
+            return NewCollection();
         }
 
-        protected abstract ICollection Collection { get; }
+        protected abstract ICollection NewCollection();
 
         [Test] public void CopyToChokesWithNullArray()
         {
             Assert.Throws<ArgumentNullException>(delegate
             {
-                Collection.CopyTo(null, 0);
+                NewCollection().CopyTo(null, 0);
+            });
+        }
+
+        [Test] public void CopyToChokesOnMultiDimensionArray()
+        {
+            ICollection c = NewCollection();
+            Assert.Throws<ArgumentException>(delegate
+            {
+                c.CopyTo(new object[c.Count, 2], 0);
             });
         }
 
 
         [Test] public void CopyToChokesWithNegativeIndex()
         {
-            var c = Collection;
+            ICollection c = NewCollection();
             Assert.Throws<ArgumentOutOfRangeException>(delegate
             {
                 c.CopyTo(new object[0], -1);
@@ -44,7 +91,7 @@ namespace Spring.Collections
 
         [Test] public void CopyToChokesWhenArrayIsTooSmallToHold()
         {
-            var c = Collection;
+            ICollection c = NewCollection();
             Assert.Throws<ArgumentException>(delegate
             {
                 c.CopyTo(new object[c.Count -1], 0);
@@ -61,35 +108,18 @@ namespace Spring.Collections
 
         [Test] public void CopyToZeroLowerBoundArray()
         {
-            var c = Collection;
-            var target = new object[c.Count];
+            ICollection c = NewCollection();
+            object[] target = new object[c.Count];
             c.CopyTo(target, 0);
             CollectionAssert.AreEqual(target, c);
         }
 
         [Test] public void CopyToArbitraryLowerBoundArray()
         {
-            var c = Collection;
-            var target = NewArray<object>(1, c.Count);
+            ICollection c = NewCollection();
+            Array target = NewArray<object>(1, c.Count);
             c.CopyTo(target, 1);
             CollectionAssert.AreEqual(target, c);
-        }
-
-        public void CopyTo(Array array, int index)
-        {
-            var collection = Collection;
-            object[] objects = new object[10];
-            collection.CopyTo(objects, 0);
-        }
-
-        public void SyncRoot()
-        {
-            
-        }
-
-        public void IsSynchronized()
-        {
-            
         }
 
         private static Array NewArray<T>(int from, int to)
@@ -100,31 +130,6 @@ namespace Spring.Collections
                 new int[] { from }); // lower bound
         }
 
-    }
-
-    [TestFixture(typeof(string))]
-    [TestFixture(typeof(int))]
-    public class ListAsCollectionTest<T> : CollectionFunctionTestBase
-    {
-        protected override ICollection Collection
-        {
-            get { return new ArrayList(TestData<T>.MakeTestArray(55)); }
-        }
-    }
-
-    [TestFixture(typeof(string))]
-    [TestFixture(typeof(int))]
-    public class ArrayAsCollectionTest<T> : CollectionFunctionTestBase
-    {
-        [SetUp]
-        public void SetUp()
-        {
-            AntiHangingLimit = 600;
-        }
-        protected override ICollection Collection
-        {
-            get { return TestData<T>.MakeTestArray(555); }
-        }
     }
 
 }

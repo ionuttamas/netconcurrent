@@ -4,29 +4,29 @@ using NUnit.Framework;
 
 namespace Spring.Collections
 {
-    /* Example usage of EnumeratorFunctionTestBase
+    /* Example usage of EnumeratorTestFixture
  
         [TestFixture(typeof(string))]
         [TestFixture(typeof(int))]
-        public class ListEnumeratorTest<T> : EnumeratorFunctionTestBase
+        public class ListEnumeratorTest<T> : EnumeratorTestFixture
         {
-            protected override IEnumerator Enumerator
+            protected override IEnumerator NewEnumerator()
             {
-                get { return new ArrayList(TestData<T>.MakeTestArray(55)).GetEnumerator(); }
+                return new ArrayList(TestData<T>.MakeTestArray(55)).GetEnumerator();
             }
         }
 
         [TestFixture(typeof(string))]
         [TestFixture(typeof(int))]
-        public class ArrayEnumeratorTest<T> : EnumeratorFunctionTestBase
+        public class ArrayEnumeratorTest<T> : EnumeratorTestFixture
         {
             [SetUp] public void SetUp()
             {
                 AntiHangingLimit = 600;
             }
-            protected override IEnumerator Enumerator
+            protected override IEnumerator NewEnumerator()
             {
-                get { return TestData<T>.MakeTestArray(555).GetEnumerator(); }
+                return TestData<T>.MakeTestArray(555).GetEnumerator();
             }
         }
 
@@ -36,7 +36,7 @@ namespace Spring.Collections
     /// Basic functionality test cases for implementation of <see cref="IEnumerator"/>.
     /// </summary>
     /// <author>Kenneth Xu</author>
-    public abstract class EnumeratorFunctionTestBase
+    public abstract class EnumeratorTestFixture
     {
         private int _antiHangingLimit = 512;
         protected int AntiHangingLimit
@@ -45,20 +45,26 @@ namespace Spring.Collections
             set { _antiHangingLimit = value; }
         }
 
-        protected abstract IEnumerator Enumerator { get; }
+        protected abstract IEnumerator NewEnumerator();
 
         [Test] public void IteratingThroughEnumeratorOnce()
         {
-            Iterate(Enumerator);
+            Iterate(NewEnumerator());
         }
 
         [Test] public void IterateEnumeratorResetAndIterateAgain()
         {
-            IEnumerator e = Enumerator;
+            IEnumerator e = NewEnumerator();
             int count = Iterate(e);
-            e.Reset();
+            try
+            {
+                e.Reset();
+            }
+            catch(NotSupportedException)
+            {
+                return;
+            }
             Assert.That(Iterate(e), Is.EqualTo(count));
-
         }
 
         private int Iterate(IEnumerator enumerator)

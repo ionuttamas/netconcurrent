@@ -133,8 +133,8 @@ namespace Spring.Collections.Generic
         /// </exception>
         public virtual void CopyTo(T[] array, int arrayIndex)
         {
-            if (arrayIndex<0) throw new ArgumentOutOfRangeException("arrayIndex: " + arrayIndex);
             if (array == null) throw new ArgumentNullException("array");
+            if (arrayIndex<array.GetLowerBound(0)) throw new ArgumentOutOfRangeException("arrayIndex: " + arrayIndex);
             try
             {
                 foreach (T e in this) array[arrayIndex++] = e;
@@ -358,8 +358,8 @@ namespace Spring.Collections.Generic
         /// <filterpriority>2</filterpriority>
         protected virtual void CopyTo(Array array, int index)
         {
-            if (index < 0) throw new ArgumentOutOfRangeException("index: " + index);
             if (array == null) throw new ArgumentNullException("array");
+            if (index < array.GetLowerBound(0)) throw new ArgumentOutOfRangeException("index: " + index);
             try
             {
                 foreach (T e in this) array.SetValue(e, index++);

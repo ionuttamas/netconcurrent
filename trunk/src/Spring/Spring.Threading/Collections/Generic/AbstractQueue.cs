@@ -239,7 +239,12 @@ namespace Spring.Collections.Generic
 
         #region IQueue Members
 
-        //TODO: In IQueue, Why there is Add, which the same as Offer.
+        /// <summary>
+        /// Add differ from <see cref="IQueue.Offer"/> by throwing exception
+        /// When queue is full.
+        /// </summary>
+        /// <param name="objectToAdd"></param>
+        /// <returns></returns>
         bool IQueue.Add(object objectToAdd)
         {
             Add((T) objectToAdd);
@@ -282,7 +287,11 @@ namespace Spring.Collections.Generic
             return Poll(out element) ? (object)element : null;
         }
 
-        //TODO: In IQueue, Why there is Remove, which the same as Pull.
+        /// <summary>
+        /// Remove differ from <see cref="IQueue.Poll"/> by throwing exception
+        /// When queue is empty.
+        /// </summary>
+        /// <returns></returns>
         object IQueue.Remove()
         {
             return Remove();
