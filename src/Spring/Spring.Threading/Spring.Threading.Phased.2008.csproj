@@ -84,12 +84,14 @@
   <ItemGroup>
     <Compile Include="AssemblyInfo.cs" />
     <Compile Include="Collections\Generic\AbstractCollection.cs" />
+    <Compile Include="Collections\Generic\AbstractEnumerator.cs" />
     <Compile Include="Collections\Generic\AbstractList.cs" />
     <Compile Include="Collections\Generic\AbstractQueue.cs" />
     <Compile Include="Collections\Generic\ArrayQueue.cs" />
     <Compile Include="Collections\Generic\IQueue.cs" />
     <Compile Include="Collections\Generic\PriorityQueue.cs" />
     <Compile Include="CommonAssemblyInfo.cs" />
+    <Compile Include="ExceptionExtensions.cs" />
     <Compile Include="Threading\AtomicTypes\AbstractAtomicArray.cs" />
     <Compile Include="Threading\AtomicTypes\Atomic.cs" />
     <Compile Include="Threading\AtomicTypes\AtomicArray.cs" />

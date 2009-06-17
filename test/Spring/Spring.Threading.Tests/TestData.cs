@@ -21,7 +21,7 @@ namespace Spring
 
         public static T MakeData(int i)
         {
-            return (T) Convert.ChangeType(1, typeof (T));
+            return (T) Convert.ChangeType(i, typeof (T));
         }
 
         public static T[] MakeTestArray(int count)
